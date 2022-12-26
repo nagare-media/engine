@@ -1,0 +1,12 @@
+apiVersion: engine.nagare.media/v1alpha1
+kind: ClusterFunction
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterfunction
+    app.kubernetes.io/instance: clusterfunction-sample
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: nagare-media-engine
+  name: clusterfunction-sample
+spec:
+  # TODO(user): Add fields here

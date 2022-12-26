@@ -1,0 +1,23 @@
+# Binaries for programs and plugins
+bin/
+testbin/*
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Miscellaneous build output
+out/
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories
+vendor/
+
+# Temporary directories
+tmp/

@@ -1,0 +1,374 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  creationTimestamp: null
+  name: mutating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-cluster
+  failurePolicy: Fail
+  name: mcluster.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clusters
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-clusterfunction
+  failurePolicy: Fail
+  name: mclusterfunction.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clusterfunctions
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-clustermedialocation
+  failurePolicy: Fail
+  name: mclustermedialocation.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clustermedialocations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-clustertasktemplate
+  failurePolicy: Fail
+  name: mclustertasktemplate.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clustertasktemplates
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-function
+  failurePolicy: Fail
+  name: mfunction.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - functions
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-medialocation
+  failurePolicy: Fail
+  name: mmedialocation.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - medialocations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-task
+  failurePolicy: Fail
+  name: mtask.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - tasks
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-tasktemplate
+  failurePolicy: Fail
+  name: mtasktemplate.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - tasktemplates
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-workflow
+  failurePolicy: Fail
+  name: mworkflow.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - workflows
+  sideEffects: None
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  creationTimestamp: null
+  name: validating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-cluster
+  failurePolicy: Fail
+  name: vcluster.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clusters
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-clusterfunction
+  failurePolicy: Fail
+  name: vclusterfunction.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clusterfunctions
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-clustermedialocation
+  failurePolicy: Fail
+  name: vclustermedialocation.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clustermedialocations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-clustertasktemplate
+  failurePolicy: Fail
+  name: vclustertasktemplate.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clustertasktemplates
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-function
+  failurePolicy: Fail
+  name: vfunction.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - functions
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-medialocation
+  failurePolicy: Fail
+  name: vmedialocation.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - medialocations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-task
+  failurePolicy: Fail
+  name: vtask.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - tasks
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-tasktemplate
+  failurePolicy: Fail
+  name: vtasktemplate.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - tasktemplates
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-workflow
+  failurePolicy: Fail
+  name: vworkflow.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - workflows
+  sideEffects: None

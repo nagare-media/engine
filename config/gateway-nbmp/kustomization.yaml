@@ -1,0 +1,5 @@
+resources:
+- gateway-nbmp.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true

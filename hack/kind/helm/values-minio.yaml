@@ -1,0 +1,39 @@
+mode: standalone
+
+DeploymentUpdate:
+  type: RollingUpdate
+  maxUnavailable: 1
+
+rootUser: root
+rootPassword: rootroot
+
+replicas: 1
+
+persistence:
+  enabled: true
+  storageClass: standard
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+ingress:
+  enabled: true
+  path: /
+  hosts:
+    - s3.local.gd
+
+consoleIngress:
+  enabled: true
+  hosts:
+    - minio.local.gd
+
+users:
+  - accessKey: MLYEAE6AES7IUSL4APYL
+    secretKey: snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H
+    policy: readwrite
+
+buckets:
+  - name: nagare-media-engine
+    policy: none
+    purge: false
+    versioning: false
+    objectlocking: false

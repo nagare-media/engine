@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrolebinding
+    app.kubernetes.io/instance: gateway-nbmp-rolebinding
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: nagare-media-engine
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/managed-by: kustomize
+  name: gateway-nbmp-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gateway-nbmp
+subjects:
+- kind: ServiceAccount
+  name: gateway-nbmp
+  namespace: system

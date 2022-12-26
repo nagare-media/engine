@@ -1,0 +1,86 @@
+#!/bin/bash
+
+# Copyright 2022 The nagare media authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Validation
+
+[ -n "${TESTENV_K8S_VERSION}" ] || fatal "mandatory variable \$TESTENV_K8S_VERSION is empty"
+[ -n "${TESTENV_INGRESS_NGINX_VERSION}" ] || fatal "mandatory variable \$TESTENV_INGRESS_NGINX_VERSION is empty"
+[ -n "${TESTENV_CERT_MANAGER_VERSION}" ] || fatal "mandatory variable \$TESTENV_CERT_MANAGER_VERSION is empty"
+[ -n "${TESTENV_KUBE_PROMETHEUS_STACK_VERSION}" ] || fatal "mandatory variable \$TESTENV_KUBE_PROMETHEUS_STACK_VERSION is empty"
+[ -n "${TESTENV_TEMPO_VERSION}" ] || fatal "mandatory variable \$TESTENV_TEMPO_VERSION is empty"
+[ -n "${TESTENV_MINIO_VERSION}" ] || fatal "mandatory variable \$TESTENV_MINIO_VERSION is empty"
+[ -n "${TESTENV_NATS_VERSION}" ] || fatal "mandatory variable \$TESTENV_NATS_VERSION is empty"
+
+# Variables
+
+CLUSTER_NAME=nagare-media
+
+# Main
+
+# skip if cluster already exists
+if kind get clusters | grep -q "${CLUSTER_NAME}"; then
+  kubectl config use kind-nagare-media
+  exit
+fi
+
+# create cluster
+kind create cluster \
+  --name ${CLUSTER_NAME} \
+  --image "kindest/node:v${TESTENV_K8S_VERSION}" \
+  --config hack/kind/config.yaml \
+  --wait 300s
+
+# deploy ingress-nginx
+helm upgrade --install --wait --timeout 15m \
+  --namespace ingress-nginx --create-namespace \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  ingress-nginx ingress-nginx --version "${TESTENV_INGRESS_NGINX_VERSION}" \
+  --values - < hack/kind/helm/values-ingress-nginx.yaml
+
+# deploy cert-manager
+helm upgrade --install --wait --timeout 15m \
+  --namespace cert-manager --create-namespace \
+  --repo https://charts.jetstack.io \
+  cert-manager cert-manager --version "${TESTENV_CERT_MANAGER_VERSION}" \
+  --values - < hack/kind/helm/values-cert-manager.yaml
+
+# deploy Prometheus, Prometheus Operator, Grafana, ...
+helm upgrade --install --wait --timeout 15m \
+  --namespace monitoring --create-namespace \
+  --repo https://prometheus-community.github.io/helm-charts \
+  kube-prometheus-stack kube-prometheus-stack --version "${TESTENV_KUBE_PROMETHEUS_STACK_VERSION}" \
+  --values - < hack/kind/helm/values-kube-prometheus-stack.yaml
+
+# deploy Grafana Tempo
+helm upgrade --install --wait --timeout 15m \
+  --namespace monitoring --create-namespace \
+  --repo https://grafana.github.io/helm-charts \
+  tempo tempo --version "${TESTENV_TEMPO_VERSION}" \
+  --values - < hack/kind/helm/values-tempo.yaml
+
+# deploy MinIO as S3 implementation
+helm upgrade --install --wait --timeout 15m \
+  --namespace s3 --create-namespace \
+  --repo https://charts.min.io/ \
+  minio minio --version "${TESTENV_MINIO_VERSION}" \
+  --values - < hack/kind/helm/values-minio.yaml
+
+# deploy NATS
+helm upgrade --install --wait --timeout 15m \
+  --namespace nats --create-namespace \
+  --repo https://nats-io.github.io/k8s/helm/charts/ \
+  nats nats --version "${TESTENV_NATS_VERSION}" \
+  --values - < hack/kind/helm/values-nats.yaml

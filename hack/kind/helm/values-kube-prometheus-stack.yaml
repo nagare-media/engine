@@ -1,0 +1,58 @@
+prometheus:
+  ingress:
+    enabled: true
+    hosts:
+      - prometheus.local.gd
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: standard
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+alertmanager:
+  ingress:
+    enabled: true
+    hosts:
+      - alertmanager.local.gd
+  alertmanagerSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: standard
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+grafana:
+  adminPassword: admin
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_role: Admin
+  ingress:
+    enabled: true
+    hosts:
+      - grafana.local.gd
+  additionalDataSources:
+    - name: Tempo
+      type: tempo
+      access: proxy
+      url: http://tempo.monitoring:3100
+      orgId: 1
+      version: 1
+      editable: false
+      jsonData:
+        httpMethod: GET
+        search:
+          hide: false
+        nodeGraph:
+          enabled: true
+
+kubeEtcd:
+  service:
+    targetPort: 2381

@@ -1,0 +1,33 @@
+nats:
+  jetstream:
+    enabled: true
+    memStorage:
+      enabled: true
+      size: 512Mi
+    fileStorage:
+      enabled: true
+      size: 10Gi
+      storageClassName: standard
+      accessModes:
+        - ReadWriteOnce
+  # tls:
+  #   allowNonTLS: false
+
+natsbox:
+  enabled: true
+
+exporter:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+
+auth:
+  enabled: true
+  basic:
+    users:
+      - user: nagare-media-engine
+        password: nagare-media-engine
+    defaultPermissions:
+      publish: [">"]
+      subscribe: [">"]

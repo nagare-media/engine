@@ -1,0 +1,12 @@
+resources:
+# manager
+- service_account-manager.yaml
+- role-manager.yaml
+- role_binding-manager.yaml
+- leader_election_role-manager.yaml
+- leader_election_role_binding-manager.yaml
+
+# gateway-nbmp
+- service_account-gateway-nbmp.yaml
+- role-gateway-nbmp.yaml
+- role_binding-gateway-nbmp.yaml

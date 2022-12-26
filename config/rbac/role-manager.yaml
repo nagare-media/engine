@@ -1,0 +1,59 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager
+rules:
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - tasks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - tasks/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - tasks/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - workflows
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - workflows/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - workflows/status
+  verbs:
+  - get
+  - patch
+  - update
