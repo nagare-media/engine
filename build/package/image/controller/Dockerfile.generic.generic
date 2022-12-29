@@ -57,4 +57,11 @@ WORKDIR /
 COPY --from=build "/app/bin/manager-${VERSION}-${OS}-${ARCH}" /manager
 USER 65532:65532
 
+# metrics
+EXPOSE 8080
+# health probe
+EXPOSE 8081
+# webhooks
+EXPOSE 9443
+
 CMD [ "/manager" ]

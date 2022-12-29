@@ -57,4 +57,7 @@ WORKDIR /
 COPY --from=build "/app/bin/gateway-nbmp-${VERSION}-${OS}-${ARCH}" /gateway-nbmp
 USER 65532:65532
 
+# API
+EXPOSE 8080
+
 CMD [ "/gateway-nbmp" ]
