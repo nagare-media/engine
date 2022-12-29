@@ -18,11 +18,14 @@ package cli
 
 import (
 	"flag"
+	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	"github.com/mattn/go-isatty"
+	"go.uber.org/zap/zapcore"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -52,13 +55,23 @@ func Execute() error {
 		"The controller will load its initial configuration from this file. "+
 			"Omit this flag to use the default configuration values. "+
 			"Command-line flags override configuration from this file.")
-	opts := zap.Options{
-		Development: true,
+
+	logOpts := zap.Options{
+		TimeEncoder: zapcore.ISO8601TimeEncoder,
 	}
-	opts.BindFlags(flag.CommandLine)
+	logOpts.EncoderConfigOptions = []zap.EncoderConfigOption{
+		func(ec *zapcore.EncoderConfig) {
+			ec.EncodeLevel = zapcore.LowercaseLevelEncoder
+			if logOpts.Development && (isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())) {
+				ec.EncodeLevel = zapcore.LowercaseColorLevelEncoder
+			}
+		},
+	}
+	logOpts.BindFlags(flag.CommandLine)
+
 	flag.Parse()
 
-	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&logOpts)))
 
 	var err error
 	// TODO: set default values
