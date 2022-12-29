@@ -3,3 +3,8 @@ resources:
 
 generatorOptions:
   disableNameSuffixHash: true
+
+configMapGenerator:
+- name: gateway-nbmp-config
+  files:
+  - gateway_nbmp_configuration

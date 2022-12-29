@@ -48,6 +48,8 @@ spec:
       containers:
       - command:
         - /gateway-nbmp
+        args:
+        - "--config=gateway_nbmp_configuration.yaml"
         image: ghcr.io/nagare-media/engine/gateway-nbmp:dev
         name: gateway-nbmp
         securityContext:
@@ -76,5 +78,13 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
+        volumeMounts:
+        - name: gateway-nbmp-config
+          mountPath: /gateway_nbmp_configuration.yaml
+          subPath: gateway_nbmp_configuration.yaml
+      volumes:
+      - name: gateway-nbmp-config
+        configMap:
+          name: gateway-nbmp-config
       serviceAccountName: gateway-nbmp
       terminationGracePeriodSeconds: 10
