@@ -2,7 +2,7 @@ apiVersion: engine.nagare.media/v1alpha1
 kind: ControllerManagerConfiguration
 metadata:
   labels:
-    app.kubernetes.io/name: controllermanagerconfig
+    app.kubernetes.io/name: controllermanagerconfiguration
     app.kubernetes.io/instance: controller-manager-configuration
     app.kubernetes.io/component: manager
     app.kubernetes.io/created-by: nagare-media-engine
