@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	enginev1alpha1 "github.com/nagare-media/engine/api/v1alpha1"
+	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 // WorkflowReconciler reconciles a Workflow object
@@ -57,6 +57,6 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 // SetupWithManager sets up the controller with the Manager.
 func (r *WorkflowReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&enginev1alpha1.Workflow{}).
+		For(&enginev1.Workflow{}).
 		Complete(r)
 }
