@@ -32,7 +32,7 @@ import (
 
 	"github.com/mattn/go-isatty"
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
-	"github.com/nagare-media/engine/internal/gateway-nbmp/web"
+	"github.com/nagare-media/engine/internal/gateway-nbmp/http"
 	"github.com/nagare-media/engine/internal/pkg/version"
 )
 
@@ -122,7 +122,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	// start components
 
-	ws := web.NewServer(c.Config.Webserver)
+	ws := http.NewServer(c.Config.Webserver)
 	if err := ws.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running webserver")
 		return err

@@ -44,6 +44,9 @@ type WebserverConfiguration struct {
 	// +kubebuilder:validation:Enum=tcp;tcp4;tcp6
 	// +optional
 	Network *string `json:"network"`
+
+	// +optional
+	PublicBaseURL *string `json:"publicBaseURL"`
 }
 
 func (wc *WebserverConfiguration) Default() {
