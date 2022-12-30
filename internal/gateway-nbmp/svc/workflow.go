@@ -50,7 +50,10 @@ func (wfsvc *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) e
 
 	// the ID should initially be empty
 	if wf.General.ID != "" {
-		// TODO: Ack ??
+		wf.Acknowledge = &nbmpv2.Acknowledge{
+			Status: nbmpv2.FailedAcknowledgeStatus,
+			Failed: []string{"$.general.id"},
+		}
 		return ErrInvalid
 	}
 	wf.General.ID = uuid.UUIDv4()
