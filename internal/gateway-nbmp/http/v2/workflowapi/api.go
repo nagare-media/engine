@@ -25,6 +25,7 @@ import (
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/gateway-nbmp/http/api"
+	nbmpapiv2 "github.com/nagare-media/engine/internal/gateway-nbmp/http/v2"
 	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
 	"github.com/nagare-media/engine/pkg/http"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
@@ -83,7 +84,7 @@ func (wfapi *workflowapi) handleRequest(svcCall func(ctx context.Context, wf *nb
 		// service call
 		err := svcCall(ctx, wf)
 		if err != nil {
-			return wfapi.svcErrorHandler(c, wf, err)
+			return nbmpapiv2.SvcErrorHandler(c, wf, err)
 		}
 
 		// create response
@@ -125,29 +126,4 @@ func (wfapi *workflowapi) handleRequest(svcCall func(ctx context.Context, wf *nb
 
 		return c.Send(respBody)
 	}
-}
-
-func (wfapi *workflowapi) svcErrorHandler(c *fiber.Ctx, wf *nbmpv2.Workflow, svcErr error) error {
-	var s int
-	switch svcErr {
-	// responses without a body
-	default:
-		return fiber.ErrInternalServerError
-	case svc.ErrNotFound:
-		return fiber.ErrNotFound
-
-	// responses with a body including error details
-	case svc.ErrUnsupported:
-		s = fiber.StatusUnprocessableEntity
-	case svc.ErrInvalid:
-		s = fiber.StatusBadRequest
-	}
-
-	c.Status(s)
-	respBody, err := json.Marshal(wf)
-	if err != nil {
-		return fiber.ErrInternalServerError
-	}
-
-	return c.Send(respBody)
 }
