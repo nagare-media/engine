@@ -34,12 +34,15 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/gateway-nbmp/http"
 	"github.com/nagare-media/engine/internal/pkg/version"
+	"github.com/nagare-media/engine/pkg/inject"
 )
 
 type cli struct {
 	Config enginev1.GatewayNBMPConfiguration
 	scheme *runtime.Scheme
 }
+
+var _ inject.Scheme = &cli{}
 
 func New() *cli {
 	return &cli{}
