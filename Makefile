@@ -155,7 +155,7 @@ build: $(addprefix build-, $(CMDS)) ## Build all binaries
 
 ## build-manager:      ## Build controller manager binary
 ## build-gateway-nbmp: ## Build NBMP gateway binary
-build-%: generate-go-deepcopy fmt vet
+build-%: generate-modules generate-go-deepcopy fmt vet
 	@	CMD="$*" \
 		PKG="$(PKG)" \
 		OS="$(OS)" \
