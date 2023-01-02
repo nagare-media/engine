@@ -13,7 +13,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-clusterfunction
   failurePolicy: Fail
-  name: mclusterfunction.kb.io
+  name: mclusterfunction.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -33,7 +33,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-clustermedialocation
   failurePolicy: Fail
-  name: mclustermedialocation.kb.io
+  name: mclustermedialocation.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -53,7 +53,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-clustermediaprocessingentity
   failurePolicy: Fail
-  name: mclustermediaprocessingentity.kb.io
+  name: mclustermediaprocessingentity.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -73,7 +73,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-clustertasktemplate
   failurePolicy: Fail
-  name: mclustertasktemplate.kb.io
+  name: mclustertasktemplate.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -93,7 +93,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-function
   failurePolicy: Fail
-  name: mfunction.kb.io
+  name: mfunction.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -113,7 +113,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-medialocation
   failurePolicy: Fail
-  name: mmedialocation.kb.io
+  name: mmedialocation.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -133,7 +133,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-mediaprocessingentity
   failurePolicy: Fail
-  name: mmediaprocessingentity.kb.io
+  name: mmediaprocessingentity.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -153,7 +153,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-task
   failurePolicy: Fail
-  name: mtask.kb.io
+  name: mtask.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -173,7 +173,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-tasktemplate
   failurePolicy: Fail
-  name: mtasktemplate.kb.io
+  name: mtasktemplate.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -193,7 +193,7 @@ webhooks:
       namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-workflow
   failurePolicy: Fail
-  name: mworkflow.kb.io
+  name: mworkflow.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -220,7 +220,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-clusterfunction
   failurePolicy: Fail
-  name: vclusterfunction.kb.io
+  name: vclusterfunction.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -240,7 +240,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-clustermedialocation
   failurePolicy: Fail
-  name: vclustermedialocation.kb.io
+  name: vclustermedialocation.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -260,7 +260,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity
   failurePolicy: Fail
-  name: vclustermediaprocessingentity.kb.io
+  name: vclustermediaprocessingentity.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -280,7 +280,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-clustertasktemplate
   failurePolicy: Fail
-  name: vclustertasktemplate.kb.io
+  name: vclustertasktemplate.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -300,7 +300,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-function
   failurePolicy: Fail
-  name: vfunction.kb.io
+  name: vfunction.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -320,7 +320,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-medialocation
   failurePolicy: Fail
-  name: vmedialocation.kb.io
+  name: vmedialocation.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -340,7 +340,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-mediaprocessingentity
   failurePolicy: Fail
-  name: vmediaprocessingentity.kb.io
+  name: vmediaprocessingentity.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -360,7 +360,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-task
   failurePolicy: Fail
-  name: vtask.kb.io
+  name: vtask.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -380,7 +380,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-tasktemplate
   failurePolicy: Fail
-  name: vtasktemplate.kb.io
+  name: vtasktemplate.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
@@ -400,7 +400,7 @@ webhooks:
       namespace: system
       path: /validate-engine-nagare-media-v1alpha1-workflow
   failurePolicy: Fail
-  name: vworkflow.kb.io
+  name: vworkflow.engine.nagare.media
   rules:
   - apiGroups:
     - engine.nagare.media
