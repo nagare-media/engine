@@ -16,8 +16,10 @@
 
 # Variables
 
-CLUSTER_NAME=nagare-media
+MANAGEMENT_CLUSTER_NAME=nagare-media-mgmt
+EDGE_CLUSTER_NAME=nagare-media-edge
 
 # Main
 
-kind delete cluster --name "${CLUSTER_NAME}"
+kind delete cluster --name "${MANAGEMENT_CLUSTER_NAME}"
+kind delete cluster --name "${EDGE_CLUSTER_NAME}"

@@ -26,22 +26,36 @@
 
 # Variables
 
-CLUSTER_NAME=nagare-media
+MANAGEMENT_CLUSTER_NAME=nagare-media-mgmt
+EDGE_CLUSTER_NAME=nagare-media-edge
 
 # Main
 
 # skip if cluster already exists
-if kind get clusters | grep -q "${CLUSTER_NAME}"; then
-  kubectl config use kind-nagare-media
+if kind get clusters 2> /dev/null | grep -q "${MANAGEMENT_CLUSTER_NAME}"; then
+  kubectl config use "kind-${MANAGEMENT_CLUSTER_NAME}"
   exit
 fi
 
-# create cluster
+# create clusters
 kind create cluster \
-  --name ${CLUSTER_NAME} \
+  --name ${MANAGEMENT_CLUSTER_NAME} \
   --image "kindest/node:v${TESTENV_K8S_VERSION}" \
-  --config hack/kind/config.yaml \
+  --config "hack/kind/config-${MANAGEMENT_CLUSTER_NAME}.yaml" \
   --wait 300s
+
+kind create cluster \
+  --name ${EDGE_CLUSTER_NAME} \
+  --image "kindest/node:v${TESTENV_K8S_VERSION}" \
+  --config "hack/kind/config-${EDGE_CLUSTER_NAME}.yaml" \
+  --wait 300s
+
+# create kubeconfig secret in management cluster to get access to edge cluster
+kubectl config use "kind-${MANAGEMENT_CLUSTER_NAME}"
+kubectl create secret generic edge-cluster-kubeconfig "--from-literal=kubeconfig=$(
+  # --internal works since all kind clusters are created using the same Docker network bridge
+  kind get kubeconfig --name "${EDGE_CLUSTER_NAME}" --internal
+)"
 
 # deploy ingress-nginx
 helm upgrade --install --wait --timeout 15m \
