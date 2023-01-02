@@ -25,6 +25,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
+//+kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;create;update;patch;delete
+//+kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;create;update;patch;delete
+
 type WorkflowService interface {
 	Create(ctx context.Context, wf *nbmpv2.Workflow) error
 	Update(ctx context.Context, wf *nbmpv2.Workflow) error
