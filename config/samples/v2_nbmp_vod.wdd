@@ -1,0 +1,128 @@
+{
+  "scheme": {
+    "uri": "urn:mpeg:mpegi:nbmp:2023"
+  },
+  "general": {
+    "id": "7e5b8825-9442-499f-95fe-abf8f03970c7",
+    "name": "Live workflow",
+    "description": "A simple live workflow.",
+    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1apha1",
+    "published-time": "2023-01-01T23:48:48.723348+01:00",
+    "state": "instantiated"
+  },
+  "input": {
+    "media-parameters": [
+      {
+        "stream-id": "input",
+        "name": "input",
+        "keywords": [],
+        "mime-type": "video/mp4",
+        "protocol": "rtmp",
+        "mode": "pull",
+        "caching-server-url": "rtmp://nagare.media/app/input"
+      }
+    ]
+  },
+  "output": {
+    "media-parameters": [
+      {
+        "stream-id": "output",
+        "name": "output",
+        "keywords": [],
+        "mime-type": "video/mp4",
+        "protocol": "dash-cmaf-ingest",
+        "mode": "push",
+        "caching-server-url": "http://nagare.media/cmaf/example.str/Switching(video)/Streams(output.cmfv)"
+      }
+    ]
+  },
+  "processing": {
+    "keywords": [],
+    "image": [],
+    "connection-map": [
+      {
+        "connection-id": "watermark -> package-cmaf",
+        "from": {
+          "id": "watermark-function",
+          "instance": "watermark",
+          "port-name": "output1"
+        },
+        "to": {
+          "id": "package-function",
+          "instance": "package-cmaf",
+          "port-name": "input1"
+        },
+        "co-located": false,
+        "breakable": true
+      }
+    ],
+    "function-restrictions": [
+      {
+        "instance": "watermark",
+        "general": {
+          "id": "watermark",
+          "name": "watermark",
+          "description": "watermark",
+          "input-ports": [
+            {
+              "port-name": "input1",
+              "bind": {
+                "stream-id": "input",
+                "name": "input1"
+              }
+            }
+          ],
+          "output-ports": [
+            {
+              "port-name": "output1",
+              "bind": {
+                "name": "output1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "instance": "package-cmaf",
+        "general": {
+          "id": "package-cmaf",
+          "name": "package-cmaf",
+          "description": "package-cmaf",
+          "input-ports": [
+            {
+              "port-name": "input1",
+              "bind": {
+                "name": "input1"
+              }
+            }
+          ],
+          "output-ports": [
+            {
+              "port-name": "output1",
+              "bind": {
+                "stream-id": "output",
+                "name": "output1"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "requirement": {
+    "security": {
+      "tls": false,
+      "ipsec": false,
+      "cenc": false
+    },
+    "workflow-task": {
+      "function-fusible": false,
+      "function-enhancable": false,
+      "execution-mode": "streaming"
+    }
+  },
+  "failover": {
+    "failover-mode": "continue-with-last-good-state",
+    "failover-delay": 0
+  }
+}

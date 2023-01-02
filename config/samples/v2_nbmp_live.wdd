@@ -1,0 +1,316 @@
+{
+  "scheme": {
+    "uri": "urn:mpeg:mpegi:nbmp:2023"
+  },
+  "general": {
+    "id": "8406e61f-9ff5-4000-9185-3af62b54108c",
+    "name": "VoD workflow",
+    "description": "A simple VoD workflow.",
+    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1apha1",
+    "published-time": "2023-01-01T23:49:34.706237+01:00",
+    "state": "instantiated"
+  },
+  "input": {
+    "media-parameters": [
+      {
+        "stream-id": "input.mp4",
+        "name": "input.mp4",
+        "keywords": [],
+        "mime-type": "video/mp4",
+        "protocol": "http",
+        "mode": "pull",
+        "caching-server-url": "https://nagare.media/input.mp4"
+      }
+    ]
+  },
+  "output": {
+    "media-parameters": [
+      {
+        "stream-id": "master.m3u8",
+        "name": "master.m3u8",
+        "keywords": [],
+        "mime-type": "application/vnd.apple.mpegurl",
+        "protocol": "s3",
+        "mode": "push",
+        "caching-server-url": "s3://nagare.media/output/master.m3u8"
+      },
+      {
+        "stream-id": "variant-1080p.m3u8",
+        "name": "variant-1080p.m3u8",
+        "keywords": [],
+        "mime-type": "application/vnd.apple.mpegurl",
+        "protocol": "s3",
+        "mode": "push",
+        "caching-server-url": "s3://nagare.media/output/variant-1080p.m3u8"
+      },
+      {
+        "stream-id": "1080p.cmfv",
+        "name": "1080p.cmfv",
+        "keywords": [],
+        "mime-type": "video/mp4",
+        "protocol": "s3",
+        "mode": "push",
+        "caching-server-url": "s3://nagare.media/output/1080p.cmfv"
+      },
+      {
+        "stream-id": "variant-720p.m3u8",
+        "name": "variant-720p.m3u8",
+        "keywords": [],
+        "mime-type": "application/vnd.apple.mpegurl",
+        "protocol": "s3",
+        "mode": "push",
+        "caching-server-url": "s3://nagare.media/output/variant-720p.m3u8"
+      },
+      {
+        "stream-id": "720p.cmfv",
+        "name": "720p.cmfv",
+        "keywords": [],
+        "mime-type": "video/mp4",
+        "protocol": "s3",
+        "mode": "push",
+        "caching-server-url": "s3://nagare.media/output/720p.cmfv"
+      },
+      {
+        "stream-id": "variant-audio.m3u8",
+        "name": "variant-audio.m3u8",
+        "keywords": [],
+        "mime-type": "application/vnd.apple.mpegurl",
+        "protocol": "s3",
+        "mode": "push",
+        "caching-server-url": "s3://nagare.media/output/variant-audio.m3u8"
+      },
+      {
+        "stream-id": "audio.cmfa",
+        "name": "audio.cmfa",
+        "keywords": [],
+        "mime-type": "audio/mp4",
+        "protocol": "s3",
+        "mode": "push",
+        "caching-server-url": "s3://nagare.media/output/audio.cmfa"
+      }
+    ]
+  },
+  "processing": {
+    "keywords": [],
+    "image": [],
+    "connection-map": [
+      {
+        "connection-id": "transcode-1080p -\u003e package-cmaf-hls",
+        "from": {
+          "id": "transcode-function",
+          "instance": "transcode-1080p",
+          "port-name": "output1"
+        },
+        "to": {
+          "id": "package-function",
+          "instance": "package-cmaf-hls",
+          "port-name": "input1"
+        },
+        "co-located": false,
+        "breakable": true
+      },
+      {
+        "connection-id": "transcode-720p -\u003e package-cmaf-hls",
+        "from": {
+          "id": "transcode-function",
+          "instance": "transcode-720p",
+          "port-name": "output1"
+        },
+        "to": {
+          "id": "package-function",
+          "instance": "package-cmaf-hls",
+          "port-name": "input2"
+        },
+        "co-located": false,
+        "breakable": true
+      },
+      {
+        "connection-id": "transcode-audio -\u003e package-cmaf-hls",
+        "from": {
+          "id": "transcode-function",
+          "instance": "transcode-audio",
+          "port-name": "output1"
+        },
+        "to": {
+          "id": "package-function",
+          "instance": "package-cmaf-hls",
+          "port-name": "input3"
+        },
+        "co-located": false,
+        "breakable": true
+      }
+    ],
+    "function-restrictions": [
+      {
+        "instance": "transcode-1080p",
+        "general": {
+          "id": "transcode-1080p",
+          "name": "transcode-1080p",
+          "description": "transcode-1080p",
+          "input-ports": [
+            {
+              "port-name": "input1",
+              "bind": {
+                "stream-id": "input.mp4",
+                "name": "input1"
+              }
+            }
+          ],
+          "output-ports": [
+            {
+              "port-name": "output1",
+              "bind": {
+                "name": "output1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "instance": "transcode-720p",
+        "general": {
+          "id": "transcode-720p",
+          "name": "transcode-720p",
+          "description": "transcode-720p",
+          "input-ports": [
+            {
+              "port-name": "input1",
+              "bind": {
+                "stream-id": "input.mp4",
+                "name": "input1"
+              }
+            }
+          ],
+          "output-ports": [
+            {
+              "port-name": "output1",
+              "bind": {
+                "name": "output1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "instance": "transcode-audio",
+        "general": {
+          "id": "transcode-audio",
+          "name": "transcode-audio",
+          "description": "transcode-audio",
+          "input-ports": [
+            {
+              "port-name": "input1",
+              "bind": {
+                "stream-id": "input.mp4",
+                "name": "input1"
+              }
+            }
+          ],
+          "output-ports": [
+            {
+              "port-name": "output1",
+              "bind": {
+                "name": "output1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "instance": "package-cmaf-hls",
+        "general": {
+          "id": "package-cmaf-hls",
+          "name": "package-cmaf-hls",
+          "description": "package-cmaf-hls",
+          "input-ports": [
+            {
+              "port-name": "input1",
+              "bind": {
+                "name": "input1"
+              }
+            },
+            {
+              "port-name": "input2",
+              "bind": {
+                "name": "input2"
+              }
+            },
+            {
+              "port-name": "input3",
+              "bind": {
+                "name": "input3"
+              }
+            }
+          ],
+          "output-ports": [
+            {
+              "port-name": "output1",
+              "bind": {
+                "stream-id": "master.m3u8",
+                "name": "output1"
+              }
+            },
+            {
+              "port-name": "output2",
+              "bind": {
+                "stream-id": "variant-1080p.m3u8",
+                "name": "output2"
+              }
+            },
+            {
+              "port-name": "output3",
+              "bind": {
+                "stream-id": "1080p.cmfv",
+                "name": "output3"
+              }
+            },
+            {
+              "port-name": "output4",
+              "bind": {
+                "stream-id": "variant-720p.m3u8",
+                "name": "output4"
+              }
+            },
+            {
+              "port-name": "output5",
+              "bind": {
+                "stream-id": "720p.cmfv",
+                "name": "output5"
+              }
+            },
+            {
+              "port-name": "output6",
+              "bind": {
+                "stream-id": "variant-audio.m3u8",
+                "name": "output6"
+              }
+            },
+            {
+              "port-name": "output7",
+              "bind": {
+                "stream-id": "audio.cmfa",
+                "name": "output7"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "requirement": {
+    "security": {
+      "tls": false,
+      "ipsec": false,
+      "cenc": false
+    },
+    "workflow-task": {
+      "function-fusible": false,
+      "function-enhancable": false,
+      "execution-mode": "step"
+    }
+  },
+  "failover": {
+    "failover-mode": "continue-with-last-good-state",
+    "failover-delay": 0
+  }
+}
