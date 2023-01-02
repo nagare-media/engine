@@ -9,6 +9,9 @@ metadata:
 spec:
   group: engine.nagare.media
   names:
+    categories:
+    - nagare-all
+    - nme-all
     kind: ClusterTaskTemplate
     listKind: ClusterTaskTemplateList
     plural: clustertasktemplates
@@ -34,18 +37,8 @@ spec:
           metadata:
             type: object
           spec:
-            description: ClusterTaskTemplateSpec defines the desired state of ClusterTaskTemplate
-            properties:
-              foo:
-                description: Foo is an example field of ClusterTaskTemplate. Edit
-                  clustertasktemplate_types.go to remove/update
-                type: string
-            type: object
-          status:
-            description: ClusterTaskTemplateStatus defines the observed state of ClusterTaskTemplate
+            description: TaskTemplateSpec defines the desired state of TaskTemplate
             type: object
         type: object
     served: true
     storage: true
-    subresources:
-      status: {}

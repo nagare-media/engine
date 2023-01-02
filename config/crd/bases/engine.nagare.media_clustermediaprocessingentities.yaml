@@ -9,6 +9,9 @@ metadata:
 spec:
   group: engine.nagare.media
   names:
+    categories:
+    - nagare-all
+    - nme-all
     kind: ClusterMediaProcessingEntity
     listKind: ClusterMediaProcessingEntityList
     plural: clustermediaprocessingentities
@@ -34,20 +37,8 @@ spec:
           metadata:
             type: object
           spec:
-            description: ClusterMediaProcessingEntitySpec defines the desired state
-              of ClusterMediaProcessingEntity
-            properties:
-              foo:
-                description: Foo is an example field of ClusterMediaProcessingEntity.
-                  Edit clustermediaprocessingentity_types.go to remove/update
-                type: string
-            type: object
-          status:
-            description: ClusterMediaProcessingEntityStatus defines the observed state
-              of ClusterMediaProcessingEntity
+            description: MediaProcessingEntitySpec defines the desired state of MediaProcessingEntity
             type: object
         type: object
     served: true
     storage: true
-    subresources:
-      status: {}

@@ -20,35 +20,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
-// ClusterMediaLocationSpec defines the desired state of ClusterMediaLocation
-type ClusterMediaLocationSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of ClusterMediaLocation. Edit clustermedialocation_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
-}
-
-// ClusterMediaLocationStatus defines the observed state of ClusterMediaLocation
-type ClusterMediaLocationStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
-
 //+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:resource:scope=Cluster
+//+kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
 
 // ClusterMediaLocation is the Schema for the clustermedialocations API
 type ClusterMediaLocation struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ClusterMediaLocationSpec   `json:"spec,omitempty"`
-	Status ClusterMediaLocationStatus `json:"status,omitempty"`
+	Spec MediaLocationSpec `json:"spec,omitempty"`
 }
 
 //+kubebuilder:object:root=true

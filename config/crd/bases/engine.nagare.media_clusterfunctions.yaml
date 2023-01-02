@@ -9,6 +9,9 @@ metadata:
 spec:
   group: engine.nagare.media
   names:
+    categories:
+    - nagare-all
+    - nme-all
     kind: ClusterFunction
     listKind: ClusterFunctionList
     plural: clusterfunctions
@@ -33,18 +36,8 @@ spec:
           metadata:
             type: object
           spec:
-            description: ClusterFunctionSpec defines the desired state of ClusterFunction
-            properties:
-              foo:
-                description: Foo is an example field of ClusterFunction. Edit clusterfunction_types.go
-                  to remove/update
-                type: string
-            type: object
-          status:
-            description: ClusterFunctionStatus defines the observed state of ClusterFunction
+            description: FunctionSpec defines the desired state of Function
             type: object
         type: object
     served: true
     storage: true
-    subresources:
-      status: {}

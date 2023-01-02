@@ -9,6 +9,11 @@ metadata:
 spec:
   group: engine.nagare.media
   names:
+    categories:
+    - nagare-all
+    - nme-all
+    - nagare
+    - nme
     kind: Task
     listKind: TaskList
     plural: tasks
@@ -34,11 +39,6 @@ spec:
             type: object
           spec:
             description: TaskSpec defines the desired state of Task
-            properties:
-              foo:
-                description: Foo is an example field of Task. Edit task_types.go to
-                  remove/update
-                type: string
             type: object
           status:
             description: TaskStatus defines the observed state of Task

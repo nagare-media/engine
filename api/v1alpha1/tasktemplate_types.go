@@ -20,34 +20,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // TaskTemplateSpec defines the desired state of TaskTemplate
 type TaskTemplateSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of TaskTemplate. Edit tasktemplate_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
-}
-
-// TaskTemplateStatus defines the observed state of TaskTemplate
-type TaskTemplateStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 }
 
 //+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
+//+kubebuilder:resource:categories={nagare-all,nme-all}
 
 // TaskTemplate is the Schema for the tasktemplates API
 type TaskTemplate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   TaskTemplateSpec   `json:"spec,omitempty"`
-	Status TaskTemplateStatus `json:"status,omitempty"`
+	Spec TaskTemplateSpec `json:"spec,omitempty"`
 }
 
 //+kubebuilder:object:root=true
