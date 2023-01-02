@@ -37,7 +37,39 @@ spec:
           metadata:
             type: object
           spec:
-            description: MediaProcessingEntitySpec defines the desired state of MediaProcessingEntity
+            description: Specification of a Media Processing Entity (MPE).
+            properties:
+              local:
+                description: Configures the Media Processing Entity (MPE) to talk
+                  to the local Kubernetes cluster.
+                type: object
+              remote:
+                description: Configures the Media Processing Entity (MPE) to talk
+                  to a remote Kubernetes cluster.
+                properties:
+                  kubeconfig:
+                    description: Kubeconfig that defines connection configuration.
+                    properties:
+                      secretRef:
+                        description: Reference to a secret that contains the kubeconfig
+                          in specified key. If no key is specified, "kubeconfig" is
+                          used by default.
+                        properties:
+                          key:
+                            description: Key within the secret.
+                            type: string
+                          name:
+                            description: Name of the referred object.
+                            type: string
+                        required:
+                        - name
+                        type: object
+                    required:
+                    - secretRef
+                    type: object
+                required:
+                - kubeconfig
+                type: object
             type: object
         type: object
     served: true

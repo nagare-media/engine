@@ -18,10 +18,50 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	meta "github.com/nagare-media/engine/pkg/apis/meta"
 )
 
-// MediaProcessingEntitySpec defines the desired state of MediaProcessingEntity
+const (
+	// MediaProcessingEntities with this annotation set to "true" will be used as default MPE for running tasks. This
+	// annotation can only be used once per MediaProcessingEntity in a singe namespace or once per
+	// ClusterMediaProcessingEntity in the whole Kubernetes cluster. A MediaProcessingEntity with this annotation has
+	// precedence over a ClusterMediaProcessingEntity.
+	IsDefaultMediaProcessingEntityAnnotation = "beta.engine.nagare.media/is-default-mpe"
+)
+
+// Specification of a Media Processing Entity (MPE).
 type MediaProcessingEntitySpec struct {
+	MediaProcessingEntityConfig `json:",inline"`
+}
+
+// Configuration of the Media Processing Entity (MPE).
+// Only one of these can be set.
+type MediaProcessingEntityConfig struct {
+	// Configures the Media Processing Entity (MPE) to talk to the local Kubernetes cluster.
+	// +optional
+	Local *LocalMediaProcessingEntity `json:"local,omitempty"`
+
+	// Configures the Media Processing Entity (MPE) to talk to a remote Kubernetes cluster.
+	// +optional
+	Remote *RemoteMediaProcessingEntity `json:"remote,omitempty"`
+}
+
+// Configuration of a local Media Processing Entity (MPE).
+type LocalMediaProcessingEntity struct {
+}
+
+// Configuration of a remote Media Processing Entity (MPE).
+type RemoteMediaProcessingEntity struct {
+	// Kubeconfig that defines connection configuration.
+	Kubeconfig Kubeconfig `json:"kubeconfig"`
+}
+
+// Configuration for connecting to a Kubernetes cluster.
+type Kubeconfig struct {
+	// Reference to a secret that contains the kubeconfig in specified key. If no key is specified, "kubeconfig" is used
+	// by default.
+	SecretRef meta.SecretReference `json:"secretRef"`
 }
 
 //+kubebuilder:object:root=true
