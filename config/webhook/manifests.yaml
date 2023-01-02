@@ -11,26 +11,6 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-cluster
-  failurePolicy: Fail
-  name: mcluster.kb.io
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clusters
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
       path: /mutate-engine-nagare-media-v1alpha1-clusterfunction
   failurePolicy: Fail
   name: mclusterfunction.kb.io
@@ -64,6 +44,26 @@ webhooks:
     - UPDATE
     resources:
     - clustermedialocations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-clustermediaprocessingentity
+  failurePolicy: Fail
+  name: mclustermediaprocessingentity.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clustermediaprocessingentities
   sideEffects: None
 - admissionReviewVersions:
   - v1
@@ -124,6 +124,26 @@ webhooks:
     - UPDATE
     resources:
     - medialocations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-engine-nagare-media-v1alpha1-mediaprocessingentity
+  failurePolicy: Fail
+  name: mmediaprocessingentity.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - mediaprocessingentities
   sideEffects: None
 - admissionReviewVersions:
   - v1
@@ -198,26 +218,6 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-cluster
-  failurePolicy: Fail
-  name: vcluster.kb.io
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clusters
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
       path: /validate-engine-nagare-media-v1alpha1-clusterfunction
   failurePolicy: Fail
   name: vclusterfunction.kb.io
@@ -251,6 +251,26 @@ webhooks:
     - UPDATE
     resources:
     - clustermedialocations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity
+  failurePolicy: Fail
+  name: vclustermediaprocessingentity.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clustermediaprocessingentities
   sideEffects: None
 - admissionReviewVersions:
   - v1
@@ -311,6 +331,26 @@ webhooks:
     - UPDATE
     resources:
     - medialocations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-engine-nagare-media-v1alpha1-mediaprocessingentity
+  failurePolicy: Fail
+  name: vmediaprocessingentity.kb.io
+  rules:
+  - apiGroups:
+    - engine.nagare.media
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - mediaprocessingentities
   sideEffects: None
 - admissionReviewVersions:
   - v1

@@ -23,42 +23,43 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// ClusterSpec defines the desired state of Cluster
-type ClusterSpec struct {
+// ClusterMediaProcessingEntitySpec defines the desired state of ClusterMediaProcessingEntity
+type ClusterMediaProcessingEntitySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Cluster. Edit cluster_types.go to remove/update
+	// Foo is an example field of ClusterMediaProcessingEntity. Edit clustermediaprocessingentity_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
 
-// ClusterStatus defines the observed state of Cluster
-type ClusterStatus struct {
+// ClusterMediaProcessingEntityStatus defines the observed state of ClusterMediaProcessingEntity
+type ClusterMediaProcessingEntityStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:resource:scope=Cluster
 
-// Cluster is the Schema for the clusters API
-type Cluster struct {
+// ClusterMediaProcessingEntity is the Schema for the clustermediaprocessingentities API
+type ClusterMediaProcessingEntity struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ClusterSpec   `json:"spec,omitempty"`
-	Status ClusterStatus `json:"status,omitempty"`
+	Spec   ClusterMediaProcessingEntitySpec   `json:"spec,omitempty"`
+	Status ClusterMediaProcessingEntityStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// ClusterList contains a list of Cluster
-type ClusterList struct {
+// ClusterMediaProcessingEntityList contains a list of ClusterMediaProcessingEntity
+type ClusterMediaProcessingEntityList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Cluster `json:"items"`
+	Items           []ClusterMediaProcessingEntity `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Cluster{}, &ClusterList{})
+	SchemeBuilder.Register(&ClusterMediaProcessingEntity{}, &ClusterMediaProcessingEntityList{})
 }

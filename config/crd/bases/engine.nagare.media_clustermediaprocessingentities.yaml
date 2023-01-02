@@ -5,20 +5,21 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.1
   creationTimestamp: null
-  name: clusters.engine.nagare.media
+  name: clustermediaprocessingentities.engine.nagare.media
 spec:
   group: engine.nagare.media
   names:
-    kind: Cluster
-    listKind: ClusterList
-    plural: clusters
-    singular: cluster
-  scope: Namespaced
+    kind: ClusterMediaProcessingEntity
+    listKind: ClusterMediaProcessingEntityList
+    plural: clustermediaprocessingentities
+    singular: clustermediaprocessingentity
+  scope: Cluster
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Cluster is the Schema for the clusters API
+        description: ClusterMediaProcessingEntity is the Schema for the clustermediaprocessingentities
+          API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -33,15 +34,17 @@ spec:
           metadata:
             type: object
           spec:
-            description: ClusterSpec defines the desired state of Cluster
+            description: ClusterMediaProcessingEntitySpec defines the desired state
+              of ClusterMediaProcessingEntity
             properties:
               foo:
-                description: Foo is an example field of Cluster. Edit cluster_types.go
-                  to remove/update
+                description: Foo is an example field of ClusterMediaProcessingEntity.
+                  Edit clustermediaprocessingentity_types.go to remove/update
                 type: string
             type: object
           status:
-            description: ClusterStatus defines the observed state of Cluster
+            description: ClusterMediaProcessingEntityStatus defines the observed state
+              of ClusterMediaProcessingEntity
             type: object
         type: object
     served: true

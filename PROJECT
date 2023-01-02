@@ -9,7 +9,7 @@ resources:
     crdVersion: v1
     namespaced: true
   domain: engine.nagare.media
-  kind: Cluster
+  kind: Function
   path: github.com/nagare-media/engine/api/v1alpha1
   version: v1alpha1
   webhooks:
@@ -20,37 +20,6 @@ resources:
     crdVersion: v1
   domain: engine.nagare.media
   kind: ClusterFunction
-  path: github.com/nagare-media/engine/api/v1alpha1
-  version: v1alpha1
-  webhooks:
-    defaulting: true
-    validation: true
-    webhookVersion: v1
-- api:
-    crdVersion: v1
-  domain: engine.nagare.media
-  kind: ClusterMediaLocation
-  path: github.com/nagare-media/engine/api/v1alpha1
-  version: v1alpha1
-  webhooks:
-    defaulting: true
-    validation: true
-    webhookVersion: v1
-- api:
-    crdVersion: v1
-  domain: engine.nagare.media
-  kind: ClusterTaskTemplate
-  path: github.com/nagare-media/engine/api/v1alpha1
-  version: v1alpha1
-  webhooks:
-    defaulting: true
-    validation: true
-    webhookVersion: v1
-- api:
-    crdVersion: v1
-    namespaced: true
-  domain: engine.nagare.media
-  kind: Function
   path: github.com/nagare-media/engine/api/v1alpha1
   version: v1alpha1
   webhooks:
@@ -70,10 +39,29 @@ resources:
     webhookVersion: v1
 - api:
     crdVersion: v1
-    namespaced: true
-  controller: true
   domain: engine.nagare.media
-  kind: Task
+  kind: ClusterMediaLocation
+  path: github.com/nagare-media/engine/api/v1alpha1
+  version: v1alpha1
+  webhooks:
+    defaulting: true
+    validation: true
+    webhookVersion: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: engine.nagare.media
+  kind: MediaProcessingEntity
+  path: github.com/nagare-media/engine/api/v1alpha1
+  version: v1alpha1
+  webhooks:
+    defaulting: true
+    validation: true
+    webhookVersion: v1
+- api:
+    crdVersion: v1
+  domain: engine.nagare.media
+  kind: ClusterMediaProcessingEntity
   path: github.com/nagare-media/engine/api/v1alpha1
   version: v1alpha1
   webhooks:
@@ -85,6 +73,28 @@ resources:
     namespaced: true
   domain: engine.nagare.media
   kind: TaskTemplate
+  path: github.com/nagare-media/engine/api/v1alpha1
+  version: v1alpha1
+  webhooks:
+    defaulting: true
+    validation: true
+    webhookVersion: v1
+- api:
+    crdVersion: v1
+  domain: engine.nagare.media
+  kind: ClusterTaskTemplate
+  path: github.com/nagare-media/engine/api/v1alpha1
+  version: v1alpha1
+  webhooks:
+    defaulting: true
+    validation: true
+    webhookVersion: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: engine.nagare.media
+  kind: Task
   path: github.com/nagare-media/engine/api/v1alpha1
   version: v1alpha1
   webhooks:

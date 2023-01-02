@@ -91,10 +91,6 @@ func Execute() error {
 		return err
 	}
 
-	if err = (&enginev1.Cluster{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "Cluster")
-		return err
-	}
 	if err = (&enginev1.Function{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Function")
 		return err
@@ -110,6 +106,14 @@ func Execute() error {
 	if err = (&enginev1.ClusterMediaLocation{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ClusterMediaLocation")
 		return err
+	}
+	if err = (&enginev1.MediaProcessingEntity{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "MediaProcessingEntity")
+		os.Exit(1)
+	}
+	if err = (&enginev1.ClusterMediaProcessingEntity{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "ClusterMediaProcessingEntity")
+		os.Exit(1)
 	}
 	if err = (&enginev1.TaskTemplate{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "TaskTemplate")

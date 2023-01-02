@@ -1,12 +1,12 @@
 apiVersion: engine.nagare.media/v1alpha1
-kind: Cluster
+kind: MediaProcessingEntity
 metadata:
   labels:
-    app.kubernetes.io/name: cluster
-    app.kubernetes.io/instance: cluster-sample
+    app.kubernetes.io/name: mediaprocessingentity
+    app.kubernetes.io/instance: mediaprocessingentity-sample
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: nagare-media-engine
-  name: cluster-sample
+  name: mediaprocessingentity-sample
 spec:
   # TODO(user): Add fields here
