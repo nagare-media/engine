@@ -51,7 +51,7 @@ spec:
                     description: Kubeconfig that defines connection configuration.
                     properties:
                       secretRef:
-                        description: Reference to a secret that contains the kubeconfig
+                        description: Reference to a Secret that contains the kubeconfig
                           in specified key. If no key is specified, "kubeconfig" is
                           used by default. Only references to Secrets are allowed.
                           A MediaProcessingEntity can only reference Secrets from

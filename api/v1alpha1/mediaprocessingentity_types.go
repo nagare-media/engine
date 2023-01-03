@@ -36,7 +36,7 @@ type MediaProcessingEntitySpec struct {
 }
 
 // Configuration of the Media Processing Entity (MPE).
-// Only one of these can be set.
+// Exactly one of these must be set.
 type MediaProcessingEntityConfig struct {
 	// Configures the Media Processing Entity (MPE) to talk to the local Kubernetes cluster.
 	// +optional
@@ -59,7 +59,7 @@ type RemoteMediaProcessingEntity struct {
 
 // Configuration for connecting to a Kubernetes cluster.
 type Kubeconfig struct {
-	// Reference to a secret that contains the kubeconfig in specified key. If no key is specified, "kubeconfig" is used
+	// Reference to a Secret that contains the kubeconfig in specified key. If no key is specified, "kubeconfig" is used
 	// by default. Only references to Secrets are allowed. A MediaProcessingEntity can only reference Secrets from its
 	// own Namespace.
 	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
