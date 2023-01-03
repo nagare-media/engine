@@ -1,0 +1,20 @@
+apiVersion: engine.nagare.media/v1alpha1
+kind: ClusterFunction
+metadata:
+  name: sleep-0-1-0
+  labels:
+    app.kubernetes.io/name: function
+    app.kubernetes.io/instance: sleep
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: nagare-media-engine
+    beta.engine.nagare.media/function-type: example
+spec:
+  version: 0.1.0+example
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: sleep
+          image: alpine
+          command: ["sleep",  "10m"]
