@@ -18,3 +18,10 @@ spec:
         - name: sleep
           image: alpine
           command: ["sleep",  "10m"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
