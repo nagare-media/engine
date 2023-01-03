@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: nagare-media-engine
   annotations:
-    beta.engine.nagare.media/is-default-mpe: "true"
+    beta.engine.nagare.media/is-default-media-processing-entity: "true"
 spec:
   local: {}
 ---

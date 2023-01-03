@@ -24,13 +24,13 @@ import (
 
 const (
 	// Selection label to indicate the type of function.
-	FunctionTypeLabel = "beta.engine.nagare.media/function-type"
+	BetaFunctionTypeLabel = "beta.engine.nagare.media/function-type"
 
 	// Selection label to indicate the language used in script functions.
-	FunctionScriptLanguageTypeLabel = "beta.engine.nagare.media/function-script-language"
+	BetaFunctionScriptLanguageTypeLabel = "beta.engine.nagare.media/function-script-language"
 )
 
-// FunctionSpec defines the desired state of Function
+// Specification of a function.
 type FunctionSpec struct {
 	// Version number of this function following the SemVer 2.0.0 specification (see https://semver.org/spec/v2.0.0.html).
 	// When label selections are used to specify functions, the version number determines the final function selection if
@@ -54,7 +54,7 @@ type FunctionSpec struct {
 	// the Workflow on the management cluster. The default is "false"
 	// +kubebuilder:default=false
 	// +optional
-	LocalMPEOnly bool `json:"localMPEOnly"`
+	LocalMediaProcessingEntitiesOnly bool `json:"localMediaProcessingEntitiesOnly"`
 
 	// Default configuration values.
 	// +optional

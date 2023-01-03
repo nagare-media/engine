@@ -27,13 +27,13 @@ const (
 	// "step" NBMP execution mode. This annotation can only be used once per MediaLocation in a singe namespace or once
 	// per ClusterMediaLocation in the whole Kubernetes cluster. A MediaLocation with this annotation has precedence over
 	// a ClusterMediaLocation.
-	IsDefaultStepMediaLocationAnnotation = "beta.engine.nagare.media/is-default-step-media-location"
+	BetaIsDefaultStepMediaLocationAnnotation = "beta.engine.nagare.media/is-default-step-media-location"
 
 	// MediaLocations with this annotation set to "true" will be used as default location between tasks that use the
 	// "streaming" NBMP execution mode. This annotation can only be used once per MediaLocation in a singe namespace or
 	// once per ClusterMediaLocation in the whole Kubernetes cluster. A MediaLocation with this annotation has precedence
 	// over a ClusterMediaLocation.
-	IsDefaultStreamingMediaLocationAnnotation = "beta.engine.nagare.media/is-default-streaming-media-location"
+	BetaIsDefaultStreamingMediaLocationAnnotation = "beta.engine.nagare.media/is-default-streaming-media-location"
 )
 
 var (

@@ -36,12 +36,12 @@ spec:
           metadata:
             type: object
           spec:
-            description: FunctionSpec defines the desired state of Function
+            description: Specification of a function.
             properties:
               defaultConfig:
                 description: Default configuration values.
                 x-kubernetes-preserve-unknown-fields: true
-              localMPEOnly:
+              localMediaProcessingEntitiesOnly:
                 default: false
                 description: Indicates that this function can only run on a local
                   Media Processing Entities (MPE), e.g. if this function changes the

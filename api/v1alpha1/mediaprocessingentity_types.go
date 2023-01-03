@@ -27,7 +27,7 @@ const (
 	// annotation can only be used once per MediaProcessingEntity in a singe namespace or once per
 	// ClusterMediaProcessingEntity in the whole Kubernetes cluster. A MediaProcessingEntity with this annotation has
 	// precedence over a ClusterMediaProcessingEntity.
-	IsDefaultMediaProcessingEntityAnnotation = "beta.engine.nagare.media/is-default-mpe"
+	BetaIsDefaultMediaProcessingEntityAnnotation = "beta.engine.nagare.media/is-default-media-processing-entity"
 )
 
 // Specification of a Media Processing Entity (MPE).
