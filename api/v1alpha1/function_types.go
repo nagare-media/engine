@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -54,6 +55,10 @@ type FunctionSpec struct {
 	// +kubebuilder:default=false
 	// +optional
 	LocalMPEOnly bool `json:"localMPEOnly"`
+
+	// Default configuration values.
+	// +optional
+	DefaultConfig *apiextensionsv1.JSON `json:"defaultConfig,omitempty"`
 }
 
 //+kubebuilder:object:root=true

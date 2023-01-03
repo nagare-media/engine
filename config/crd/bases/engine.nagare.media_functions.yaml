@@ -38,6 +38,9 @@ spec:
           spec:
             description: FunctionSpec defines the desired state of Function
             properties:
+              defaultConfig:
+                description: Default configuration values.
+                x-kubernetes-preserve-unknown-fields: true
               localMPEOnly:
                 default: false
                 description: Indicates that this function can only run on a local
