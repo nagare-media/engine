@@ -36,7 +36,697 @@ spec:
           metadata:
             type: object
           spec:
-            description: MediaLocationSpec defines the desired state of MediaLocation
+            description: Specification of a media location.
+            properties:
+              http:
+                description: Configures an HTTP media location. This media location
+                  can be used between NBMP tasks that use the "step" execution mode.
+                properties:
+                  auth:
+                    description: HTTP authentication configuration.
+                    properties:
+                      basic:
+                        description: Configures an HTTP basic authentication method.
+                        properties:
+                          secretRef:
+                            description: Reference to a Secret that contains the keys
+                              "username" and "password". Only references to Secrets
+                              are allowed. A MediaLocation can only reference Secrets
+                              from its own Namespace.
+                            properties:
+                              apiVersion:
+                                description: API version of the referred object.
+                                type: string
+                              kind:
+                                description: Kind of the referred object.
+                                type: string
+                              name:
+                                description: Name of the referred object.
+                                type: string
+                              namespace:
+                                description: Namespace of the referred object.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        required:
+                        - secretRef
+                        type: object
+                      digest:
+                        description: Configures an HTTP digest authentication method.
+                        properties:
+                          secretRef:
+                            description: Reference to a Secret that contains the keys
+                              "username" and "password". Only references to Secrets
+                              are allowed. A MediaLocation can only reference Secrets
+                              from its own Namespace.
+                            properties:
+                              apiVersion:
+                                description: API version of the referred object.
+                                type: string
+                              kind:
+                                description: Kind of the referred object.
+                                type: string
+                              name:
+                                description: Name of the referred object.
+                                type: string
+                              namespace:
+                                description: Namespace of the referred object.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        required:
+                        - secretRef
+                        type: object
+                      token:
+                        description: Configures an HTTP bearer token authentication
+                          method.
+                        properties:
+                          headerName:
+                            default: Authorization
+                            description: Name of the HTTP header the token should
+                              be passed to. The default is "Authorization".
+                            type: string
+                          headerValuePrefix:
+                            default: 'Bearer '
+                            description: Prefix of the HTTP header value before the
+                              token. The default is "Bearer ".
+                            type: string
+                          secretRef:
+                            description: Reference to a Secret that contains the key
+                              "token". Only references to Secrets are allowed. A MediaLocation
+                              can only reference Secrets from its own Namespace.
+                            properties:
+                              apiVersion:
+                                description: API version of the referred object.
+                                type: string
+                              kind:
+                                description: Kind of the referred object.
+                                type: string
+                              name:
+                                description: Name of the referred object.
+                                type: string
+                              namespace:
+                                description: Namespace of the referred object.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        required:
+                        - secretRef
+                        type: object
+                    type: object
+                  baseURL:
+                    description: HTTP base URL. Media referencing this location are
+                      relative to this URL.
+                    pattern: ^(http|https)://.*$
+                    type: string
+                  headers:
+                    description: List of HTTP headers that should be send with HTTP
+                      requests. Note that it is up the the function implementation
+                      to honor these headers.
+                    items:
+                      description: Specifies a header.
+                      properties:
+                        name:
+                          description: Name of the header.
+                          type: string
+                        value:
+                          description: Value of the header. This field is required
+                            if valueFrom is not specified. If both are specified,
+                            value has precedence.
+                          type: string
+                        valueFrom:
+                          description: Reference to a ConfigMap or Secret that contains
+                            the specified key. Only references to ConfigMaps or Secrets
+                            are allowed. A MediaLocation can only reference Objects
+                            from its own Namespace. This field is required if value
+                            is not specified. If both are specified, value has precedence.
+                          properties:
+                            apiVersion:
+                              description: API version of the referred object.
+                              type: string
+                            key:
+                              description: Key within the ConfigMap or Secret.
+                              type: string
+                            kind:
+                              description: Kind of the referred object.
+                              type: string
+                            name:
+                              description: Name of the referred object.
+                              type: string
+                            namespace:
+                              description: Namespace of the referred object.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  queryArgs:
+                    description: List of HTTP query arguments that should be send
+                      with HTTP requests. Note that it is up the the function implementation
+                      to honor these query arguments.
+                    items:
+                      description: Specifies a URL query argument.
+                      properties:
+                        name:
+                          description: Name of the query argument.
+                          type: string
+                        value:
+                          description: Value of the query argument. This field is
+                            required if valueFrom is not specified. If both are specified,
+                            value has precedence.
+                          type: string
+                        valueFrom:
+                          description: Reference to a ConfigMap or Secret that contains
+                            the specified key. Only references to ConfigMaps or Secrets
+                            are allowed. A MediaLocation can only reference Objects
+                            from its own Namespace. This field is required if value
+                            is not specified. If both are specified, value has precedence.
+                          properties:
+                            apiVersion:
+                              description: API version of the referred object.
+                              type: string
+                            key:
+                              description: Key within the ConfigMap or Secret.
+                              type: string
+                            kind:
+                              description: Kind of the referred object.
+                              type: string
+                            name:
+                              description: Name of the referred object.
+                              type: string
+                            namespace:
+                              description: Namespace of the referred object.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                required:
+                - baseURL
+                type: object
+              opencast:
+                description: Configures an Opencast media location. This media location
+                  can be used between NBMP tasks that use the "step" execution mode.
+                properties:
+                  auth:
+                    description: Opencast authentication configuration.
+                    properties:
+                      basic:
+                        description: Configures an HTTP basic authentication method.
+                        properties:
+                          secretRef:
+                            description: Reference to a Secret that contains the keys
+                              "username" and "password". Only references to Secrets
+                              are allowed. A MediaLocation can only reference Secrets
+                              from its own Namespace.
+                            properties:
+                              apiVersion:
+                                description: API version of the referred object.
+                                type: string
+                              kind:
+                                description: Kind of the referred object.
+                                type: string
+                              name:
+                                description: Name of the referred object.
+                                type: string
+                              namespace:
+                                description: Namespace of the referred object.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        required:
+                        - secretRef
+                        type: object
+                    type: object
+                  endpointOverwrites:
+                    description: Overwrite specific Opencast API endpoints. These
+                      will be used instead of endpoints from the service registry.
+                    properties:
+                      externalAPI:
+                        description: Overwrite for the External API.
+                        pattern: ^(http|https)://.*$
+                        type: string
+                    type: object
+                  headers:
+                    description: List of additional HTTP headers that should be send
+                      with HTTP requests. Note that it is up the the function implementation
+                      to honor these headers.
+                    items:
+                      description: Specifies a header.
+                      properties:
+                        name:
+                          description: Name of the header.
+                          type: string
+                        value:
+                          description: Value of the header. This field is required
+                            if valueFrom is not specified. If both are specified,
+                            value has precedence.
+                          type: string
+                        valueFrom:
+                          description: Reference to a ConfigMap or Secret that contains
+                            the specified key. Only references to ConfigMaps or Secrets
+                            are allowed. A MediaLocation can only reference Objects
+                            from its own Namespace. This field is required if value
+                            is not specified. If both are specified, value has precedence.
+                          properties:
+                            apiVersion:
+                              description: API version of the referred object.
+                              type: string
+                            key:
+                              description: Key within the ConfigMap or Secret.
+                              type: string
+                            kind:
+                              description: Kind of the referred object.
+                              type: string
+                            name:
+                              description: Name of the referred object.
+                              type: string
+                            namespace:
+                              description: Namespace of the referred object.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  queryArgs:
+                    description: List of additional HTTP query arguments that should
+                      be send with HTTP requests. Note that it is up the the function
+                      implementation to honor these query arguments.
+                    items:
+                      description: Specifies a URL query argument.
+                      properties:
+                        name:
+                          description: Name of the query argument.
+                          type: string
+                        value:
+                          description: Value of the query argument. This field is
+                            required if valueFrom is not specified. If both are specified,
+                            value has precedence.
+                          type: string
+                        valueFrom:
+                          description: Reference to a ConfigMap or Secret that contains
+                            the specified key. Only references to ConfigMaps or Secrets
+                            are allowed. A MediaLocation can only reference Objects
+                            from its own Namespace. This field is required if value
+                            is not specified. If both are specified, value has precedence.
+                          properties:
+                            apiVersion:
+                              description: API version of the referred object.
+                              type: string
+                            key:
+                              description: Key within the ConfigMap or Secret.
+                              type: string
+                            kind:
+                              description: Kind of the referred object.
+                              type: string
+                            name:
+                              description: Name of the referred object.
+                              type: string
+                            namespace:
+                              description: Namespace of the referred object.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  serviceRegistryURL:
+                    description: URL to the Opencast service registry. Usually this
+                      takes the form of "http://my.tld/services/available.json".
+                    pattern: ^(http|https)://.*$
+                    type: string
+                required:
+                - auth
+                - serviceRegistryURL
+                type: object
+              rist:
+                description: Configures a RIST media location. This media location
+                  can be used between NBMP tasks that use the "streaming" execution
+                  mode.
+                properties:
+                  baseURL:
+                    description: RIST base URL. Media referencing this location are
+                      relative to this URL.
+                    pattern: ^rist://.*$
+                    type: string
+                  bufferSize:
+                    description: 'Sets the buffer size. The maximum duration is 30s.
+                      TODO(mtneug): add validation'
+                    type: string
+                  encryption:
+                    description: RIST encryption configuration.
+                    properties:
+                      secretRef:
+                        description: Reference to a Secret that contains the key "secret".
+                          Only references to Secrets are allowed. A MediaLocation
+                          can only reference Secrets from its own Namespace.
+                        properties:
+                          apiVersion:
+                            description: API version of the referred object.
+                            type: string
+                          kind:
+                            description: Kind of the referred object.
+                            type: string
+                          name:
+                            description: Name of the referred object.
+                            type: string
+                          namespace:
+                            description: Namespace of the referred object.
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      type:
+                        description: Encryption type.
+                        enum:
+                        - aes-128
+                        - aes-256
+                        type: string
+                    required:
+                    - secretRef
+                    - type
+                    type: object
+                  profile:
+                    default: main
+                    description: RIST profile to use. The default is "main".
+                    enum:
+                    - simple
+                    - main
+                    - advanced
+                    type: string
+                required:
+                - baseURL
+                type: object
+              rtmp:
+                description: Configures an RTMP media location. This media location
+                  can be used between NBMP tasks that use the "streaming" execution
+                  mode.
+                properties:
+                  app:
+                    description: The RTMP application name. This overwrites application
+                      names given through baseURL.
+                    type: string
+                  auth:
+                    description: RTMP authentication configuration.
+                    properties:
+                      basic:
+                        description: Configures an RTMP basic authentication method.
+                        properties:
+                          secretRef:
+                            description: Reference to a Secret that contains the keys
+                              "username" and "password". Only references to Secrets
+                              are allowed. A MediaLocation can only reference Secrets
+                              from its own Namespace.
+                            properties:
+                              apiVersion:
+                                description: API version of the referred object.
+                                type: string
+                              kind:
+                                description: Kind of the referred object.
+                                type: string
+                              name:
+                                description: Name of the referred object.
+                                type: string
+                              namespace:
+                                description: Namespace of the referred object.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        required:
+                        - secretRef
+                        type: object
+                      streamingKey:
+                        description: Configures an RTMP streaming key authentication
+                          method. The streaming key will be used as RTMP playpath.
+                        properties:
+                          secretRef:
+                            description: Reference to a Secret that contains the key
+                              "streamingKey". Only references to Secrets are allowed.
+                              A MediaLocation can only reference Secrets from its
+                              own Namespace.
+                            properties:
+                              apiVersion:
+                                description: API version of the referred object.
+                                type: string
+                              kind:
+                                description: Kind of the referred object.
+                                type: string
+                              name:
+                                description: Name of the referred object.
+                                type: string
+                              namespace:
+                                description: Namespace of the referred object.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        required:
+                        - secretRef
+                        type: object
+                    type: object
+                  baseURL:
+                    description: RTMP base URL. Media referencing this location are
+                      relative to this URL.
+                    pattern: ^(rtmp|rtmpe|rtmps|rtmpt|rtmpte|rtmpts)://.*$
+                    type: string
+                  queryArgs:
+                    description: List of RTMP query arguments that should be send
+                      with RTMP requests. Note that it is up the the function implementation
+                      to honor these query arguments.
+                    items:
+                      description: Specifies a URL query argument.
+                      properties:
+                        name:
+                          description: Name of the query argument.
+                          type: string
+                        value:
+                          description: Value of the query argument. This field is
+                            required if valueFrom is not specified. If both are specified,
+                            value has precedence.
+                          type: string
+                        valueFrom:
+                          description: Reference to a ConfigMap or Secret that contains
+                            the specified key. Only references to ConfigMaps or Secrets
+                            are allowed. A MediaLocation can only reference Objects
+                            from its own Namespace. This field is required if value
+                            is not specified. If both are specified, value has precedence.
+                          properties:
+                            apiVersion:
+                              description: API version of the referred object.
+                              type: string
+                            key:
+                              description: Key within the ConfigMap or Secret.
+                              type: string
+                            kind:
+                              description: Kind of the referred object.
+                              type: string
+                            name:
+                              description: Name of the referred object.
+                              type: string
+                            namespace:
+                              description: Namespace of the referred object.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                required:
+                - baseURL
+                type: object
+              rtsp:
+                description: Configures an RTSP media location. This media location
+                  can be used between NBMP tasks that use the "streaming" execution
+                  mode.
+                properties:
+                  auth:
+                    description: RTSP authentication configuration.
+                    properties:
+                      basic:
+                        description: Configures an RTSP basic authentication method.
+                        properties:
+                          secretRef:
+                            description: Reference to a Secret that contains the keys
+                              "username" and "password". Only references to Secrets
+                              are allowed. A MediaLocation can only reference Secrets
+                              from its own Namespace.
+                            properties:
+                              apiVersion:
+                                description: API version of the referred object.
+                                type: string
+                              kind:
+                                description: Kind of the referred object.
+                                type: string
+                              name:
+                                description: Name of the referred object.
+                                type: string
+                              namespace:
+                                description: Namespace of the referred object.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        required:
+                        - secretRef
+                        type: object
+                    type: object
+                  baseURL:
+                    description: RTSP base URL. Media referencing this location are
+                      relative to this URL.
+                    pattern: ^(rtsp|rtsps|rtspu)://.*$
+                    type: string
+                  queryArgs:
+                    description: List of RTSP query arguments that should be send
+                      with RTSP requests. Note that it is up the the function implementation
+                      to honor these query arguments.
+                    items:
+                      description: Specifies a URL query argument.
+                      properties:
+                        name:
+                          description: Name of the query argument.
+                          type: string
+                        value:
+                          description: Value of the query argument. This field is
+                            required if valueFrom is not specified. If both are specified,
+                            value has precedence.
+                          type: string
+                        valueFrom:
+                          description: Reference to a ConfigMap or Secret that contains
+                            the specified key. Only references to ConfigMaps or Secrets
+                            are allowed. A MediaLocation can only reference Objects
+                            from its own Namespace. This field is required if value
+                            is not specified. If both are specified, value has precedence.
+                          properties:
+                            apiVersion:
+                              description: API version of the referred object.
+                              type: string
+                            key:
+                              description: Key within the ConfigMap or Secret.
+                              type: string
+                            kind:
+                              description: Kind of the referred object.
+                              type: string
+                            name:
+                              description: Name of the referred object.
+                              type: string
+                            namespace:
+                              description: Namespace of the referred object.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  transportProtocol:
+                    default: auto
+                    description: Forces a specific transport protocol. The default
+                      is "auto" which tries detecting the best transport protocol
+                      automatically.
+                    enum:
+                    - auto
+                    - udp
+                    - tcp
+                    - udp_multicast
+                    - http
+                    - https
+                    type: string
+                required:
+                - baseURL
+                type: object
+              s3:
+                description: Configures an S3 media location. This media location
+                  can be used between NBMP tasks that use the "step" execution mode.
+                properties:
+                  auth:
+                    description: S3 authentication configuration.
+                    properties:
+                      aws:
+                        description: Configures an AWS authentication method.
+                        properties:
+                          secretRef:
+                            description: Reference to a Secret that contains the keys
+                              "accessKeyID" and "secretAccessKey". Only references
+                              to Secrets are allowed. A MediaLocation can only reference
+                              Secrets from its own Namespace.
+                            properties:
+                              apiVersion:
+                                description: API version of the referred object.
+                                type: string
+                              kind:
+                                description: Kind of the referred object.
+                                type: string
+                              name:
+                                description: Name of the referred object.
+                                type: string
+                              namespace:
+                                description: Namespace of the referred object.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        required:
+                        - secretRef
+                        type: object
+                    required:
+                    - aws
+                    type: object
+                  bucket:
+                    description: Name of the S3 bucket.
+                    type: string
+                  endpointURL:
+                    description: Custom endpoint URL to send S3 requests to.
+                    type: string
+                  region:
+                    description: Region of the S3 bucket.
+                    type: string
+                  usePathStyle:
+                    default: false
+                    description: Whether to use path-style URLs to access S3. By default
+                      virtual-hosted–style is used.
+                    type: boolean
+                required:
+                - auth
+                - bucket
+                - region
+                type: object
             type: object
         type: object
     served: true
