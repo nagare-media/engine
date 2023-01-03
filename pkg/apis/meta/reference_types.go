@@ -18,24 +18,41 @@ package meta
 
 // Reference to a local object.
 type LocalObjectReference struct {
-	// Name of the referred object.
-	Name string `json:"name"`
-}
-
-// Reference to a object of given kind.
-type KindObjectReference struct {
-	// Name of the referred object.
-	Name string `json:"name"`
+	// API version of the referred object.
+	// +optional
+	APIVersion string `json:"apiVersion,omitempty"`
 
 	// Kind of the referred object.
-	Kind string `json:"kind"`
+	// +optional
+	Kind string `json:"kind,omitempty"`
+
+	// Name of the referred object.
+	Name string `json:"name"`
 }
 
-// Specifies a reference to a Secret.
-type SecretReference struct {
-	LocalObjectReference `json:",inline"`
+// Reference to an object.
+type ObjectReference struct {
+	// API version of the referred object.
+	// +optional
+	APIVersion string `json:"apiVersion,omitempty"`
 
-	// Key within the secret.
+	// Kind of the referred object.
+	// +optional
+	Kind string `json:"kind,omitempty"`
+
+	// Name of the referred object.
+	Name string `json:"name"`
+
+	// Namespace of the referred object.
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+}
+
+// Specifies a reference to a ConfigMap or Secret.
+type ConfigMapOrSecretReference struct {
+	ObjectReference `json:",inline"`
+
+	// Key within the ConfigMap or Secret.
 	// +optional
 	Key string `json:"key,omitempty"`
 }

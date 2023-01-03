@@ -53,13 +53,24 @@ spec:
                       secretRef:
                         description: Reference to a secret that contains the kubeconfig
                           in specified key. If no key is specified, "kubeconfig" is
-                          used by default.
+                          used by default. Only references to Secrets are allowed.
+                          A MediaProcessingEntity can only reference Secrets from
+                          its own Namespace.
                         properties:
+                          apiVersion:
+                            description: API version of the referred object.
+                            type: string
                           key:
-                            description: Key within the secret.
+                            description: Key within the ConfigMap or Secret.
+                            type: string
+                          kind:
+                            description: Kind of the referred object.
                             type: string
                           name:
                             description: Name of the referred object.
+                            type: string
+                          namespace:
+                            description: Namespace of the referred object.
                             type: string
                         required:
                         - name

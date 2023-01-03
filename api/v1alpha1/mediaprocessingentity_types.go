@@ -60,8 +60,9 @@ type RemoteMediaProcessingEntity struct {
 // Configuration for connecting to a Kubernetes cluster.
 type Kubeconfig struct {
 	// Reference to a secret that contains the kubeconfig in specified key. If no key is specified, "kubeconfig" is used
-	// by default.
-	SecretRef meta.SecretReference `json:"secretRef"`
+	// by default. Only references to Secrets are allowed. A MediaProcessingEntity can only reference Secrets from its
+	// own Namespace.
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
 //+kubebuilder:object:root=true
