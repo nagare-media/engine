@@ -2,6 +2,7 @@
 apiVersion: engine.nagare.media/v1alpha1
 kind: ClusterMediaProcessingEntity
 metadata:
+  name: local-cluster
   labels:
     app.kubernetes.io/name: mediaprocessingentity
     app.kubernetes.io/instance: local-cluster
@@ -10,20 +11,19 @@ metadata:
     app.kubernetes.io/created-by: nagare-media-engine
   annotations:
     beta.engine.nagare.media/is-default-mpe: "true"
-  name: local-cluster
 spec:
   local: {}
 ---
 apiVersion: engine.nagare.media/v1alpha1
 kind: MediaProcessingEntity
 metadata:
+  name: edge-cluster
   labels:
     app.kubernetes.io/name: mediaprocessingentity
     app.kubernetes.io/instance: edge-cluster
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: nagare-media-engine
-  name: edge-cluster
 spec:
   remote:
     kubeconfig:
