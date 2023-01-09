@@ -22,6 +22,7 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
@@ -64,16 +65,36 @@ func (ml *MediaLocation) ValidateDelete() error {
 }
 
 func (ml *MediaLocation) validate(old *MediaLocation) error {
+	var allErrs field.ErrorList
+	specPath := field.NewPath("spec")
+
 	if ml.Spec.RIST != nil {
 		if ml.Spec.RIST.BufferSize != nil {
 			if ml.Spec.RIST.BufferSize.Duration < 0 {
-				return apierrors.NewBadRequest("bufferSize is negative")
+				allErrs = append(
+					allErrs,
+					field.Invalid(
+						specPath.Child("rist", "bufferSize"),
+						ml.Spec.RIST.BufferSize,
+						"must not be negative",
+					),
+				)
 			}
 			if ml.Spec.RIST.BufferSize.Duration > 30*time.Second {
-				return apierrors.NewBadRequest("bufferSize is larger than 30s")
+				allErrs = append(
+					allErrs,
+					field.Invalid(
+						specPath.Child("rist", "bufferSize"),
+						ml.Spec.RIST.BufferSize,
+						"must not be larger than 30s",
+					),
+				)
 			}
 		}
 	}
 
-	return nil
+	if len(allErrs) == 0 {
+		return nil
+	}
+	return apierrors.NewInvalid(GroupVersion.WithKind("MediaLocation").GroupKind(), ml.Name, allErrs)
 }
