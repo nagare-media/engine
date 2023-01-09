@@ -8521,12 +8521,11 @@ spec:
                     type: object
                 type: object
               version:
-                description: 'Version number of this function following the SemVer
+                description: Version number of this function following the SemVer
                   2.0.0 specification (see https://semver.org/spec/v2.0.0.html). When
                   label selections are used to specify functions, the version number
                   determines the final function selection if multiple functions have
-                  the same labels. Cannot be updated. TODO: hinder changes to this
-                  field'
+                  the same labels. Cannot be updated.
                 pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$
                 type: string
             required:

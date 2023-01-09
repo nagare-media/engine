@@ -21,6 +21,7 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
@@ -63,5 +64,20 @@ func (f *Function) ValidateDelete() error {
 }
 
 func (f *Function) validate(old *Function) error {
-	return nil
+	var allErrs field.ErrorList
+	specPath := field.NewPath("spec")
+
+	if old != nil {
+		if f.Spec.Version != old.Spec.Version {
+			allErrs = append(
+				allErrs,
+				field.Forbidden(specPath.Child("version"), "field is immutable"),
+			)
+		}
+	}
+
+	if len(allErrs) == 0 {
+		return nil
+	}
+	return apierrors.NewInvalid(GroupVersion.WithKind("Function").GroupKind(), f.Name, allErrs)
 }

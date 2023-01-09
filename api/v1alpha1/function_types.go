@@ -36,7 +36,6 @@ type FunctionSpec struct {
 	// When label selections are used to specify functions, the version number determines the final function selection if
 	// multiple functions have the same labels.
 	// Cannot be updated.
-	// TODO: hinder changes to this field
 	// +kubebuilder:validation:Pattern="^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-(0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?$"
 	Version string `json:"version"`
 
