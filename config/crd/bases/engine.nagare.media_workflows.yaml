@@ -38,10 +38,57 @@ spec:
           metadata:
             type: object
           spec:
-            description: WorkflowSpec defines the desired state of Workflow
+            description: Specification of a Workflow.
+            properties:
+              config:
+                description: Workflow configuration values.
+                x-kubernetes-preserve-unknown-fields: true
+              humanReadable:
+                description: Human readable description of this Workflow.
+                properties:
+                  description:
+                    description: Human readable description of this Workflow.
+                    type: string
+                  name:
+                    description: Human readable name of this Workflow.
+                    type: string
+                type: object
+              mediaLocations:
+                description: Named references to MediaLocations.
+                items:
+                  properties:
+                    name:
+                      description: Name of the MediaLocation as used in the Workflow.
+                      pattern: '[a-Z0-9-]+'
+                      type: string
+                    ref:
+                      description: Reference to a MediaLocation of ClusterMediaLocation.
+                        Only references to these two kinds are allowed. A Workflow
+                        can only reference MediaLocations from its own Namespace.
+                      properties:
+                        apiVersion:
+                          description: API version of the referred object.
+                          type: string
+                        kind:
+                          description: Kind of the referred object.
+                          type: string
+                        name:
+                          description: Name of the referred object.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                  required:
+                  - name
+                  - ref
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
             type: object
           status:
-            description: WorkflowStatus defines the observed state of Workflow
+            description: Status of a Workflow.
             type: object
         type: object
     served: true

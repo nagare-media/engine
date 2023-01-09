@@ -17,14 +17,56 @@ limitations under the License.
 package v1alpha1
 
 import (
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	meta "github.com/nagare-media/engine/pkg/apis/meta"
 )
 
-// WorkflowSpec defines the desired state of Workflow
+const (
+	WorkflowLabel = "engine.nagare.media/workflow"
+)
+
+// Specification of a Workflow.
 type WorkflowSpec struct {
+	// Human readable description of this Workflow.
+	// +optional
+	HumanReadable *HumanReadableWorkflowDescription `json:"humanReadable,omitempty"`
+
+	// Named references to MediaLocations.
+	// +listMapKey=name
+	// +listType=map
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	// +optional
+	MediaLocations []NamedMediaLocationReference `json:"mediaLocations,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
+
+	// Workflow configuration values.
+	// +optional
+	Config *apiextensionsv1.JSON `json:"config,omitempty"`
 }
 
-// WorkflowStatus defines the observed state of Workflow
+type HumanReadableWorkflowDescription struct {
+	// Human readable name of this Workflow.
+	// +optional
+	Name *string `json:"name,omitempty"`
+
+	// Human readable description of this Workflow.
+	// +optional
+	Description *string `json:"description,omitempty"`
+}
+
+type NamedMediaLocationReference struct {
+	// Name of the MediaLocation as used in the Workflow.
+	// +kubebuilder:validation:Pattern="[a-Z0-9-]+"
+	Name string `json:"name"`
+
+	// Reference to a MediaLocation of ClusterMediaLocation. Only references to these two kinds are allowed. A Workflow
+	// can only reference MediaLocations from its own Namespace.
+	Ref meta.LocalObjectReference `json:"ref"`
+}
+
+// Status of a Workflow.
 type WorkflowStatus struct {
 }
 
