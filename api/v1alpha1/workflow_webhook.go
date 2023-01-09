@@ -32,44 +32,33 @@ func (r *Workflow) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-workflow,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=workflows,verbs=create;update,versions=v1alpha1,name=mworkflow.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &Workflow{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *Workflow) Default() {
-	workflowlog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
+	workflowlog.V(1).Info("default", "name", r.Name)
 }
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-workflow,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=workflows,verbs=create;update,versions=v1alpha1,name=vworkflow.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &Workflow{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *Workflow) ValidateCreate() error {
-	workflowlog.Info("validate create", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object creation.
+	workflowlog.V(1).Info("validate create", "name", r.Name)
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *Workflow) ValidateUpdate(old runtime.Object) error {
-	workflowlog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
+	workflowlog.V(1).Info("validate update", "name", r.Name)
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *Workflow) ValidateDelete() error {
-	workflowlog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
+	workflowlog.V(1).Info("validate delete", "name", r.Name)
 	return nil
 }

@@ -32,44 +32,33 @@ func (r *ClusterMediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustermedialocation,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermedialocations,verbs=create;update,versions=v1alpha1,name=mclustermedialocation.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &ClusterMediaLocation{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *ClusterMediaLocation) Default() {
-	clustermedialocationlog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
+	clustermedialocationlog.V(1).Info("default", "name", r.Name)
 }
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermedialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermedialocations,verbs=create;update,versions=v1alpha1,name=vclustermedialocation.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &ClusterMediaLocation{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterMediaLocation) ValidateCreate() error {
-	clustermedialocationlog.Info("validate create", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object creation.
+	clustermedialocationlog.V(1).Info("validate create", "name", r.Name)
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterMediaLocation) ValidateUpdate(old runtime.Object) error {
-	clustermedialocationlog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
+	clustermedialocationlog.V(1).Info("validate update", "name", r.Name)
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterMediaLocation) ValidateDelete() error {
-	clustermedialocationlog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
+	clustermedialocationlog.V(1).Info("validate delete", "name", r.Name)
 	return nil
 }

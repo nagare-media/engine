@@ -32,44 +32,33 @@ func (r *MediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-medialocation,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=mmedialocation.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &MediaLocation{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *MediaLocation) Default() {
-	medialocationlog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
+	medialocationlog.V(1).Info("default", "name", r.Name)
 }
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-medialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=vmedialocation.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &MediaLocation{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaLocation) ValidateCreate() error {
-	medialocationlog.Info("validate create", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object creation.
+	medialocationlog.V(1).Info("validate create", "name", r.Name)
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaLocation) ValidateUpdate(old runtime.Object) error {
-	medialocationlog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
+	medialocationlog.V(1).Info("validate update", "name", r.Name)
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaLocation) ValidateDelete() error {
-	medialocationlog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
+	medialocationlog.V(1).Info("validate delete", "name", r.Name)
 	return nil
 }

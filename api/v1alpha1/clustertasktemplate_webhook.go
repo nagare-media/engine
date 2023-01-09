@@ -32,44 +32,33 @@ func (r *ClusterTaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=mclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &ClusterTaskTemplate{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *ClusterTaskTemplate) Default() {
-	clustertasktemplatelog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
+	clustertasktemplatelog.V(1).Info("default", "name", r.Name)
 }
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=vclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &ClusterTaskTemplate{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterTaskTemplate) ValidateCreate() error {
-	clustertasktemplatelog.Info("validate create", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object creation.
+	clustertasktemplatelog.V(1).Info("validate create", "name", r.Name)
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterTaskTemplate) ValidateUpdate(old runtime.Object) error {
-	clustertasktemplatelog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
+	clustertasktemplatelog.V(1).Info("validate update", "name", r.Name)
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterTaskTemplate) ValidateDelete() error {
-	clustertasktemplatelog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
+	clustertasktemplatelog.V(1).Info("validate delete", "name", r.Name)
 	return nil
 }

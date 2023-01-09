@@ -32,44 +32,33 @@ func (r *MediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) error 
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=mmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &MediaProcessingEntity{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *MediaProcessingEntity) Default() {
-	mediaprocessingentitylog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
+	mediaprocessingentitylog.V(1).Info("default", "name", r.Name)
 }
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &MediaProcessingEntity{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaProcessingEntity) ValidateCreate() error {
-	mediaprocessingentitylog.Info("validate create", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object creation.
+	mediaprocessingentitylog.V(1).Info("validate create", "name", r.Name)
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaProcessingEntity) ValidateUpdate(old runtime.Object) error {
-	mediaprocessingentitylog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
+	mediaprocessingentitylog.V(1).Info("validate update", "name", r.Name)
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaProcessingEntity) ValidateDelete() error {
-	mediaprocessingentitylog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
+	mediaprocessingentitylog.V(1).Info("validate delete", "name", r.Name)
 	return nil
 }
