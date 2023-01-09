@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *ClusterMediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (cmpe *ClusterMediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(cmpe).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *ClusterMediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager)
 var _ webhook.Defaulter = &ClusterMediaProcessingEntity{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *ClusterMediaProcessingEntity) Default() {
+func (cmpe *ClusterMediaProcessingEntity) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vclustermediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
@@ -41,16 +44,24 @@ func (r *ClusterMediaProcessingEntity) Default() {
 var _ webhook.Validator = &ClusterMediaProcessingEntity{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterMediaProcessingEntity) ValidateCreate() error {
-	return nil
+func (cmpe *ClusterMediaProcessingEntity) ValidateCreate() error {
+	return cmpe.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterMediaProcessingEntity) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (cmpe *ClusterMediaProcessingEntity) ValidateUpdate(old runtime.Object) error {
+	oldCMPE, ok := old.(*ClusterMediaProcessingEntity)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaProcessingEntity but got a %T", old))
+	}
+	return cmpe.validate(oldCMPE)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterMediaProcessingEntity) ValidateDelete() error {
+func (cmpe *ClusterMediaProcessingEntity) ValidateDelete() error {
+	return nil
+}
+
+func (cmpe *ClusterMediaProcessingEntity) validate(old *ClusterMediaProcessingEntity) error {
 	return nil
 }

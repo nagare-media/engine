@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *MediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (mpe *MediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(mpe).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *MediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) error 
 var _ webhook.Defaulter = &MediaProcessingEntity{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *MediaProcessingEntity) Default() {
+func (mpe *MediaProcessingEntity) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
@@ -41,16 +44,24 @@ func (r *MediaProcessingEntity) Default() {
 var _ webhook.Validator = &MediaProcessingEntity{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *MediaProcessingEntity) ValidateCreate() error {
-	return nil
+func (mpe *MediaProcessingEntity) ValidateCreate() error {
+	return mpe.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *MediaProcessingEntity) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (mpe *MediaProcessingEntity) ValidateUpdate(old runtime.Object) error {
+	oldMPE, ok := old.(*MediaProcessingEntity)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a MediaProcessingEntity but got a %T", old))
+	}
+	return mpe.validate(oldMPE)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *MediaProcessingEntity) ValidateDelete() error {
+func (mpe *MediaProcessingEntity) ValidateDelete() error {
+	return nil
+}
+
+func (mpe *MediaProcessingEntity) validate(old *MediaProcessingEntity) error {
 	return nil
 }

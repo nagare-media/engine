@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *MediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (ml *MediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(ml).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *MediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Defaulter = &MediaLocation{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *MediaLocation) Default() {
+func (ml *MediaLocation) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-medialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=vmedialocation.engine.nagare.media,admissionReviewVersions=v1
@@ -41,16 +44,24 @@ func (r *MediaLocation) Default() {
 var _ webhook.Validator = &MediaLocation{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *MediaLocation) ValidateCreate() error {
-	return nil
+func (ml *MediaLocation) ValidateCreate() error {
+	return ml.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *MediaLocation) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (ml *MediaLocation) ValidateUpdate(old runtime.Object) error {
+	oldML, ok := old.(*MediaLocation)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a MediaLocation but got a %T", old))
+	}
+	return ml.validate(oldML)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *MediaLocation) ValidateDelete() error {
+func (ml *MediaLocation) ValidateDelete() error {
+	return nil
+}
+
+func (ml *MediaLocation) validate(old *MediaLocation) error {
 	return nil
 }

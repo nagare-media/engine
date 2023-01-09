@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *ClusterMediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (cml *ClusterMediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(cml).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *ClusterMediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Defaulter = &ClusterMediaLocation{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *ClusterMediaLocation) Default() {
+func (cml *ClusterMediaLocation) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermedialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermedialocations,verbs=create;update,versions=v1alpha1,name=vclustermedialocation.engine.nagare.media,admissionReviewVersions=v1
@@ -41,16 +44,24 @@ func (r *ClusterMediaLocation) Default() {
 var _ webhook.Validator = &ClusterMediaLocation{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterMediaLocation) ValidateCreate() error {
-	return nil
+func (cml *ClusterMediaLocation) ValidateCreate() error {
+	return cml.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterMediaLocation) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (cml *ClusterMediaLocation) ValidateUpdate(old runtime.Object) error {
+	oldCML, ok := old.(*ClusterMediaLocation)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaLocation but got a %T", old))
+	}
+	return cml.validate(oldCML)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterMediaLocation) ValidateDelete() error {
+func (cml *ClusterMediaLocation) ValidateDelete() error {
+	return nil
+}
+
+func (cml *ClusterMediaLocation) validate(old *ClusterMediaLocation) error {
 	return nil
 }

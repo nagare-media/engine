@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *ClusterTaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (ctt *ClusterTaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(ctt).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *ClusterTaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Defaulter = &ClusterTaskTemplate{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *ClusterTaskTemplate) Default() {
+func (ctt *ClusterTaskTemplate) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=vclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
@@ -41,16 +44,24 @@ func (r *ClusterTaskTemplate) Default() {
 var _ webhook.Validator = &ClusterTaskTemplate{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterTaskTemplate) ValidateCreate() error {
-	return nil
+func (ctt *ClusterTaskTemplate) ValidateCreate() error {
+	return ctt.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterTaskTemplate) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (ctt *ClusterTaskTemplate) ValidateUpdate(old runtime.Object) error {
+	oldCTT, ok := old.(*ClusterTaskTemplate)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterTaskTemplate but got a %T", old))
+	}
+	return ctt.validate(oldCTT)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterTaskTemplate) ValidateDelete() error {
+func (ctt *ClusterTaskTemplate) ValidateDelete() error {
+	return nil
+}
+
+func (ctt *ClusterTaskTemplate) validate(old *ClusterTaskTemplate) error {
 	return nil
 }

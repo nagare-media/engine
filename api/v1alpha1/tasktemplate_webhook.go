@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *TaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (tt *TaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(tt).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *TaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Defaulter = &TaskTemplate{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *TaskTemplate) Default() {
+func (tt *TaskTemplate) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-tasktemplate,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=tasktemplates,verbs=create;update,versions=v1alpha1,name=vtasktemplate.engine.nagare.media,admissionReviewVersions=v1
@@ -41,16 +44,24 @@ func (r *TaskTemplate) Default() {
 var _ webhook.Validator = &TaskTemplate{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *TaskTemplate) ValidateCreate() error {
-	return nil
+func (tt *TaskTemplate) ValidateCreate() error {
+	return tt.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *TaskTemplate) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (tt *TaskTemplate) ValidateUpdate(old runtime.Object) error {
+	oldTT, ok := old.(*TaskTemplate)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a TaskTemplate but got a %T", old))
+	}
+	return tt.validate(oldTT)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *TaskTemplate) ValidateDelete() error {
+func (tt *TaskTemplate) ValidateDelete() error {
+	return nil
+}
+
+func (tt *TaskTemplate) validate(old *TaskTemplate) error {
 	return nil
 }

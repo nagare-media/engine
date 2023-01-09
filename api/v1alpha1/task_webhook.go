@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *Task) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (t *Task) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(t).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *Task) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Defaulter = &Task{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *Task) Default() {
+func (t *Task) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-task,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=tasks,verbs=create;update,versions=v1alpha1,name=vtask.engine.nagare.media,admissionReviewVersions=v1
@@ -41,18 +44,25 @@ func (r *Task) Default() {
 var _ webhook.Validator = &Task{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *Task) ValidateCreate() error {
-
-	// check if workflow is already finished
-	return nil
+func (t *Task) ValidateCreate() error {
+	return t.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *Task) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (t *Task) ValidateUpdate(old runtime.Object) error {
+	oldT, ok := old.(*Task)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a Task but got a %T", old))
+	}
+	return t.validate(oldT)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *Task) ValidateDelete() error {
+func (t *Task) ValidateDelete() error {
+	return nil
+}
+
+func (t *Task) validate(old *Task) error {
+	// check if workflow is already finished
 	return nil
 }

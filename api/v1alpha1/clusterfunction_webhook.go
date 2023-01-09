@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *ClusterFunction) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (cf *ClusterFunction) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(cf).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *ClusterFunction) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Defaulter = &ClusterFunction{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *ClusterFunction) Default() {
+func (cf *ClusterFunction) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clusterfunction,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=vclusterfunction.engine.nagare.media,admissionReviewVersions=v1
@@ -41,16 +44,24 @@ func (r *ClusterFunction) Default() {
 var _ webhook.Validator = &ClusterFunction{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterFunction) ValidateCreate() error {
-	return nil
+func (cf *ClusterFunction) ValidateCreate() error {
+	return cf.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterFunction) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (cf *ClusterFunction) ValidateUpdate(old runtime.Object) error {
+	oldCF, ok := old.(*ClusterFunction)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterFunction but got a %T", old))
+	}
+	return cf.validate(oldCF)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *ClusterFunction) ValidateDelete() error {
+func (cf *ClusterFunction) ValidateDelete() error {
+	return nil
+}
+
+func (cf *ClusterFunction) validate(old *ClusterFunction) error {
 	return nil
 }

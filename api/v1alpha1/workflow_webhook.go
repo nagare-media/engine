@@ -17,14 +17,17 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-func (r *Workflow) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (w *Workflow) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(w).
 		Complete()
 }
 
@@ -33,7 +36,7 @@ func (r *Workflow) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Defaulter = &Workflow{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *Workflow) Default() {
+func (w *Workflow) Default() {
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-workflow,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=workflows,verbs=create;update,versions=v1alpha1,name=vworkflow.engine.nagare.media,admissionReviewVersions=v1
@@ -41,16 +44,24 @@ func (r *Workflow) Default() {
 var _ webhook.Validator = &Workflow{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *Workflow) ValidateCreate() error {
-	return nil
+func (w *Workflow) ValidateCreate() error {
+	return w.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *Workflow) ValidateUpdate(old runtime.Object) error {
-	return nil
+func (w *Workflow) ValidateUpdate(old runtime.Object) error {
+	oldW, ok := old.(*Workflow)
+	if !ok {
+		return apierrors.NewBadRequest(fmt.Sprintf("expected a Workflow but got a %T", old))
+	}
+	return w.validate(oldW)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *Workflow) ValidateDelete() error {
+func (w *Workflow) ValidateDelete() error {
+	return nil
+}
+
+func (w *Workflow) validate(old *Workflow) error {
 	return nil
 }
