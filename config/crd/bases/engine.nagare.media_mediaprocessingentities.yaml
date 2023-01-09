@@ -38,6 +38,8 @@ spec:
             type: object
           spec:
             description: Specification of a Media Processing Entity (MPE).
+            maxProperties: 1
+            minProperties: 1
             properties:
               local:
                 description: Configures the Media Processing Entity (MPE) to talk

@@ -37,6 +37,8 @@ spec:
             type: object
           spec:
             description: Specification of a media location.
+            maxProperties: 1
+            minProperties: 1
             properties:
               http:
                 description: Configures an HTTP media location. This media location
@@ -44,6 +46,8 @@ spec:
                 properties:
                   auth:
                     description: HTTP authentication configuration.
+                    maxProperties: 1
+                    minProperties: 1
                     properties:
                       basic:
                         description: Configures an HTTP basic authentication method.
@@ -245,6 +249,8 @@ spec:
                 properties:
                   auth:
                     description: Opencast authentication configuration.
+                    maxProperties: 1
+                    minProperties: 1
                     properties:
                       basic:
                         description: Configures an HTTP basic authentication method.
@@ -397,8 +403,7 @@ spec:
                     pattern: ^rist://.*$
                     type: string
                   bufferSize:
-                    description: 'Sets the buffer size. The maximum duration is 30s.
-                      TODO(mtneug): add validation'
+                    description: Sets the buffer size. The maximum duration is 30s.
                     type: string
                   encryption:
                     description: RIST encryption configuration.
@@ -455,6 +460,7 @@ spec:
                     type: string
                   auth:
                     description: RTMP authentication configuration.
+                    minProperties: 1
                     properties:
                       basic:
                         description: Configures an RTMP basic authentication method.
@@ -574,6 +580,8 @@ spec:
                 properties:
                   auth:
                     description: RTSP authentication configuration.
+                    maxProperties: 1
+                    minProperties: 1
                     properties:
                       basic:
                         description: Configures an RTSP basic authentication method.
@@ -677,6 +685,8 @@ spec:
                 properties:
                   auth:
                     description: S3 authentication configuration.
+                    maxProperties: 1
+                    minProperties: 1
                     properties:
                       aws:
                         description: Configures an AWS authentication method.

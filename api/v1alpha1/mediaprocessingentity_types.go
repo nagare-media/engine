@@ -37,6 +37,8 @@ type MediaProcessingEntitySpec struct {
 
 // Configuration of the Media Processing Entity (MPE).
 // Exactly one of these must be set.
+// +kubebuilder:validation:MinProperties=1
+// +kubebuilder:validation:MaxProperties=1
 type MediaProcessingEntityConfig struct {
 	// Configures the Media Processing Entity (MPE) to talk to the local Kubernetes cluster.
 	// +optional

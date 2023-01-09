@@ -66,6 +66,8 @@ type MediaLocationSpec struct {
 
 // Configuration of a media location.
 // Exactly one of these must be set.
+// +kubebuilder:validation:MinProperties=1
+// +kubebuilder:validation:MaxProperties=1
 type MediaLocationConfig struct {
 	// Configures an HTTP media location.
 	// This media location can be used between NBMP tasks that use the "step" execution mode.
@@ -133,6 +135,8 @@ type HTTPMediaLocation struct {
 // Configuration of an HTTP authentication method.
 // Exactly one of these must be set.
 // TODO(mtneug): is this a valid assumption? Maybe allow specifying multiple methods and choose during request time?
+// +kubebuilder:validation:MinProperties=1
+// +kubebuilder:validation:MaxProperties=1
 type HTTPAuthConfig struct {
 	// Configures an HTTP basic authentication method.
 	// +optional
@@ -201,6 +205,8 @@ type S3MediaLocation struct {
 
 // Configuration of an S3 authentication method.
 // Exactly one of these must be set.
+// +kubebuilder:validation:MinProperties=1
+// +kubebuilder:validation:MaxProperties=1
 type S3AuthConfig struct {
 	// Configures an AWS authentication method.
 	// +option
@@ -257,6 +263,8 @@ type OpencastEndpointOverwrites struct {
 
 // Configuration of an Opencast authentication method.
 // Exactly one of these must be set.
+// +kubebuilder:validation:MinProperties=1
+// +kubebuilder:validation:MaxProperties=1
 type OpencastAuthConfig struct {
 	// Configures an HTTP basic authentication method.
 	// +optional
@@ -289,6 +297,7 @@ type RTMPMediaLocation struct {
 
 // Configuration of an RTMP authentication method.
 // Multiple methods can be set.
+// +kubebuilder:validation:MinProperties=1
 type RTMPAuthConfig struct {
 	// Configures an RTMP basic authentication method.
 	// +optional
@@ -341,6 +350,8 @@ type RTSPMediaLocation struct {
 
 // Configuration of an RTSP authentication method.
 // Exactly one of these must be set.
+// +kubebuilder:validation:MinProperties=1
+// +kubebuilder:validation:MaxProperties=1
 type RTSPAuthConfig struct {
 	// Configures an RTSP basic authentication method.
 	// +optional
@@ -367,7 +378,6 @@ type RISTMediaLocation struct {
 	Profile *string `json:"profile,omitempty"`
 
 	// Sets the buffer size. The maximum duration is 30s.
-	// TODO(mtneug): add validation
 	// +optional
 	BufferSize *metav1.Duration `json:"bufferSize,omitempty"`
 
