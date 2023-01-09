@@ -8,3 +8,10 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: false
+      containers:
+      - name: gateway-nbmp
+        args:
+        - "--config=gateway-nbmp_configuration.yaml"
+        - "--zap-devel"
+        - "--zap-stacktrace-level=error"
+        - "--zap-log-level=2"

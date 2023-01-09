@@ -8,3 +8,10 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: false
+      containers:
+      - name: manager
+        args:
+        - "--config=controller_manager_configuration.yaml"
+        - "--zap-devel"
+        - "--zap-stacktrace-level=error"
+        - "--zap-log-level=2"
