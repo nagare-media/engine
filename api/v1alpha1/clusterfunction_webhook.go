@@ -37,6 +37,7 @@ var _ webhook.Defaulter = &ClusterFunction{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (cf *ClusterFunction) Default() {
+	(*Function)(cf).Default()
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clusterfunction,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=vclusterfunction.engine.nagare.media,admissionReviewVersions=v1
@@ -63,5 +64,5 @@ func (cf *ClusterFunction) ValidateDelete() error {
 }
 
 func (cf *ClusterFunction) validate(old *ClusterFunction) error {
-	return nil
+	return (*Function)(cf).validate((*Function)(old))
 }

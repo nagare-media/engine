@@ -37,6 +37,7 @@ var _ webhook.Defaulter = &ClusterTaskTemplate{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (ctt *ClusterTaskTemplate) Default() {
+	(*TaskTemplate)(ctt).Default()
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=vclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
@@ -63,5 +64,5 @@ func (ctt *ClusterTaskTemplate) ValidateDelete() error {
 }
 
 func (ctt *ClusterTaskTemplate) validate(old *ClusterTaskTemplate) error {
-	return nil
+	return (*TaskTemplate)(ctt).validate((*TaskTemplate)(old))
 }

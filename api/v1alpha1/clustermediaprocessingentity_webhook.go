@@ -37,6 +37,7 @@ var _ webhook.Defaulter = &ClusterMediaProcessingEntity{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (cmpe *ClusterMediaProcessingEntity) Default() {
+	(*MediaProcessingEntity)(cmpe).Default()
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vclustermediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
@@ -63,5 +64,5 @@ func (cmpe *ClusterMediaProcessingEntity) ValidateDelete() error {
 }
 
 func (cmpe *ClusterMediaProcessingEntity) validate(old *ClusterMediaProcessingEntity) error {
-	return nil
+	return (*MediaProcessingEntity)(cmpe).validate((*MediaProcessingEntity)(old))
 }

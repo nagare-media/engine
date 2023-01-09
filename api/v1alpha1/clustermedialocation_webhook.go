@@ -37,6 +37,7 @@ var _ webhook.Defaulter = &ClusterMediaLocation{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (cml *ClusterMediaLocation) Default() {
+	(*MediaLocation)(cml).Default()
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermedialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermedialocations,verbs=create;update,versions=v1alpha1,name=vclustermedialocation.engine.nagare.media,admissionReviewVersions=v1
@@ -63,5 +64,5 @@ func (cml *ClusterMediaLocation) ValidateDelete() error {
 }
 
 func (cml *ClusterMediaLocation) validate(old *ClusterMediaLocation) error {
-	return nil
+	return (*MediaLocation)(cml).validate((*MediaLocation)(old))
 }
