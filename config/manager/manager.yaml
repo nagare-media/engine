@@ -47,6 +47,8 @@ spec:
       containers:
       - command:
         - /manager
+        args:
+        - "--config=controller_manager_configuration.yaml"
         image: ghcr.io/nagare-media/engine/controller:dev
         name: manager
         securityContext:
@@ -74,5 +76,13 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
+        volumeMounts:
+        - name: manager-config
+          mountPath: /controller_manager_configuration.yaml
+          subPath: controller_manager_configuration.yaml
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10
+      volumes:
+      - name: manager-config
+        configMap:
+          name: manager-config
