@@ -25,14 +25,14 @@ import (
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
 )
 
-// Specification of a task.
+// Specification of a Task.
 type TaskSpec struct {
 	// Reference to a TaskTemplate or ClusterTaskTemplate. Only references to these two kinds are allowed. A Task can only
 	// reference TaskTemplates from its own Namespace.
 	// +optional
 	TaskTemplateRef *meta.ObjectReference `json:"taskTemplateRef,omitempty"`
 
-	// Human readable description of this task.
+	// Human readable description of this Task.
 	// +optional
 	HumanReadable *HumanReadableTaskDescription `json:"humanReadable,omitempty"`
 
@@ -88,11 +88,11 @@ type TaskSpec struct {
 }
 
 type HumanReadableTaskDescription struct {
-	// Human readable name of this task.
+	// Human readable name of this Task.
 	// +optional
 	Name *string `json:"name,omitempty"`
 
-	// Human readable description of this task.
+	// Human readable description of this Task.
 	// +optional
 	Description *string `json:"description,omitempty"`
 }
@@ -123,7 +123,7 @@ const (
 	JobFailurePolicyActionIgnore JobFailurePolicyAction = "Ignore"
 )
 
-// Status of a task.
+// Status of a Task.
 type TaskStatus struct {
 	// The latest available observations of an object's current state. When a Task fails, one of the conditions will have
 	// type "Failed" and status true. When a Task is completed, one of the conditions will have type "Complete" and status
@@ -146,7 +146,7 @@ type TaskStatus struct {
 
 	// Reference to the Job.
 	// +optional
-	JobRef *LocalJobRef `json:"jobRef,omitempty"`
+	JobRef *LocalJobReference `json:"jobRef,omitempty"`
 }
 
 // Description of the current Task status.
@@ -185,7 +185,7 @@ const (
 )
 
 // Reference to a local Job.
-type LocalJobRef struct {
+type LocalJobReference struct {
 	// Name of the Job.
 	Name string `json:"name"`
 

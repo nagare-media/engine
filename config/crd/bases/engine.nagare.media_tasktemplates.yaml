@@ -112,10 +112,10 @@ spec:
                 description: Human readable description of this task.
                 properties:
                   description:
-                    description: Human readable description of this task.
+                    description: Human readable description of this Task.
                     type: string
                   name:
-                    description: Human readable name of this task.
+                    description: Human readable name of this Task.
                     type: string
                 type: object
               jobFailurePolicy:

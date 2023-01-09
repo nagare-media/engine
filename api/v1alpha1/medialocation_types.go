@@ -111,15 +111,19 @@ type HTTPMediaLocation struct {
 	// Note that it is up the the function implementation to honor these headers.
 	// +listType=map
 	// +listMapKey=name
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
 	// +optional
-	Headers []Header `json:"headers,omitempty"`
+	Headers []Header `json:"headers,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
 	// List of HTTP query arguments that should be send with HTTP requests.
 	// Note that it is up the the function implementation to honor these query arguments.
 	// +listType=map
 	// +listMapKey=name
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
 	// +optional
-	QueryArgs []QueryArg `json:"queryArgs,omitempty"`
+	QueryArgs []QueryArg `json:"queryArgs,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
 	// HTTP authentication configuration.
 	// +optional
@@ -224,15 +228,19 @@ type OpencastMediaLocation struct {
 	// Note that it is up the the function implementation to honor these headers.
 	// +listType=map
 	// +listMapKey=name
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
 	// +optional
-	Headers []Header `json:"headers,omitempty"`
+	Headers []Header `json:"headers,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
 	// List of additional HTTP query arguments that should be send with HTTP requests.
 	// Note that it is up the the function implementation to honor these query arguments.
 	// +listType=map
 	// +listMapKey=name
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
 	// +optional
-	QueryArgs []QueryArg `json:"queryArgs,omitempty"`
+	QueryArgs []QueryArg `json:"queryArgs,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
 	// Opencast authentication configuration.
 	Auth OpencastAuthConfig `json:"auth"`
@@ -269,8 +277,10 @@ type RTMPMediaLocation struct {
 	// Note that it is up the the function implementation to honor these query arguments.
 	// +listType=map
 	// +listMapKey=name
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
 	// +optional
-	QueryArgs []QueryArg `json:"queryArgs,omitempty"`
+	QueryArgs []QueryArg `json:"queryArgs,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
 	// RTMP authentication configuration.
 	// +optional
@@ -319,8 +329,10 @@ type RTSPMediaLocation struct {
 	// Note that it is up the the function implementation to honor these query arguments.
 	// +listType=map
 	// +listMapKey=name
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
 	// +optional
-	QueryArgs []QueryArg `json:"queryArgs,omitempty"`
+	QueryArgs []QueryArg `json:"queryArgs,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
 	// RTSP authentication configuration.
 	// +optional
