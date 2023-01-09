@@ -40,6 +40,9 @@ spec:
           spec:
             description: Specification of a task.
             properties:
+              config:
+                description: Configuration values.
+                x-kubernetes-preserve-unknown-fields: true
               functionRef:
                 description: Reference to a Function or ClusterFunction. Only references
                   to these two kinds are allowed. A Task can only reference Functions
