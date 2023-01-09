@@ -7,4 +7,4 @@ generatorOptions:
 configMapGenerator:
 - name: gateway-nbmp-config
   files:
-  - gateway_nbmp_configuration
+  - gateway_nbmp_configuration.yaml
