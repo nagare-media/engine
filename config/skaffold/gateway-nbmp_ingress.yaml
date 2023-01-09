@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gateway-nbmp
+  namespace: system
+  labels:
+    app.kubernetes.io/name: ingress
+    app.kubernetes.io/instance: gateway-nbmp
+    app.kubernetes.io/component: gateway-nbmp
+    app.kubernetes.io/created-by: nagare-media-engine
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  rules:
+  - host: engine.nagare.local.gd
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: gateway-nbmp
+            port:
+              name: http

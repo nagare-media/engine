@@ -1,5 +1,6 @@
 resources:
 - gateway-nbmp.yaml
+- gateway-nbmp_service.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
@@ -7,4 +8,4 @@ generatorOptions:
 configMapGenerator:
 - name: gateway-nbmp-config
   files:
-  - gateway_nbmp_configuration.yaml
+  - gateway-nbmp_configuration.yaml

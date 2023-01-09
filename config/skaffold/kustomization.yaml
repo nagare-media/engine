@@ -1,9 +1,14 @@
+namespace: nagare-media-engine-system
+
 bases:
 - ../default
 
+resources:
+  - gateway-nbmp_ingress.yaml
+
 patchesStrategicMerge:
-- manager_patch.yaml
-- gateway-nbmp_patch.yaml
+- patches/manager.yaml
+- patches/gateway-nbmp.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
@@ -13,3 +18,7 @@ configMapGenerator:
   behavior: replace
   files:
   - controller_manager_configuration.yaml
+- name: gateway-nbmp-config
+  behavior: replace
+  files:
+  - gateway-nbmp_configuration.yaml
