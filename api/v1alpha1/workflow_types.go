@@ -59,7 +59,7 @@ type HumanReadableWorkflowDescription struct {
 
 type NamedMediaLocationReference struct {
 	// Name of the MediaLocation as used in the Workflow.
-	// +kubebuilder:validation:Pattern="[a-Z0-9-]+"
+	// +kubebuilder:validation:Pattern="[a-zA-Z0-9-]+"
 	Name string `json:"name"`
 
 	// Reference to a MediaLocation of ClusterMediaLocation. Only references to these two kinds are allowed. A Workflow

@@ -59,7 +59,7 @@ spec:
                   properties:
                     name:
                       description: Name of the MediaLocation as used in the Workflow.
-                      pattern: '[a-Z0-9-]+'
+                      pattern: '[a-zA-Z0-9-]+'
                       type: string
                     ref:
                       description: Reference to a MediaLocation of ClusterMediaLocation.
