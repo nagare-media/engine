@@ -207,7 +207,7 @@ image-%:
 
 .PHONY: install
 install: output-crds ## Install CRDs
-	kubectl apply -f out/crds.yaml
+	kubectl apply --server-side -f out/crds.yaml
 
 .PHONY: uninstall
 uninstall: output-crds ## Uninstall CRDs
@@ -215,7 +215,7 @@ uninstall: output-crds ## Uninstall CRDs
 
 .PHONY: deploy
 deploy: output-deployment ## Deploy application
-	kubectl apply -f out/deploy.yaml
+	kubectl apply --server-side -f out/deploy.yaml
 
 .PHONY: undeploy
 undeploy: output-deployment ## Undeploy application
