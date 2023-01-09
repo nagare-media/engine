@@ -8757,6 +8757,10 @@ spec:
                       type: string
                     type:
                       description: Type of Task condition.
+                      enum:
+                      - Ready
+                      - Complete
+                      - Failed
                       type: string
                   required:
                   - status

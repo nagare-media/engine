@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -68,7 +69,63 @@ type NamedMediaLocationReference struct {
 
 // Status of a Workflow.
 type WorkflowStatus struct {
+	// The latest available observations of an object's current state. When a Workflow fails, one of the conditions will
+	// have type "Failed" and status true. When a Workflow is completed, one of the conditions will have type "Complete"
+	// and status true.
+	// +optional
+	// +patchMergeKey=type
+	// +patchStrategy=merge
+	// +listType=atomic
+	Conditions []WorkflowCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
+
+	// Represents time when the Workflow controller started processing a Workflow. It is represented in RFC3339 form and
+	// is in UTC.
+	// +optional
+	StartTime *metav1.Time `json:"startTime,omitempty"`
+
+	// Represents time when the Workflow has ended processing (either failed or completed). It is not guaranteed to be set
+	// in happens-before order across separate operations. It is represented in RFC3339 form and is in UTC.
+	// +optional
+	EndTime *metav1.Time `json:"endTime,omitempty"`
 }
+
+type WorkflowCondition struct {
+	// Type of Workflow condition.
+	Type WorkflowConditionType `json:"type"`
+
+	// Status of the condition, one of True, False, Unknown.
+	Status corev1.ConditionStatus `json:"status"`
+
+	// Last time the condition was checked.
+	// +optional
+	LastProbeTime metav1.Time `json:"lastProbeTime,omitempty"`
+
+	// Last time the condition transit from one status to another.
+	// +optional
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+
+	// (brief) reason for the condition's last transition.
+	// +optional
+	Reason string `json:"reason,omitempty"`
+
+	// Human readable message indicating details about last transition.
+	// +optional
+	Message string `json:"message,omitempty"`
+}
+
+// +kubebuilder:validation:Enum=Ready;Complete;Failed
+type WorkflowConditionType string
+
+const (
+	// WorkflowReady means the Workflow has been processed by the Workflow controller.
+	WorkflowReady = "Ready"
+
+	// WorkflowComplete means the Workflow has completed its execution.
+	WorkflowComplete = "Complete"
+
+	// WorkflowFailed means the Workflow has failed its execution.
+	WorkflowFailed = "Failed"
+)
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status

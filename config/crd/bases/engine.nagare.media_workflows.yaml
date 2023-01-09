@@ -89,6 +89,59 @@ spec:
             type: object
           status:
             description: Status of a Workflow.
+            properties:
+              conditions:
+                description: The latest available observations of an object's current
+                  state. When a Workflow fails, one of the conditions will have type
+                  "Failed" and status true. When a Workflow is completed, one of the
+                  conditions will have type "Complete" and status true.
+                items:
+                  properties:
+                    lastProbeTime:
+                      description: Last time the condition was checked.
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      description: Last time the condition transit from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Human readable message indicating details about
+                        last transition.
+                      type: string
+                    reason:
+                      description: (brief) reason for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type of Workflow condition.
+                      enum:
+                      - Ready
+                      - Complete
+                      - Failed
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              endTime:
+                description: Represents time when the Workflow has ended processing
+                  (either failed or completed). It is not guaranteed to be set in
+                  happens-before order across separate operations. It is represented
+                  in RFC3339 form and is in UTC.
+                format: date-time
+                type: string
+              startTime:
+                description: Represents time when the Workflow controller started
+                  processing a Workflow. It is represented in RFC3339 form and is
+                  in UTC.
+                format: date-time
+                type: string
             type: object
         type: object
     served: true
