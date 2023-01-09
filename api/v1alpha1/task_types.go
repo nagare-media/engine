@@ -17,15 +17,175 @@ limitations under the License.
 package v1alpha1
 
 import (
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	meta "github.com/nagare-media/engine/pkg/apis/meta"
 )
 
-// TaskSpec defines the desired state of Task
+// Specification of a task.
 type TaskSpec struct {
+	// Reference to a TaskTemplate or ClusterTaskTemplate. Only references to these two kinds are allowed. A Task can only
+	// reference TaskTemplates from its own Namespace.
+	// +optional
+	TaskTemplateRef *meta.ObjectReference `json:"taskTemplateRef,omitempty"`
+
+	// Human readable description of this task.
+	// +optional
+	HumanReadable *HumanReadableTaskDescription `json:"humanReadable,omitempty"`
+
+	// Reference to a MediaProcessingEntity or ClusterMediaProcessingEntity. Only references to these two kinds are
+	// allowed. A Task can only reference MediaProcessingEntities from its own Namespace. This field is required if no
+	// mediaProcessingEntitySelector is specified. If both are specified, mediaProcessingEntityRef has precedence. Both
+	// fields may be omitted if a TaskTemplate is used that specifies a MediaProcessingEntity.
+	// +optional
+	MediaProcessingEntityRef *meta.ObjectReference `json:"mediaProcessingEntityRef,omitempty"`
+
+	// Label selector for a MediaProcessingEntity or ClusterMediaProcessingEntity. MediaProcessingEntity has precedence
+	// over ClusterMediaProcessingEntity. If multiple Media Processing Entities are selected, the newest one is chosen.
+	// This field is required if no mediaProcessingEntityRef is specified. If both are specified, mediaProcessingEntityRef
+	// has precedence. Both fields may be omitted if a TaskTemplate is used that specifies a MediaProcessingEntity.
+	// +optional
+	MediaProcessingEntitySelector *metav1.LabelSelector `json:"mediaProcessingEntitySelector,omitempty"`
+
+	// Reference to a Workflow. Only references to Workflow are allowed. A Task can only reference Workflow from its own
+	// Namespace.
+	WorkflowRef meta.LocalObjectReference `json:"workflowRef"`
+
+	// Reference to a Function or ClusterFunction. Only references to these two kinds are allowed. A Task can only
+	// reference Functions from its own Namespace. This field is required if no FunctionSelector is specified. If both are
+	// specified, FunctionRef has precedence. Both fields may be omitted if a TaskTemplate is used that specifies a
+	// Function.
+	// +optional
+	FunctionRef *meta.ObjectReference `json:"functionRef,omitempty"`
+
+	// Label selector for a Function or ClusterFunction. Function has precedence over ClusterFunction. If multiple
+	// Functions are selected, the Function with the newest version is chosen. This field is required if no FunctionRef is
+	// specified. If both are specified, FunctionRef has precedence. Both fields may be omitted if a TaskTemplate is used
+	// that specifies a Function.
+	// +optional
+	FunctionSelector *metav1.LabelSelector `json:"functionSelector,omitempty"`
+
+	// Patches applied to the Job template description of the Function.
+	//
+	// Only these fields may be patched:
+	// TODO: update white list
+	// TODO: enforce limits
+	// TODO: which fields should be patchable?
+	// +optional
+	TemplatePatches *batchv1.JobTemplateSpec `json:"templatePatches,omitempty"`
+
+	// Policy for dealing with a failed Job resulting from this Task. Conditions for when a Job is considered as failure
+	// are defined in the templates `jobFailurePolicy` field.
+	// +optional
+	JobFailurePolicy *JobFailurePolicy `json:"jobFailurePolicy,omitempty"`
 }
 
-// TaskStatus defines the observed state of Task
+type HumanReadableTaskDescription struct {
+	// Human readable name of this task.
+	// +optional
+	Name *string `json:"name,omitempty"`
+
+	// Human readable description of this task.
+	// +optional
+	Description *string `json:"description,omitempty"`
+}
+
+type JobFailurePolicy struct {
+	// The default action taken when a job fails and no rule applies.
+	// +kubebuilder:default=FailWorkflow
+	// +optional
+	DefaultAction *JobFailurePolicyAction `json:"defaultAction,omitempty"`
+
+	// TODO: allow for more detailed policy rules
+	// At most 20 elements are allowed.
+	// +kubebuilder:validation:MaxItems=20
+	// +listType=atomic
+	// Rules []JobFailurePolicyRule `json:"rules"`
+}
+
+// +kubebuilder:validation:Enum=FailWorkflow;Ignore
+type JobFailurePolicyAction string
+
+const (
+	// This is an action which might be taken on a Job failure - mark the Task and Workflow as Failed and terminate all
+	// running Tasks.
+	JobFailurePolicyActionFailWorkflow JobFailurePolicyAction = "FailWorkflow"
+
+	// This is an action which might be taken on a Job failure - mark the Task as Failed but do not terminate other Tasks.
+	// Dependent Tasks have to deal with this fail-state.
+	JobFailurePolicyActionIgnore JobFailurePolicyAction = "Ignore"
+)
+
+// Status of a task.
 type TaskStatus struct {
+	// The latest available observations of an object's current state. When a Task fails, one of the conditions will have
+	// type "Failed" and status true. When a Task is completed, one of the conditions will have type "Complete" and status
+	// true.
+	// +optional
+	// +patchMergeKey=type
+	// +patchStrategy=merge
+	// +listType=atomic
+	Conditions []TaskCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
+
+	// Represents time when the Task controller started processing a Task. It is represented in RFC3339 form and is in
+	// UTC.
+	// +optional
+	StartTime *metav1.Time `json:"startTime,omitempty"`
+
+	// Represents time when the Task has ended processing (either failed or completed). It is not guaranteed to be set in
+	// happens-before order across separate operations. It is represented in RFC3339 form and is in UTC.
+	// +optional
+	EndTime *metav1.Time `json:"endTime,omitempty"`
+
+	// Reference to the Job.
+	// +optional
+	JobRef *LocalJobRef `json:"jobRef,omitempty"`
+}
+
+// Description of the current Task status.
+type TaskCondition struct {
+	// Type of Task condition.
+	Type TaskConditionType `json:"type"`
+
+	// Status of the condition, one of True, False, Unknown.
+	Status corev1.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
+
+	// Last time the condition was checked.
+	// +optional
+	LastProbeTime metav1.Time `json:"lastProbeTime,omitempty" protobuf:"bytes,3,opt,name=lastProbeTime"`
+	// Last time the condition transit from one status to another.
+	// +optional
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,4,opt,name=lastTransitionTime"`
+	// (brief) reason for the condition's last transition.
+	// +optional
+	Reason string `json:"reason,omitempty" protobuf:"bytes,5,opt,name=reason"`
+	// Human readable message indicating details about last transition.
+	// +optional
+	Message string `json:"message,omitempty" protobuf:"bytes,6,opt,name=message"`
+}
+
+type TaskConditionType string
+
+const (
+	// TaskReady means the Task has been processed by the Task controller and a Job was created.
+	TaskReady = "Ready"
+
+	// TaskComplete means the Task has completed its execution.
+	TaskComplete = "Complete"
+
+	// TaskFailed means the Task has failed its execution.
+	TaskFailed = "Failed"
+)
+
+// Reference to a local Job.
+type LocalJobRef struct {
+	// Name of the Job.
+	Name string `json:"name"`
+
+	// UID of the Job.
+	UID string `json:"uid"`
 }
 
 //+kubebuilder:object:root=true
