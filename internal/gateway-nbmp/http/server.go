@@ -75,6 +75,7 @@ func NewServer(cfg enginev1.WebserverConfiguration) *server {
 
 	// Health API
 	s.app.Get("/healthz", http.HealthRequestHandler())
+	s.app.Get("/readyz", http.HealthRequestHandler())
 
 	// NBMP 2nd edition APIs
 	s.app.Group("/v2").
