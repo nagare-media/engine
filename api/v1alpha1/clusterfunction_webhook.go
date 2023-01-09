@@ -19,12 +19,8 @@ package v1alpha1
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
-
-// log is for logging in this package.
-var clusterfunctionlog = logf.Log.WithName("clusterfunction-resource")
 
 func (r *ClusterFunction) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
@@ -38,7 +34,6 @@ var _ webhook.Defaulter = &ClusterFunction{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *ClusterFunction) Default() {
-	clusterfunctionlog.V(1).Info("default", "name", r.Name)
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clusterfunction,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=vclusterfunction.engine.nagare.media,admissionReviewVersions=v1
@@ -47,18 +42,15 @@ var _ webhook.Validator = &ClusterFunction{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterFunction) ValidateCreate() error {
-	clusterfunctionlog.V(1).Info("validate create", "name", r.Name)
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterFunction) ValidateUpdate(old runtime.Object) error {
-	clusterfunctionlog.V(1).Info("validate update", "name", r.Name)
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *ClusterFunction) ValidateDelete() error {
-	clusterfunctionlog.V(1).Info("validate delete", "name", r.Name)
 	return nil
 }

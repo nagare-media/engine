@@ -19,12 +19,8 @@ package v1alpha1
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
-
-// log is for logging in this package.
-var workflowlog = logf.Log.WithName("workflow-resource")
 
 func (r *Workflow) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
@@ -38,7 +34,6 @@ var _ webhook.Defaulter = &Workflow{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *Workflow) Default() {
-	workflowlog.V(1).Info("default", "name", r.Name)
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-workflow,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=workflows,verbs=create;update,versions=v1alpha1,name=vworkflow.engine.nagare.media,admissionReviewVersions=v1
@@ -47,18 +42,15 @@ var _ webhook.Validator = &Workflow{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *Workflow) ValidateCreate() error {
-	workflowlog.V(1).Info("validate create", "name", r.Name)
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *Workflow) ValidateUpdate(old runtime.Object) error {
-	workflowlog.V(1).Info("validate update", "name", r.Name)
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *Workflow) ValidateDelete() error {
-	workflowlog.V(1).Info("validate delete", "name", r.Name)
 	return nil
 }

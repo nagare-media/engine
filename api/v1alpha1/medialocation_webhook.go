@@ -19,12 +19,8 @@ package v1alpha1
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
-
-// log is for logging in this package.
-var medialocationlog = logf.Log.WithName("medialocation-resource")
 
 func (r *MediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
@@ -38,7 +34,6 @@ var _ webhook.Defaulter = &MediaLocation{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *MediaLocation) Default() {
-	medialocationlog.V(1).Info("default", "name", r.Name)
 }
 
 //+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-medialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=vmedialocation.engine.nagare.media,admissionReviewVersions=v1
@@ -47,18 +42,15 @@ var _ webhook.Validator = &MediaLocation{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaLocation) ValidateCreate() error {
-	medialocationlog.V(1).Info("validate create", "name", r.Name)
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaLocation) ValidateUpdate(old runtime.Object) error {
-	medialocationlog.V(1).Info("validate update", "name", r.Name)
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *MediaLocation) ValidateDelete() error {
-	medialocationlog.V(1).Info("validate delete", "name", r.Name)
 	return nil
 }
