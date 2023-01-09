@@ -17,7 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -40,15 +40,15 @@ type FunctionSpec struct {
 	// +kubebuilder:validation:Pattern="^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-(0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?$"
 	Version string `json:"version"`
 
-	// Describes the pod that will be created when executing this function.
+	// Describes the Job that will be created when executing this function.
 	//
 	// The following limitations are imposed:
-	// - spec.restartPolicy must be "OnFailure" or "Never". The default is "Never"
+	// - spec.template.spec.restartPolicy: must be "OnFailure" or "Never". The default is "Never"
 	//
 	// Cannot be updated.
 	// TODO: make some exceptions
 	// TODO: hinder changes to this field
-	Template corev1.PodTemplateSpec `json:"template"`
+	Template batchv1.JobTemplateSpec `json:"template"`
 
 	// Indicates that this function can only run on a local Media Processing Entities (MPE), e.g. if this function changes
 	// the Workflow on the management cluster. The default is "false"
