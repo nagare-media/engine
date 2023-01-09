@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"fmt"
+	"time"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -63,5 +64,16 @@ func (ml *MediaLocation) ValidateDelete() error {
 }
 
 func (ml *MediaLocation) validate(old *MediaLocation) error {
+	if ml.Spec.RIST != nil {
+		if ml.Spec.RIST.BufferSize != nil {
+			if ml.Spec.RIST.BufferSize.Duration < 0 {
+				return apierrors.NewBadRequest("bufferSize is negative")
+			}
+			if ml.Spec.RIST.BufferSize.Duration > 30*time.Second {
+				return apierrors.NewBadRequest("bufferSize is larger than 30s")
+			}
+		}
+	}
+
 	return nil
 }
