@@ -19,10 +19,12 @@ package svc
 import (
 	"context"
 
-	"github.com/nagare-media/engine/internal/gateway-nbmp/store"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/uuid"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 //+kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;create;update;patch;delete
@@ -35,19 +37,19 @@ type WorkflowService interface {
 	Retrieve(ctx context.Context, wf *nbmpv2.Workflow) error
 }
 
-type workflowService struct{}
+type workflowService struct {
+	k8s client.Client
+}
 
 var _ WorkflowService = &workflowService{}
 
-func NewWorkflowService() *workflowService {
-	return nil
+func NewWorkflowService(cfg *enginev1.GatewayNBMPConfiguration, k8sClient client.Client) *workflowService {
+	return &workflowService{
+		k8s: k8sClient,
+	}
 }
 
-func NewWorkflowServiceWithStore(s store.Store) *workflowService {
-	return nil
-}
-
-func (wfsvc *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error {
+func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx)
 	PopulateWorkflowDefaults(wf)
 
@@ -67,7 +69,7 @@ func (wfsvc *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) e
 	return nil
 }
 
-func (wfsvc *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error {
+func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
 	l.V(2).Info("updating workflow")
 	PopulateWorkflowDefaults(wf)
@@ -75,7 +77,7 @@ func (wfsvc *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) e
 	return nil
 }
 
-func (wfsvc *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error {
+func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
 	l.V(2).Info("deleting workflow")
 	PopulateWorkflowDefaults(wf)
@@ -83,7 +85,7 @@ func (wfsvc *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) e
 	return nil
 }
 
-func (wfsvc *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) error {
+func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
 	l.V(2).Info("retrieving workflow")
 	PopulateWorkflowDefaults(wf)

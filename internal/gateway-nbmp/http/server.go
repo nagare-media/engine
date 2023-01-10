@@ -25,21 +25,19 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	nbmpv2 "github.com/nagare-media/engine/internal/gateway-nbmp/http/v2"
 	"github.com/nagare-media/engine/internal/gateway-nbmp/http/v2/workflowapi"
+	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
 	"github.com/nagare-media/engine/pkg/http"
 )
 
 type server struct {
-	cfg *enginev1.WebserverConfiguration
+	cfg *enginev1.GatewayNBMPConfiguration
 	app *fiber.App
 	ctx context.Context
 }
 
-func NewServer(cfg enginev1.WebserverConfiguration) *server {
-	cfgCopy := cfg.DeepCopy()
-	cfgCopy.Default()
-
+func NewServer(cfg *enginev1.GatewayNBMPConfiguration, wfsvc svc.WorkflowService) *server {
 	s := &server{
-		cfg: cfgCopy,
+		cfg: cfg,
 		app: fiber.New(fiber.Config{
 			ServerHeader:          "nagare media engine",
 			AppName:               "nagare media engine gateway-nbmp",
@@ -49,10 +47,10 @@ func NewServer(cfg enginev1.WebserverConfiguration) *server {
 			DisableDefaultContentType:    true, // we set Content-Type ourselves
 			DisablePreParseMultipartForm: true, // we don't expect multipart/form-data requests
 
-			ReadTimeout:  *cfgCopy.ReadTimeout,
-			WriteTimeout: *cfgCopy.WriteTimeout,
-			IdleTimeout:  *cfgCopy.IdleTimeout,
-			Network:      *cfgCopy.Network,
+			ReadTimeout:  *cfg.Webserver.ReadTimeout,
+			WriteTimeout: *cfg.Webserver.WriteTimeout,
+			IdleTimeout:  *cfg.Webserver.IdleTimeout,
+			Network:      *cfg.Webserver.Network,
 
 			RequestMethods: []string{
 				fiber.MethodGet,
@@ -82,7 +80,7 @@ func NewServer(cfg enginev1.WebserverConfiguration) *server {
 		// middlewares
 		Use(nbmpv2.HandleRequest).
 		// APIs
-		Mount("/workflows", workflowapi.New(cfgCopy).App())
+		Mount("/workflows", workflowapi.New(cfg, wfsvc).App())
 
 	return s
 }
@@ -96,7 +94,7 @@ func (s *server) Start(ctx context.Context) error {
 	var err error
 	listenDone := make(chan struct{})
 	go func() {
-		err = s.app.Listen(*s.cfg.BindAddress)
+		err = s.app.Listen(*s.cfg.Webserver.BindAddress)
 		if err != nil {
 			l.Error(err, "problem starting listener")
 		}

@@ -26,6 +26,9 @@ import (
 type GatewayNBMPConfigurationSpec struct {
 	// +optional
 	Webserver WebserverConfiguration `json:"webserver,omitempty"`
+
+	// +optional
+	Service ServiceConfiguration `json:"service,omitempty"`
 }
 
 type WebserverConfiguration struct {
@@ -49,26 +52,7 @@ type WebserverConfiguration struct {
 	PublicBaseURL *string `json:"publicBaseURL"`
 }
 
-func (wc *WebserverConfiguration) Default() {
-	if wc.BindAddress == nil {
-		wc.BindAddress = utilpointer.String(":8080")
-	}
-
-	if wc.ReadTimeout == nil {
-		wc.ReadTimeout = utilpointer.Duration(time.Minute)
-	}
-
-	if wc.WriteTimeout == nil {
-		wc.WriteTimeout = utilpointer.Duration(time.Minute)
-	}
-
-	if wc.IdleTimeout == nil {
-		wc.IdleTimeout = utilpointer.Duration(time.Minute)
-	}
-
-	if wc.Network == nil {
-		wc.Network = utilpointer.String("tcp")
-	}
+type ServiceConfiguration struct {
 }
 
 //+kubebuilder:object:root=true
@@ -82,4 +66,26 @@ type GatewayNBMPConfiguration struct {
 
 func init() {
 	SchemeBuilder.Register(&GatewayNBMPConfiguration{})
+}
+
+func (wc *GatewayNBMPConfiguration) Default() {
+	if wc.Webserver.BindAddress == nil {
+		wc.Webserver.BindAddress = utilpointer.String(":8080")
+	}
+
+	if wc.Webserver.ReadTimeout == nil {
+		wc.Webserver.ReadTimeout = utilpointer.Duration(time.Minute)
+	}
+
+	if wc.Webserver.WriteTimeout == nil {
+		wc.Webserver.WriteTimeout = utilpointer.Duration(time.Minute)
+	}
+
+	if wc.Webserver.IdleTimeout == nil {
+		wc.Webserver.IdleTimeout = utilpointer.Duration(time.Minute)
+	}
+
+	if wc.Webserver.Network == nil {
+		wc.Webserver.Network = utilpointer.String("tcp")
+	}
 }

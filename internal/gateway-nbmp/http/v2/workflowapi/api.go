@@ -32,17 +32,13 @@ import (
 )
 
 type workflowapi struct {
-	cfg   *enginev1.WebserverConfiguration
+	cfg   *enginev1.GatewayNBMPConfiguration
 	wfsvc svc.WorkflowService
 }
 
 var _ api.API = &workflowapi{}
 
-func New(cfg *enginev1.WebserverConfiguration) *workflowapi {
-	return NewWithSvc(cfg, svc.NewWorkflowService())
-}
-
-func NewWithSvc(cfg *enginev1.WebserverConfiguration, wfsvc svc.WorkflowService) *workflowapi {
+func New(cfg *enginev1.GatewayNBMPConfiguration, wfsvc svc.WorkflowService) *workflowapi {
 	return &workflowapi{
 		cfg:   cfg,
 		wfsvc: wfsvc,
@@ -94,10 +90,10 @@ func (wfapi *workflowapi) handleRequest(svcCall func(ctx context.Context, wf *nb
 		}
 
 		var selfURL string
-		if wfapi.cfg.PublicBaseURL == nil {
+		if wfapi.cfg.Webserver.PublicBaseURL == nil {
 			selfURL = c.BaseURL() + "/" + c.Path() + "/" + wf.General.ID
 		} else {
-			selfURL = *wfapi.cfg.PublicBaseURL + "/" + wf.General.ID
+			selfURL = *wfapi.cfg.Webserver.PublicBaseURL + "/" + wf.General.ID
 		}
 		// TODO: the NBMP standard requires (SHOULD) a link object in the WDD response. The JSON schema definition does not
 		//       specify a link object.

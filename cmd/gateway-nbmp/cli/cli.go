@@ -22,35 +22,42 @@ import (
 	"flag"
 	"os"
 
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	"github.com/mattn/go-isatty"
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/gateway-nbmp/http"
+	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
 	"github.com/nagare-media/engine/internal/pkg/version"
-	"github.com/nagare-media/engine/pkg/inject"
 )
 
-type cli struct {
-	Config enginev1.GatewayNBMPConfiguration
-	scheme *runtime.Scheme
+var (
+	scheme = runtime.NewScheme()
+)
+
+func init() {
+	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
+	utilruntime.Must(enginev1.AddToScheme(scheme))
 }
 
-var _ inject.Scheme = &cli{}
+type cli struct{}
 
 func New() *cli {
 	return &cli{}
-}
-
-func (c *cli) InjectScheme(scheme *runtime.Scheme) error {
-	c.scheme = scheme
-	return nil
 }
 
 func (c *cli) Execute(ctx context.Context, args []string) error {
@@ -88,7 +95,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// configure
+	// configure gateway-nbmp
 
 	if showUsage {
 		fs.Usage()
@@ -105,7 +112,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	log.SetLogger(l)
 
 	if configFile == "" {
-		err := errors.New("-config option missing")
+		err := errors.New("--config option missing")
 		setupLog.Error(err, "setup failed")
 		fs.Usage()
 		return err
@@ -116,16 +123,47 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	codecs := serializer.NewCodecFactory(c.scheme)
-	err = runtime.DecodeInto(codecs.UniversalDecoder(), content, &c.Config)
+	var cfg enginev1.GatewayNBMPConfiguration
+	codecs := serializer.NewCodecFactory(scheme)
+	err = runtime.DecodeInto(codecs.UniversalDecoder(), content, &cfg)
 	if err != nil {
 		setupLog.Error(err, "unable to load the config file")
 		return err
 	}
 
+	cfg.Default()
+
+	// configure Kubernetes API client
+
+	k8sCfg := ctrl.GetConfigOrDie()
+
+	mapper, err := apiutil.NewDynamicRESTMapper(k8sCfg)
+	if err != nil {
+		return err
+	}
+
+	k8sCache, err := cache.New(k8sCfg, cache.Options{Scheme: scheme, Mapper: mapper})
+	if err != nil {
+		return err
+	}
+
+	k8sClient, err := client.New(k8sCfg, client.Options{Scheme: scheme, Mapper: mapper})
+	if err != nil {
+		return err
+	}
+	k8sClient, err = client.NewDelegatingClient(client.NewDelegatingClientInput{
+		CacheReader: k8sCache,
+		Client:      k8sClient,
+	})
+	if err != nil {
+		return err
+	}
+
 	// start components
 
-	ws := http.NewServer(c.Config.Webserver)
+	wfsvc := svc.NewWorkflowService(&cfg, k8sClient)
+
+	ws := http.NewServer(&cfg, wfsvc)
 	if err := ws.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running webserver")
 		return err

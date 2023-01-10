@@ -19,38 +19,18 @@ package main
 import (
 	"os"
 
-	"k8s.io/apimachinery/pkg/runtime"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 
-	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/cmd/gateway-nbmp/cli"
 )
 
-var (
-	scheme = runtime.NewScheme()
-	logger = log.Log.WithName("engine")
-)
-
-func init() {
-	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	utilruntime.Must(enginev1.AddToScheme(scheme))
-}
-
 func main() {
 	ctx := signals.SetupSignalHandler()
-	log.IntoContext(ctx, logger)
+	log.IntoContext(ctx, log.Log.WithName("engine"))
 
 	c := cli.New()
-	err := c.InjectScheme(scheme)
-	if err != nil {
-		os.Exit(1)
-	}
-
-	err = c.Execute(ctx, os.Args[1:])
-	if err != nil {
+	if err := c.Execute(ctx, os.Args[1:]); err != nil {
 		os.Exit(1)
 	}
 }
