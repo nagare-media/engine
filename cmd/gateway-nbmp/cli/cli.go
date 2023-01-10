@@ -151,6 +151,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
+	k8sClient = client.NewNamespacedClient(k8sClient, cfg.Services.KubernetesNamespace)
 	k8sClient, err = client.NewDelegatingClient(client.NewDelegatingClientInput{
 		CacheReader: k8sCache,
 		Client:      k8sClient,

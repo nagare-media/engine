@@ -24,11 +24,8 @@ import (
 )
 
 type GatewayNBMPConfigurationSpec struct {
-	// +optional
-	Webserver WebserverConfiguration `json:"webserver,omitempty"`
-
-	// +optional
-	Service ServiceConfiguration `json:"service,omitempty"`
+	Webserver WebserverConfiguration `json:"webserver"`
+	Services  ServicesConfiguration  `json:"services"`
 }
 
 type WebserverConfiguration struct {
@@ -52,7 +49,10 @@ type WebserverConfiguration struct {
 	PublicBaseURL *string `json:"publicBaseURL"`
 }
 
-type ServiceConfiguration struct {
+type ServicesConfiguration struct {
+	// Limit gateway-nbmp to a specific Kubernetes namespace.
+	// +optional
+	KubernetesNamespace string `json:"kubernetesNamespace,omitempty"`
 }
 
 //+kubebuilder:object:root=true
