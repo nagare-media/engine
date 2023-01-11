@@ -38,6 +38,7 @@ type WorkflowService interface {
 }
 
 type workflowService struct {
+	cfg *enginev1.GatewayNBMPConfiguration
 	k8s client.Client
 }
 
@@ -45,6 +46,7 @@ var _ WorkflowService = &workflowService{}
 
 func NewWorkflowService(cfg *enginev1.GatewayNBMPConfiguration, k8sClient client.Client) *workflowService {
 	return &workflowService{
+		cfg: cfg,
 		k8s: k8sClient,
 	}
 }
