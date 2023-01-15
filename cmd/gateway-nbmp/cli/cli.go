@@ -25,6 +25,7 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/klog/v2"
 
 	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
@@ -110,6 +111,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	l := zap.New(zap.UseFlagOptions(&logOpts)).WithName("engine")
 	ctx = log.IntoContext(ctx, l)
 	log.SetLogger(l)
+	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	if configFile == "" {
 		err := errors.New("--config option missing")
