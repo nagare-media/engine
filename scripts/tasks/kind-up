@@ -98,3 +98,12 @@ helm upgrade --install --wait --timeout 15m \
   --repo https://nats-io.github.io/k8s/helm/charts/ \
   nats nats --version "${TESTENV_NATS_VERSION}" \
   --values - < hack/kind/helm/values-nats.yaml
+
+# apply manifests
+kubectl config use "kind-${EDGE_CLUSTER_NAME}"
+kubectl apply --force-conflicts --server-side -f "hack/kind/manifests/common"
+kubectl rollout restart -n kube-system deployment/coredns
+
+kubectl config use "kind-${MANAGEMENT_CLUSTER_NAME}"
+kubectl apply --force-conflicts --server-side -f "hack/kind/manifests/common"
+kubectl rollout restart -n kube-system deployment/coredns
