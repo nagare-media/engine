@@ -113,7 +113,7 @@ type JobFailurePolicy struct {
 // +kubebuilder:validation:Enum=FailWorkflow;Ignore
 type JobFailurePolicyAction string
 
-const (
+var (
 	// This is an action which might be taken on a Job failure - mark the Task and Workflow as Failed and terminate all
 	// running Tasks.
 	JobFailurePolicyActionFailWorkflow JobFailurePolicyAction = "FailWorkflow"
@@ -177,7 +177,7 @@ type TaskCondition struct {
 // +kubebuilder:validation:Enum=Ready;Complete;Failed
 type TaskConditionType string
 
-const (
+var (
 	// TaskReady means the Task has been processed by the Task controller and a Job was created.
 	TaskReady = "Ready"
 
