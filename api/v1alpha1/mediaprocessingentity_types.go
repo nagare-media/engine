@@ -28,6 +28,9 @@ const (
 	// ClusterMediaProcessingEntity in the whole Kubernetes cluster. A MediaProcessingEntity with this annotation has
 	// precedence over a ClusterMediaProcessingEntity.
 	BetaIsDefaultMediaProcessingEntityAnnotation = "beta.engine.nagare.media/is-default-media-processing-entity"
+
+	// Description of the location the MediaProcessingEntity is in (e.g. "de-48149").
+	BetaMediaProcessingEntityLocationLabel = "beta.engine.nagare.media/media-processing-entity-location"
 )
 
 // Specification of a Media Processing Entity (MPE).
