@@ -27,8 +27,8 @@ import (
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-//+kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;create;update;patch;delete
-//+kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;create;update;patch;delete
+//+kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch;create;update;patch;delete
 
 type WorkflowService interface {
 	Create(ctx context.Context, wf *nbmpv2.Workflow) error

@@ -16,6 +16,7 @@ rules:
   - list
   - patch
   - update
+  - watch
 - apiGroups:
   - engine.nagare.media
   resources:
@@ -27,3 +28,4 @@ rules:
   - list
   - patch
   - update
+  - watch
