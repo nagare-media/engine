@@ -25,11 +25,11 @@ type requestIDLocalKey struct{}
 
 func RequestIDMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Get(fiber.HeaderXRequestID)
+		id := c.Get(fiber.HeaderXRequestID) // request headers
 		if id == "" {
 			id = uuid.UUIDv4()
-			c.Set(fiber.HeaderXRequestID, id)
 		}
+		c.Set(fiber.HeaderXRequestID, id) // response headers
 		c.Locals(requestIDLocalKey{}, id)
 		return c.Next()
 	}
