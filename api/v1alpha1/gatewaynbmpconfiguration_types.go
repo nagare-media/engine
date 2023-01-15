@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilpointer "k8s.io/utils/pointer"
 )
@@ -53,6 +54,10 @@ type ServicesConfiguration struct {
 	// Limit gateway-nbmp to a specific Kubernetes namespace.
 	// +optional
 	KubernetesNamespace string `json:"kubernetesNamespace,omitempty"`
+
+	// Name of the GPU resource used in the Kubernetes cluster (e.g. "nvidia.com/gpu").
+	// +optional
+	DefaultKubernetesGPUResource corev1.ResourceName `json:"defaultKubernetesGPUResource,omitempty"`
 }
 
 //+kubebuilder:object:root=true
