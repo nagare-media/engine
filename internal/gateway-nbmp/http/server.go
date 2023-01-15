@@ -68,16 +68,17 @@ func NewServer(cfg *enginev1.GatewayNBMPConfiguration, wfsvc svc.WorkflowService
 	// global middlewares
 	s.app.
 		Use(http.ContextMiddleware(func() context.Context { return s.ctx })).
-		Use(http.TelemetryMiddleware()).
 		Use(http.RequestIDMiddleware())
 
 	// Health API
-	s.app.Get("/healthz", http.HealthRequestHandler())
-	s.app.Get("/readyz", http.HealthRequestHandler())
+	s.app.
+		Get("/healthz", http.HealthRequestHandler()).
+		Get("/readyz", http.HealthRequestHandler())
 
 	// NBMP 2nd edition APIs
 	s.app.Group("/v2").
 		// middlewares
+		Use(http.TelemetryMiddleware()).
 		Use(nbmpv2.HandleRequest).
 		// APIs
 		Mount("/workflows", workflowapi.New(cfg, wfsvc).App())
