@@ -62,6 +62,8 @@ func New() *cli {
 }
 
 func (c *cli) Execute(ctx context.Context, args []string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	setupLog := log.FromContext(ctx).WithName("setup")
 
 	// setup CLI flags
@@ -162,15 +164,49 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// start components
+	// create components
 
 	wfsvc := svc.NewWorkflowService(&cfg, k8sClient)
+	httpServer := http.NewServer(&cfg, wfsvc)
 
-	ws := http.NewServer(&cfg, wfsvc)
-	if err := ws.Start(ctx); err != nil {
-		setupLog.Error(err, "problem running webserver")
-		return err
+	// start components
+
+	var k8sCacheErr error
+	k8sCacheDone := make(chan struct{})
+	go func() {
+		k8sCacheErr = k8sCache.Start(ctx)
+		close(k8sCacheDone)
+	}()
+
+	if ok := k8sCache.WaitForCacheSync(ctx); !ok {
+		if k8sCacheErr == nil {
+			k8sCacheErr = errors.New("problem starting Kubernetes API client cache")
+		}
+		setupLog.Error(k8sCacheErr, "problem starting Kubernetes API client cache")
+		return k8sCacheErr
 	}
 
-	return nil
+	var httpServerErr error
+	httpServerDone := make(chan struct{})
+	go func() {
+		httpServerErr = httpServer.Start(ctx)
+		close(httpServerDone)
+	}()
+
+	// termination handling
+
+	select {
+	case <-k8sCacheDone:
+		cancel()
+	case <-httpServerDone:
+		cancel()
+	case <-ctx.Done():
+	}
+	<-k8sCacheDone
+	<-httpServerDone
+
+	if httpServerErr != nil {
+		setupLog.Error(err, "problem running webserver")
+	}
+	return httpServerErr
 }
