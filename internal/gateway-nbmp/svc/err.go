@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The nagare media authors
+Copyright 2023 The nagare media authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,10 +16,26 @@ limitations under the License.
 
 package svc
 
-import "errors"
+import (
+	"errors"
+
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+)
 
 var (
-	ErrNotFound    = errors.New("nbmp: resource not found")
-	ErrUnsupported = errors.New("nbmp: resource has unsupported descriptions")
-	ErrInvalid     = errors.New("nbmp: resource is invalid")
+	ErrNotFound      = errors.New("nbmp: resource not found")
+	ErrAlreadyExists = errors.New("nbmp: resource already exists")
+	ErrUnsupported   = errors.New("nbmp: resource has unsupported descriptions")
+	ErrInvalid       = errors.New("nbmp: resource is invalid")
 )
+
+func apiErrorHandler(err error) error {
+	switch {
+	case apierrors.IsNotFound(err),
+		apierrors.IsGone(err):
+		return ErrNotFound
+	case apierrors.IsAlreadyExists(err):
+		return ErrAlreadyExists
+	}
+	return err
+}

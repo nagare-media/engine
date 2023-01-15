@@ -21,23 +21,43 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+
 	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
 )
 
 func SvcErrorHandler(c *fiber.Ctx, obj interface{}, svcErr error) error {
 	var s int
 	switch svcErr {
-	// responses without a body
-	default:
-		return fiber.ErrInternalServerError
-	case svc.ErrNotFound:
-		return fiber.ErrNotFound
-
-	// responses with a body including error details
-	case svc.ErrUnsupported:
-		s = fiber.StatusUnprocessableEntity
 	case svc.ErrInvalid:
-		s = fiber.StatusBadRequest
+		s = fiber.StatusBadRequest // 400
+
+	case svc.ErrNotFound:
+		// respond without a body
+		return fiber.ErrNotFound // 404
+
+	case svc.ErrAlreadyExists:
+		s = fiber.StatusConflict // 409
+
+	case svc.ErrUnsupported:
+		s = fiber.StatusUnprocessableEntity // 422
+
+	default:
+		// check for Kubernetes API errors
+		switch {
+		default:
+			// respond without a body
+			return fiber.ErrInternalServerError // 500
+
+		case apierrors.IsServiceUnavailable(svcErr),
+			apierrors.IsUnexpectedServerError(svcErr),
+			apierrors.IsUnexpectedObjectError(svcErr):
+			s = fiber.StatusBadGateway // 502
+
+		case apierrors.IsTimeout(svcErr),
+			apierrors.IsServerTimeout(svcErr):
+			s = fiber.StatusGatewayTimeout // 504
+		}
 	}
 
 	c.Status(s)
