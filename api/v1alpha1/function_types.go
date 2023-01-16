@@ -60,8 +60,8 @@ type FunctionSpec struct {
 	DefaultConfig *apiextensionsv1.JSON `json:"defaultConfig,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:categories={nagare-all,nme-all}
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories={nagare-all,nme-all}
 
 // Function is the Schema for the functions API
 type Function struct {
@@ -71,7 +71,7 @@ type Function struct {
 	Spec FunctionSpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // FunctionList contains a list of Function
 type FunctionList struct {

@@ -69,8 +69,8 @@ type TaskTemplateSpec struct {
 	Config *apiextensionsv1.JSON `json:"config,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:categories={nagare-all,nme-all}
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories={nagare-all,nme-all}
 
 // TaskTemplate is the Schema for the tasktemplates API
 type TaskTemplate struct {
@@ -80,7 +80,7 @@ type TaskTemplate struct {
 	Spec TaskTemplateSpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // TaskTemplateList contains a list of TaskTemplate
 type TaskTemplateList struct {

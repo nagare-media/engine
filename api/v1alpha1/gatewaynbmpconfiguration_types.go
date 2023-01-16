@@ -60,7 +60,7 @@ type ServicesConfiguration struct {
 	DefaultKubernetesGPUResource corev1.ResourceName `json:"defaultKubernetesGPUResource,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // GatewayNBMPConfiguration defines the configuration for nagare media engine gateway-nbmp.
 type GatewayNBMPConfiguration struct {

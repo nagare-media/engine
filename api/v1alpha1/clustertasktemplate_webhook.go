@@ -31,7 +31,7 @@ func (ctt *ClusterTaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error 
 		Complete()
 }
 
-//+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=mclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=mclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &ClusterTaskTemplate{}
 
@@ -40,7 +40,7 @@ func (ctt *ClusterTaskTemplate) Default() {
 	(*TaskTemplate)(ctt).Default()
 }
 
-//+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=vclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=vclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &ClusterTaskTemplate{}
 

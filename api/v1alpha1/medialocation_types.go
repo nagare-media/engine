@@ -431,8 +431,8 @@ type QueryArg struct {
 	ValueFrom *meta.ConfigMapOrSecretReference `json:"valueFrom,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:categories={nagare-all,nme-all}
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories={nagare-all,nme-all}
 
 // MediaLocation is the Schema for the medialocations API
 type MediaLocation struct {
@@ -442,7 +442,7 @@ type MediaLocation struct {
 	Spec MediaLocationSpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // MediaLocationList contains a list of MediaLocation
 type MediaLocationList struct {

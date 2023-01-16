@@ -197,9 +197,9 @@ type LocalJobReference struct {
 	UID string `json:"uid"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:resource:categories={nagare-all,nme-all,nagare,nme}
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:categories={nagare-all,nme-all,nagare,nme}
 
 // Task is the Schema for the tasks API
 type Task struct {
@@ -210,7 +210,7 @@ type Task struct {
 	Status TaskStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // TaskList contains a list of Task
 type TaskList struct {

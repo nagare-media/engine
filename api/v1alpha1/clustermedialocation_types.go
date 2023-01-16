@@ -20,8 +20,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
 
 // ClusterMediaLocation is the Schema for the clustermedialocations API
 type ClusterMediaLocation struct {
@@ -31,7 +31,7 @@ type ClusterMediaLocation struct {
 	Spec MediaLocationSpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // ClusterMediaLocationList contains a list of ClusterMediaLocation
 type ClusterMediaLocationList struct {

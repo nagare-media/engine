@@ -129,9 +129,14 @@ const (
 	WorkflowFailed = "Failed"
 )
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:resource:categories={nagare-all,nme-all,nagare,nme}
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:categories={nagare-all,nme-all,nagare,nme}
+// +kubebuilder:printcolumn:name="Human Name",type="string",JSONPath=`.spec.humanReadable.name`
+// +kubebuilder:printcolumn:name="Status",type="string",JSONPath=`.status.conditions[?(@.status=="True")].type`
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=`.metadata.creationTimestamp`,description="CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC."
+// +kubebuilder:printcolumn:name="Start",type="date",JSONPath=`.status.startTime`
+// +kubebuilder:printcolumn:name="End",type="date",JSONPath=`.status.endTime`
 
 // Workflow is the Schema for the workflows API
 type Workflow struct {
@@ -142,7 +147,7 @@ type Workflow struct {
 	Status WorkflowStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // WorkflowList contains a list of Workflow
 type WorkflowList struct {

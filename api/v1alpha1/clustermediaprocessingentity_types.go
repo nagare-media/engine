@@ -20,8 +20,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
 
 // ClusterMediaProcessingEntity is the Schema for the clustermediaprocessingentities API
 type ClusterMediaProcessingEntity struct {
@@ -31,7 +31,7 @@ type ClusterMediaProcessingEntity struct {
 	Spec MediaProcessingEntitySpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // ClusterMediaProcessingEntityList contains a list of ClusterMediaProcessingEntity
 type ClusterMediaProcessingEntityList struct {

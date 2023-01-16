@@ -70,8 +70,8 @@ type Kubeconfig struct {
 	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:categories={nagare-all,nme-all}
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories={nagare-all,nme-all}
 
 // MediaProcessingEntity is the Schema for the mediaprocessingentities API
 type MediaProcessingEntity struct {
@@ -81,7 +81,7 @@ type MediaProcessingEntity struct {
 	Spec MediaProcessingEntitySpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // MediaProcessingEntityList contains a list of MediaProcessingEntity
 type MediaProcessingEntityList struct {

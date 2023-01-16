@@ -31,7 +31,7 @@ func (cf *ClusterFunction) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-//+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clusterfunction,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=mclusterfunction.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clusterfunction,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=mclusterfunction.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &ClusterFunction{}
 
@@ -40,7 +40,7 @@ func (cf *ClusterFunction) Default() {
 	(*Function)(cf).Default()
 }
 
-//+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clusterfunction,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=vclusterfunction.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clusterfunction,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=vclusterfunction.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &ClusterFunction{}
 

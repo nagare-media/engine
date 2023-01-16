@@ -20,8 +20,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
 
 // ClusterTaskTemplate is the Schema for the clustertasktemplates API
 type ClusterTaskTemplate struct {
@@ -31,7 +31,7 @@ type ClusterTaskTemplate struct {
 	Spec TaskTemplateSpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // ClusterTaskTemplateList contains a list of ClusterTaskTemplate
 type ClusterTaskTemplateList struct {

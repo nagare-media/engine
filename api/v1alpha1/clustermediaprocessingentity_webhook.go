@@ -31,7 +31,7 @@ func (cmpe *ClusterMediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manag
 		Complete()
 }
 
-//+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustermediaprocessingentity,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=create;update,versions=v1alpha1,name=mclustermediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustermediaprocessingentity,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=create;update,versions=v1alpha1,name=mclustermediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &ClusterMediaProcessingEntity{}
 
@@ -40,7 +40,7 @@ func (cmpe *ClusterMediaProcessingEntity) Default() {
 	(*MediaProcessingEntity)(cmpe).Default()
 }
 
-//+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vclustermediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vclustermediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &ClusterMediaProcessingEntity{}
 

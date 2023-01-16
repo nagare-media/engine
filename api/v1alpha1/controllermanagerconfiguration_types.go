@@ -21,7 +21,7 @@ import (
 	ctrlCfg "sigs.k8s.io/controller-runtime/pkg/config/v1alpha1"
 )
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // ControllerManagerConfiguration defines the configuration for nagare media engine controller manager.
 type ControllerManagerConfiguration struct {

@@ -33,7 +33,7 @@ func (ml *MediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-//+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-medialocation,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=mmedialocation.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-medialocation,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=mmedialocation.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &MediaLocation{}
 
@@ -41,7 +41,7 @@ var _ webhook.Defaulter = &MediaLocation{}
 func (ml *MediaLocation) Default() {
 }
 
-//+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-medialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=vmedialocation.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-medialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=vmedialocation.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &MediaLocation{}
 

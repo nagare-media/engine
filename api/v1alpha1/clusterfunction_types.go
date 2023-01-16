@@ -20,8 +20,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
 
 // ClusterFunction is the Schema for the clusterfunctions API
 type ClusterFunction struct {
@@ -31,7 +31,7 @@ type ClusterFunction struct {
 	Spec FunctionSpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // ClusterFunctionList contains a list of ClusterFunction
 type ClusterFunctionList struct {

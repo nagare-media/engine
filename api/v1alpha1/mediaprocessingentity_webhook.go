@@ -31,7 +31,7 @@ func (mpe *MediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) erro
 		Complete()
 }
 
-//+kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=mmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=mmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &MediaProcessingEntity{}
 
@@ -39,7 +39,7 @@ var _ webhook.Defaulter = &MediaProcessingEntity{}
 func (mpe *MediaProcessingEntity) Default() {
 }
 
-//+kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
 var _ webhook.Validator = &MediaProcessingEntity{}
 
