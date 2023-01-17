@@ -91,21 +91,22 @@ func (wfapi *workflowapi) handleRequest(svcCall func(ctx context.Context, wf *nb
 
 		var selfURL string
 		if wfapi.cfg.Webserver.PublicBaseURL == nil {
-			selfURL = c.BaseURL() + "/" + c.Path() + "/" + wf.General.ID
+			selfURL = c.BaseURL()
 		} else {
-			selfURL = *wfapi.cfg.Webserver.PublicBaseURL + "/" + wf.General.ID
+			selfURL = *wfapi.cfg.Webserver.PublicBaseURL
 		}
+		selfURL += "/" + c.Path() + "/" + wf.General.ID
 		// TODO: the NBMP standard requires (SHOULD) a link object in the WDD response. The JSON schema definition does not
 		//       specify a link object.
 
 		// set status and headers
-		c.Response().Header.SetContentType(nbmpv2.WorkflowDescriptionDocumentMIMEType)
+		c.Set(fiber.HeaderContentType, nbmpv2.WorkflowDescriptionDocumentMIMEType)
 
 		switch c.Method() {
 		case fiber.MethodPost:
 			// TODO: fiber.StatusAccepted may be more appropriate
 			c.Status(fiber.StatusCreated)
-			c.Response().Header.Set("Location", selfURL)
+			c.Set("Location", selfURL)
 
 		case fiber.MethodPatch, fiber.MethodPut:
 			// TODO: the NBMP standard specifies 201 as status code. This is probably a mistake as no new resource is created.
