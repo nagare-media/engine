@@ -1,0 +1,82 @@
+{
+  "scheme": {
+    "uri": "urn:mpeg:mpegi:nbmp:2023"
+  },
+  "general": {
+    "name": "nagare/example/sleep",
+    "description": "A dummy workflow that creates jobs that sleep for some time.",
+    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1apha1"
+  },
+  "processing": {
+    "connection-map": [
+      {
+        "connection-id": "sleep60 -> sleep240",
+        "from": {
+          "id": "sleep-0-1-0",
+          "instance": "sleep60",
+          "port-name": "out"
+        },
+        "to": {
+          "id": "sleep-0-1-0",
+          "instance": "sleep240",
+          "port-name": "in"
+        }
+      }
+    ],
+    "function-restrictions": [
+      {
+        "instance": "sleep60",
+        "general": {
+          "id": "sleep60",
+          "name": "nagare/example/sleep-60s",
+          "description": "sleeps for 60s",
+          "input-ports": [
+            {
+              "port-name": "in",
+              "bind": {
+                "name": "in"
+              }
+            }
+          ],
+          "output-ports": [
+            {
+              "port-name": "out",
+              "bind": {
+                "name": "out"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "instance": "sleep240",
+        "general": {
+          "id": "sleep240",
+          "name": "nagare/example/sleep-240s",
+          "description": "sleeps for 240s",
+          "input-ports": [
+            {
+              "port-name": "in",
+              "bind": {
+                "name": "in"
+              }
+            }
+          ],
+          "output-ports": [
+            {
+              "port-name": "out",
+              "bind": {
+                "name": "out"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "requirement": {
+    "workflow-task": {
+      "execution-mode": "step"
+    }
+  }
+}
