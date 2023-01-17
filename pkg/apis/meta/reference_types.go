@@ -48,6 +48,14 @@ type ObjectReference struct {
 	Namespace string `json:"namespace,omitempty"`
 }
 
+// Reference to an exact object including the UID.
+type ExactObjectReference struct {
+	ObjectReference `json:",inline"`
+
+	// UID of the object.
+	UID string `json:"uid"`
+}
+
 // Specifies a reference to a ConfigMap or Secret.
 type ConfigMapOrSecretReference struct {
 	ObjectReference `json:",inline"`
