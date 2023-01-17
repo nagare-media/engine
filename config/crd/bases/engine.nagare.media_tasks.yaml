@@ -20,7 +20,36 @@ spec:
     singular: task
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.mediaProcessingEntityRef.name
+      name: MPE
+      type: string
+    - jsonPath: .spec.workflowRef.name
+      name: Workflow
+      type: string
+    - jsonPath: .status.functionRef.name
+      name: Function
+      type: string
+    - jsonPath: .spec.humanReadable.name
+      name: Human Name
+      type: string
+    - jsonPath: .status.phase
+      name: Status
+      type: string
+    - description: CreationTimestamp is a timestamp representing the server time when
+        this object was created. It is not guaranteed to be set in happens-before
+        order across separate operations. Clients may not set this value. It is represented
+        in RFC3339 form and is in UTC.
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .status.startTime
+      name: Start
+      type: date
+    - jsonPath: .status.endTime
+      name: End
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Task is the Schema for the tasks API
@@ -8758,6 +8787,7 @@ spec:
                     type:
                       description: Type of Task condition.
                       enum:
+                      - Initialized
                       - Ready
                       - Complete
                       - Failed
@@ -8775,24 +8805,78 @@ spec:
                   and is in UTC.
                 format: date-time
                 type: string
+              functionRef:
+                description: Reference to the selected Function.
+                properties:
+                  apiVersion:
+                    description: API version of the referred object.
+                    type: string
+                  kind:
+                    description: Kind of the referred object.
+                    type: string
+                  name:
+                    description: Name of the referred object.
+                    type: string
+                required:
+                - name
+                type: object
               jobRef:
                 description: Reference to the Job.
                 properties:
+                  apiVersion:
+                    description: API version of the referred object.
+                    type: string
+                  kind:
+                    description: Kind of the referred object.
+                    type: string
                   name:
-                    description: Name of the Job.
+                    description: Name of the referred object.
+                    type: string
+                  namespace:
+                    description: Namespace of the referred object.
                     type: string
                   uid:
-                    description: UID of the Job.
+                    description: UID of the object.
                     type: string
                 required:
                 - name
                 - uid
                 type: object
+              mediaProcessingEntityRef:
+                description: Reference to the selected MediaProcessingEntity.
+                properties:
+                  apiVersion:
+                    description: API version of the referred object.
+                    type: string
+                  kind:
+                    description: Kind of the referred object.
+                    type: string
+                  name:
+                    description: Name of the referred object.
+                    type: string
+                required:
+                - name
+                type: object
+              message:
+                description: A human readable message indicating why the Task is in
+                  this condition.
+                type: string
+              phase:
+                description: The status of this Task.
+                enum:
+                - Initializing
+                - JobPending
+                - Running
+                - Succeeded
+                - Failed
+                type: string
               startTime:
                 description: Represents time when the Task controller started processing
                   a Task. It is represented in RFC3339 form and is in UTC.
                 format: date-time
                 type: string
+            required:
+            - phase
             type: object
         type: object
     served: true

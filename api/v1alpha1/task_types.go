@@ -25,6 +25,10 @@ import (
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
 )
 
+const (
+	JobProtectionFinalizer = "engine.nagare.media/job-protection"
+)
+
 // Specification of a Task.
 type TaskSpec struct {
 	// Reference to a TaskTemplate or ClusterTaskTemplate. Only references to these two kinds are allowed. A Task can only
@@ -125,6 +129,9 @@ var (
 
 // Status of a Task.
 type TaskStatus struct {
+	// The status of this Task.
+	Phase TaskPhase `json:"phase"`
+
 	// The latest available observations of an object's current state. When a Task fails, one of the conditions will have
 	// type "Failed" and status true. When a Task is completed, one of the conditions will have type "Complete" and status
 	// true.
@@ -133,6 +140,9 @@ type TaskStatus struct {
 	// +patchStrategy=merge
 	// +listType=atomic
 	Conditions []TaskCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
+
+	// A human readable message indicating why the Task is in this condition.
+	Message string `json:"message,omitempty"`
 
 	// Represents time when the Task controller started processing a Task. It is represented in RFC3339 form and is in
 	// UTC.
@@ -144,10 +154,29 @@ type TaskStatus struct {
 	// +optional
 	EndTime *metav1.Time `json:"endTime,omitempty"`
 
+	// Reference to the selected MediaProcessingEntity.
+	// +optional
+	MediaProcessingEntityRef *meta.LocalObjectReference `json:"mediaProcessingEntityRef,omitempty"`
+
+	// Reference to the selected Function.
+	// +optional
+	FunctionRef *meta.LocalObjectReference `json:"functionRef,omitempty"`
+
 	// Reference to the Job.
 	// +optional
-	JobRef *LocalJobReference `json:"jobRef,omitempty"`
+	JobRef *meta.ExactObjectReference `json:"jobRef,omitempty"`
 }
+
+// +kubebuilder:validation:Enum=Initializing;JobPending;Running;Succeeded;Failed
+type TaskPhase string
+
+const (
+	TaskPhaseInitializing TaskPhase = "Initializing"
+	TaskPhaseJobPending   TaskPhase = "JobPending"
+	TaskPhaseRunning      TaskPhase = "Running"
+	TaskPhaseSucceeded    TaskPhase = "Succeeded"
+	TaskPhaseFailed       TaskPhase = "Failed"
+)
 
 // Description of the current Task status.
 type TaskCondition struct {
@@ -174,32 +203,34 @@ type TaskCondition struct {
 	Message string `json:"message,omitempty"`
 }
 
-// +kubebuilder:validation:Enum=Ready;Complete;Failed
+// +kubebuilder:validation:Enum=Initialized;Ready;Complete;Failed
 type TaskConditionType string
 
 var (
-	// TaskReady means the Task has been processed by the Task controller and a Job was created.
-	TaskReady = "Ready"
+	// TaskConditionTypeInitialized means the Task has been processed by the Task controller and a Job was created.
+	TaskConditionTypeInitialized TaskConditionType = "Initialized"
 
-	// TaskComplete means the Task has completed its execution.
-	TaskComplete = "Complete"
+	// TaskConditionTypeReady means the Task has been processed by the Task controller and a Job was created.
+	TaskConditionTypeReady TaskConditionType = "Ready"
 
-	// TaskFailed means the Task has failed its execution.
-	TaskFailed = "Failed"
+	// TaskConditionTypeComplete means the Task has completed its execution.
+	TaskConditionTypeComplete TaskConditionType = "Complete"
+
+	// TaskConditionTypeFailed means the Task has failed its execution.
+	TaskConditionTypeFailed TaskConditionType = "Failed"
 )
-
-// Reference to a local Job.
-type LocalJobReference struct {
-	// Name of the Job.
-	Name string `json:"name"`
-
-	// UID of the Job.
-	UID string `json:"uid"`
-}
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:categories={nagare-all,nme-all,nagare,nme}
+// +kubebuilder:printcolumn:name="MPE",type="string",JSONPath=`.status.mediaProcessingEntityRef.name`
+// +kubebuilder:printcolumn:name="Workflow",type="string",JSONPath=`.spec.workflowRef.name`
+// +kubebuilder:printcolumn:name="Function",type="string",JSONPath=`.status.functionRef.name`
+// +kubebuilder:printcolumn:name="Human Name",type="string",JSONPath=`.spec.humanReadable.name`
+// +kubebuilder:printcolumn:name="Status",type="string",JSONPath=`.status.phase`
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=`.metadata.creationTimestamp`,description="CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC."
+// +kubebuilder:printcolumn:name="Start",type="date",JSONPath=`.status.startTime`
+// +kubebuilder:printcolumn:name="End",type="date",JSONPath=`.status.endTime`
 
 // Task is the Schema for the tasks API
 type Task struct {
