@@ -10,3 +10,6 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
 webserver:
   bindAddress: :8080
+  publicBaseURL: http://engine.nagare.local.gd
+services:
+  kubernetesNamespace: default

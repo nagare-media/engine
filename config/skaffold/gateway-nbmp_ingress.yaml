@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/created-by: nagare-media-engine
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/managed-by: kustomize
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "999999"
 spec:
   rules:
   - host: engine.nagare.local.gd
