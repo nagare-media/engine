@@ -24,6 +24,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
+	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
 func SvcErrorHandler(c *fiber.Ctx, obj interface{}, svcErr error) error {
@@ -61,6 +62,7 @@ func SvcErrorHandler(c *fiber.Ctx, obj interface{}, svcErr error) error {
 	}
 
 	c.Status(s)
+	c.Set(fiber.HeaderContentType, nbmpv2.WorkflowDescriptionDocumentMIMEType)
 	respBody, err := json.Marshal(obj)
 	if err != nil {
 		return fiber.ErrInternalServerError
