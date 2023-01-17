@@ -137,6 +137,11 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	cfg.Default()
 
+	err = cfg.Validate()
+	if err != nil {
+		return err
+	}
+
 	// configure Kubernetes API client
 
 	k8sCfg := ctrl.GetConfigOrDie()

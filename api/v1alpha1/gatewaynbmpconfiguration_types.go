@@ -17,11 +17,14 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"errors"
+	"strings"
 	"time"
 
+	"github.com/nagare-media/engine/pkg/apis/resources"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	utilpointer "k8s.io/utils/pointer"
+	"k8s.io/utils/pointer"
 )
 
 type GatewayNBMPConfigurationSpec struct {
@@ -75,22 +78,55 @@ func init() {
 
 func (wc *GatewayNBMPConfiguration) Default() {
 	if wc.Webserver.BindAddress == nil {
-		wc.Webserver.BindAddress = utilpointer.String(":8080")
+		wc.Webserver.BindAddress = pointer.String(":8080")
 	}
 
 	if wc.Webserver.ReadTimeout == nil {
-		wc.Webserver.ReadTimeout = utilpointer.Duration(time.Minute)
+		wc.Webserver.ReadTimeout = pointer.Duration(time.Minute)
 	}
 
 	if wc.Webserver.WriteTimeout == nil {
-		wc.Webserver.WriteTimeout = utilpointer.Duration(time.Minute)
+		wc.Webserver.WriteTimeout = pointer.Duration(time.Minute)
 	}
 
 	if wc.Webserver.IdleTimeout == nil {
-		wc.Webserver.IdleTimeout = utilpointer.Duration(time.Minute)
+		wc.Webserver.IdleTimeout = pointer.Duration(time.Minute)
 	}
 
 	if wc.Webserver.Network == nil {
-		wc.Webserver.Network = utilpointer.String("tcp")
+		wc.Webserver.Network = pointer.String("tcp")
 	}
+
+	if wc.Services.DefaultKubernetesGPUResource == "" {
+		// TODO: what should the default be?
+		wc.Services.DefaultKubernetesGPUResource = resources.NVIDIA_GPU
+	}
+}
+
+func (wc *GatewayNBMPConfiguration) Validate() error {
+	if wc.Webserver.BindAddress == nil {
+		return errors.New("missing webserver.bindAddress")
+	}
+	if wc.Webserver.ReadTimeout == nil {
+		return errors.New("missing webserver.readTimeout")
+	}
+	if wc.Webserver.WriteTimeout == nil {
+		return errors.New("missing webserver.writeTimeout")
+	}
+	if wc.Webserver.IdleTimeout == nil {
+		return errors.New("missing webserver.idleTimeout")
+	}
+	if wc.Webserver.Network == nil {
+		return errors.New("missing webserver.network")
+	}
+	if wc.Webserver.PublicBaseURL != nil && strings.HasSuffix(*wc.Webserver.PublicBaseURL, "/") {
+		return errors.New("trailing slash in webserver.publicBaseURL")
+	}
+	if wc.Services.KubernetesNamespace == "" {
+		return errors.New("missing services.kubernetesNamespace")
+	}
+	if wc.Services.DefaultKubernetesGPUResource == "" {
+		return errors.New("missing services.defaultKubernetesGPUResource")
+	}
+	return nil
 }
