@@ -20,7 +20,27 @@ spec:
     singular: workflow
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.humanReadable.name
+      name: Human Name
+      type: string
+    - jsonPath: .status.conditions[?(@.status=="True")].type
+      name: Status
+      type: string
+    - description: CreationTimestamp is a timestamp representing the server time when
+        this object was created. It is not guaranteed to be set in happens-before
+        order across separate operations. Clients may not set this value. It is represented
+        in RFC3339 form and is in UTC.
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .status.startTime
+      name: Start
+      type: date
+    - jsonPath: .status.endTime
+      name: End
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Workflow is the Schema for the workflows API
