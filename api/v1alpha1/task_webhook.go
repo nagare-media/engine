@@ -63,6 +63,5 @@ func (t *Task) ValidateDelete() error {
 }
 
 func (t *Task) validate(old *Task) error {
-	// check if workflow is already finished
 	return nil
 }
