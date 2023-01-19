@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
@@ -28,9 +29,21 @@ const (
 	// ClusterMediaProcessingEntity in the whole Kubernetes cluster. A MediaProcessingEntity with this annotation has
 	// precedence over a ClusterMediaProcessingEntity.
 	BetaIsDefaultMediaProcessingEntityAnnotation = "beta.engine.nagare.media/is-default-media-processing-entity"
+)
 
+const (
 	// Description of the location the MediaProcessingEntity is in (e.g. "de-48149").
 	BetaMediaProcessingEntityLocationLabel = "beta.engine.nagare.media/media-processing-entity-location"
+)
+
+const (
+	// Protects MediaProcessingEntities from deletion before cleanup.
+	MediaProcessingEntityProtectionFinalizer = "engine.nagare.media/mpe-protection"
+)
+
+const (
+	// Default key used in Secrets for the Kubeconfig.
+	DefaultSecretKeyKubeconfig = "kubeconfig"
 )
 
 // Specification of a Media Processing Entity (MPE).
@@ -54,6 +67,11 @@ type MediaProcessingEntityConfig struct {
 
 // Configuration of a local Media Processing Entity (MPE).
 type LocalMediaProcessingEntity struct {
+	// Configures the namespace Jobs should run in. For MediaProcessingEntities this field is optional in which case the
+	// Jobs are created in the namespace the MediaProcessingEntity is in. This field is required for
+	// ClusterMediaProcessingEntities.
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
 }
 
 // Configuration of a remote Media Processing Entity (MPE).
@@ -70,15 +88,69 @@ type Kubeconfig struct {
 	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
+// Status of a MediaProcessingEntity
+type MediaProcessingEntityStatus struct {
+	// The latest available observations of an object's current state. When a connection to a MediaProcessingEntity is
+	// established, one of the conditions will have type "Ready" and status true.
+	// +optional
+	// +patchMergeKey=type
+	// +patchStrategy=merge
+	// +listType=atomic
+	Conditions []MediaProcessingEntityCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
+
+	// A human readable message indicating why the MediaProcessingEntity is in this condition.
+	Message string `json:"message,omitempty"`
+}
+
+// Description of the current MediaProcessingEntity status.
+type MediaProcessingEntityCondition struct {
+	// Type of MediaProcessingEntity condition.
+	Type MediaProcessingEntityConditionType `json:"type"`
+
+	// Status of the condition, one of True, False, Unknown.
+	Status corev1.ConditionStatus `json:"status"`
+
+	// Last time the condition was checked.
+	// +optional
+	LastProbeTime metav1.Time `json:"lastProbeTime,omitempty"`
+
+	// Last time the condition transit from one status to another.
+	// +optional
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+
+	// (brief) reason for the condition's last transition.
+	// +optional
+	Reason string `json:"reason,omitempty"`
+
+	// Human readable message indicating details about last transition.
+	// +optional
+	Message string `json:"message,omitempty"`
+}
+
+// +kubebuilder:validation:Enum=Ready;Failed
+type MediaProcessingEntityConditionType string
+
+var (
+	// MediaProcessingEntityConditionTypeReady means the a connection to the MediaProcessingEntity could be established.
+	MediaProcessingEntityConditionTypeReady MediaProcessingEntityConditionType = "Ready"
+
+	// MediaProcessingEntityConditionTypeReady means the a connection to the MediaProcessingEntity could not be
+	// established.
+	MediaProcessingEntityConditionTypeFailed MediaProcessingEntityConditionType = "Failed"
+)
+
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // +kubebuilder:resource:categories={nagare-all,nme-all}
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=`.status.conditions[?(@.type=="Ready")].status`
 
 // MediaProcessingEntity is the Schema for the mediaprocessingentities API
 type MediaProcessingEntity struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec MediaProcessingEntitySpec `json:"spec,omitempty"`
+	Spec   MediaProcessingEntitySpec   `json:"spec,omitempty"`
+	Status MediaProcessingEntityStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

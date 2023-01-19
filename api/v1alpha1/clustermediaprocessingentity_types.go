@@ -21,14 +21,17 @@ import (
 )
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster,categories={nagare-all,nme-all}
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=`.status.conditions[?(@.type=="Ready")].status`
 
 // ClusterMediaProcessingEntity is the Schema for the clustermediaprocessingentities API
 type ClusterMediaProcessingEntity struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec MediaProcessingEntitySpec `json:"spec,omitempty"`
+	Spec   MediaProcessingEntitySpec   `json:"spec,omitempty"`
+	Status MediaProcessingEntityStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

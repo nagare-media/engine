@@ -18,7 +18,11 @@ spec:
     singular: mediaprocessingentity
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: MediaProcessingEntity is the Schema for the mediaprocessingentities
@@ -44,6 +48,13 @@ spec:
               local:
                 description: Configures the Media Processing Entity (MPE) to talk
                   to the local Kubernetes cluster.
+                properties:
+                  namespace:
+                    description: Configures the namespace Jobs should run in. For
+                      MediaProcessingEntities this field is optional in which case
+                      the Jobs are created in the namespace the MediaProcessingEntity
+                      is in. This field is required for ClusterMediaProcessingEntities.
+                    type: string
                 type: object
               remote:
                 description: Configures the Media Processing Entity (MPE) to talk
@@ -84,6 +95,54 @@ spec:
                 - kubeconfig
                 type: object
             type: object
+          status:
+            description: Status of a MediaProcessingEntity
+            properties:
+              conditions:
+                description: The latest available observations of an object's current
+                  state. When a connection to a MediaProcessingEntity is established,
+                  one of the conditions will have type "Ready" and status true.
+                items:
+                  description: Description of the current MediaProcessingEntity status.
+                  properties:
+                    lastProbeTime:
+                      description: Last time the condition was checked.
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      description: Last time the condition transit from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Human readable message indicating details about
+                        last transition.
+                      type: string
+                    reason:
+                      description: (brief) reason for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type of MediaProcessingEntity condition.
+                      enum:
+                      - Ready
+                      - Failed
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              message:
+                description: A human readable message indicating why the MediaProcessingEntity
+                  is in this condition.
+                type: string
+            type: object
         type: object
     served: true
     storage: true
+    subresources:
+      status: {}
