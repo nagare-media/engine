@@ -33,7 +33,7 @@ type TaskTemplateSpec struct {
 	// Reference to a MediaProcessingEntity or ClusterMediaProcessingEntity. Only references to these two kinds are
 	// allowed. A TaskTemplate can only reference MediaProcessingEntities from its own Namespace.
 	// +optional
-	MediaProcessingEntityRef *meta.ObjectReference `json:"mediaProcessingEntityRef,omitempty"`
+	MediaProcessingEntityRef *meta.LocalObjectReference `json:"mediaProcessingEntityRef,omitempty"`
 
 	// Label selector for a MediaProcessingEntity or ClusterMediaProcessingEntity. MediaProcessingEntity has precedence
 	// over ClusterMediaProcessingEntity. If multiple Media Processing Entities are selected, the newest one is chosen.
@@ -43,7 +43,7 @@ type TaskTemplateSpec struct {
 	// Reference to a Function or ClusterFunction. Only references to these two kinds are allowed. A TaskTemplate can only
 	// reference Functions from its own Namespace.
 	// +optional
-	FunctionRef *meta.ObjectReference `json:"functionRef,omitempty"`
+	FunctionRef *meta.LocalObjectReference `json:"functionRef,omitempty"`
 
 	// Label selector for a Function or ClusterFunction. Function has precedence over ClusterFunction. If multiple
 	// Functions are selected, the Function with the newest version is chosen.

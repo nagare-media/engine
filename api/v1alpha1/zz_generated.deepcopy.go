@@ -1390,7 +1390,7 @@ func (in *TaskSpec) DeepCopyInto(out *TaskSpec) {
 	*out = *in
 	if in.TaskTemplateRef != nil {
 		in, out := &in.TaskTemplateRef, &out.TaskTemplateRef
-		*out = new(meta.ObjectReference)
+		*out = new(meta.LocalObjectReference)
 		**out = **in
 	}
 	if in.HumanReadable != nil {
@@ -1400,7 +1400,7 @@ func (in *TaskSpec) DeepCopyInto(out *TaskSpec) {
 	}
 	if in.MediaProcessingEntityRef != nil {
 		in, out := &in.MediaProcessingEntityRef, &out.MediaProcessingEntityRef
-		*out = new(meta.ObjectReference)
+		*out = new(meta.LocalObjectReference)
 		**out = **in
 	}
 	if in.MediaProcessingEntitySelector != nil {
@@ -1411,7 +1411,7 @@ func (in *TaskSpec) DeepCopyInto(out *TaskSpec) {
 	out.WorkflowRef = in.WorkflowRef
 	if in.FunctionRef != nil {
 		in, out := &in.FunctionRef, &out.FunctionRef
-		*out = new(meta.ObjectReference)
+		*out = new(meta.LocalObjectReference)
 		**out = **in
 	}
 	if in.FunctionSelector != nil {
@@ -1559,7 +1559,7 @@ func (in *TaskTemplateSpec) DeepCopyInto(out *TaskTemplateSpec) {
 	}
 	if in.MediaProcessingEntityRef != nil {
 		in, out := &in.MediaProcessingEntityRef, &out.MediaProcessingEntityRef
-		*out = new(meta.ObjectReference)
+		*out = new(meta.LocalObjectReference)
 		**out = **in
 	}
 	if in.MediaProcessingEntitySelector != nil {
@@ -1569,7 +1569,7 @@ func (in *TaskTemplateSpec) DeepCopyInto(out *TaskTemplateSpec) {
 	}
 	if in.FunctionRef != nil {
 		in, out := &in.FunctionRef, &out.FunctionRef
-		*out = new(meta.ObjectReference)
+		*out = new(meta.LocalObjectReference)
 		**out = **in
 	}
 	if in.FunctionSelector != nil {

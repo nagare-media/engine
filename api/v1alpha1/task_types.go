@@ -34,7 +34,7 @@ type TaskSpec struct {
 	// Reference to a TaskTemplate or ClusterTaskTemplate. Only references to these two kinds are allowed. A Task can only
 	// reference TaskTemplates from its own Namespace.
 	// +optional
-	TaskTemplateRef *meta.ObjectReference `json:"taskTemplateRef,omitempty"`
+	TaskTemplateRef *meta.LocalObjectReference `json:"taskTemplateRef,omitempty"`
 
 	// Human readable description of this Task.
 	// +optional
@@ -45,7 +45,7 @@ type TaskSpec struct {
 	// mediaProcessingEntitySelector is specified. If both are specified, mediaProcessingEntityRef has precedence. Both
 	// fields may be omitted if a TaskTemplate is used that specifies a MediaProcessingEntity.
 	// +optional
-	MediaProcessingEntityRef *meta.ObjectReference `json:"mediaProcessingEntityRef,omitempty"`
+	MediaProcessingEntityRef *meta.LocalObjectReference `json:"mediaProcessingEntityRef,omitempty"`
 
 	// Label selector for a MediaProcessingEntity or ClusterMediaProcessingEntity. MediaProcessingEntity has precedence
 	// over ClusterMediaProcessingEntity. If multiple Media Processing Entities are selected, the newest one is chosen.
@@ -63,7 +63,7 @@ type TaskSpec struct {
 	// specified, FunctionRef has precedence. Both fields may be omitted if a TaskTemplate is used that specifies a
 	// Function.
 	// +optional
-	FunctionRef *meta.ObjectReference `json:"functionRef,omitempty"`
+	FunctionRef *meta.LocalObjectReference `json:"functionRef,omitempty"`
 
 	// Label selector for a Function or ClusterFunction. Function has precedence over ClusterFunction. If multiple
 	// Functions are selected, the Function with the newest version is chosen. This field is required if no FunctionRef is

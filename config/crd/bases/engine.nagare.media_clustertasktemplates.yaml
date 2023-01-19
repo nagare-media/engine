@@ -56,9 +56,6 @@ spec:
                   name:
                     description: Name of the referred object.
                     type: string
-                  namespace:
-                    description: Namespace of the referred object.
-                    type: string
                 required:
                 - name
                 type: object
@@ -146,9 +143,6 @@ spec:
                     type: string
                   name:
                     description: Name of the referred object.
-                    type: string
-                  namespace:
-                    description: Namespace of the referred object.
                     type: string
                 required:
                 - name
