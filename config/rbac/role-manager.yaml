@@ -6,6 +6,64 @@ metadata:
   name: manager
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - clustermediaprocessingentities
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - clustermediaprocessingentities/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - clustermediaprocessingentities/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - mediaprocessingentities
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - mediaprocessingentities/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - mediaprocessingentities/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - engine.nagare.media
   resources:
   - tasks

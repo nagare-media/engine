@@ -50,6 +50,7 @@ resources:
 - api:
     crdVersion: v1
     namespaced: true
+  controller: true
   domain: engine.nagare.media
   kind: MediaProcessingEntity
   path: github.com/nagare-media/engine/api/v1alpha1
@@ -60,6 +61,7 @@ resources:
     webhookVersion: v1
 - api:
     crdVersion: v1
+  controller: true
   domain: engine.nagare.media
   kind: ClusterMediaProcessingEntity
   path: github.com/nagare-media/engine/api/v1alpha1
