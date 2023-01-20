@@ -12,6 +12,26 @@ rules:
   verbs:
   - get
 - apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - clusterfunctions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - engine.nagare.media
   resources:
   - clustermediaprocessingentities
@@ -37,6 +57,30 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - clustertasktemplates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - clusterworkflows
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - functions
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - engine.nagare.media
   resources:
@@ -89,6 +133,14 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - tasktemplates
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - engine.nagare.media
   resources:

@@ -40,6 +40,16 @@ type TaskReconciler struct {
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks/finalizers,verbs=update
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=functions,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clusterfunctions,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasktemplates,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustertasktemplates,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clusterworkflows,verbs=get;list;watch
+// +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
