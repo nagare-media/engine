@@ -53,7 +53,7 @@ type ExactObjectReference struct {
 	ObjectReference `json:",inline"`
 
 	// UID of the object.
-	UID string `json:"uid"`
+	UID types.UID `json:"uid"`
 }
 
 // Specifies a reference to a ConfigMap or Secret.
