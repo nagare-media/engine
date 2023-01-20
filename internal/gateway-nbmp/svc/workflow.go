@@ -19,6 +19,7 @@ package svc
 import (
 	"context"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -55,18 +56,41 @@ func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error
 	l := log.FromContext(ctx)
 	PopulateWorkflowDefaults(wf)
 
-	// the ID should initially be empty
-	if wf.General.ID != "" {
-		wf.Acknowledge = &nbmpv2.Acknowledge{
-			Status: nbmpv2.FailedAcknowledgeStatus,
-			Failed: []string{"$.general.id"},
-		}
-		return ErrInvalid
+	// validate
+	err := ValidateWorkflowCreate(wf)
+	if err != nil {
+		return err
 	}
+
+	// initialize
 	wf.General.ID = uuid.UUIDv4()
 	l = l.WithValues("workflowID", wf.General.ID)
-
 	l.V(2).Info("creating workflow")
+	wf.General.State = &nbmpv2.InstantiatedState
+
+	// convert to Kubernetes resources
+	w, err := s.wddToWorkflow(wf)
+	if err != nil {
+		return err
+	}
+
+	tasks, err := s.wddToTasks(wf, w)
+	if err != nil {
+		return err
+	}
+
+	// create Kubernetes resources
+	err = s.k8s.Create(ctx, w)
+	if err != nil {
+		return apiErrorHandler(err)
+	}
+
+	for _, t := range tasks {
+		err = s.k8s.Create(ctx, t)
+		if err != nil {
+			return apiErrorHandler(err)
+		}
+	}
 
 	return nil
 }
@@ -76,13 +100,64 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 	l.V(2).Info("updating workflow")
 	PopulateWorkflowDefaults(wf)
 
-	return nil
+	// validate
+	err := ValidateWorkflowCommon(wf)
+	if err != nil {
+		return err
+	}
+
+	// convert to Kubernetes resources
+	w, err := s.wddToWorkflow(wf)
+	if err != nil {
+		return err
+	}
+
+	tasks, err := s.wddToTasks(wf, w)
+	if err != nil {
+		return err
+	}
+
+	// update Kubernetes resources
+	err = s.k8s.Update(ctx, w)
+	if err != nil {
+		return apiErrorHandler(err)
+	}
+
+	for _, t := range tasks {
+		err = s.k8s.Update(ctx, t)
+		if err != nil {
+			return apiErrorHandler(err)
+		}
+	}
+
+	// return latest version
+	return s.Retrieve(ctx, wf)
 }
 
 func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
 	l.V(2).Info("deleting workflow")
 	PopulateWorkflowDefaults(wf)
+
+	// validate
+	err := ValidateWorkflowDelete(wf)
+	if err != nil {
+		return err
+	}
+
+	// convert to Kubernetes resources
+	w := &enginev1.Workflow{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: wf.General.ID,
+		},
+	}
+
+	// delete Kubernetes resources
+	// Tasks have a owner reference and will be deleted automatically
+	err = s.k8s.Delete(ctx, w)
+	if err != nil {
+		return apiErrorHandler(err)
+	}
 
 	return nil
 }
@@ -92,11 +167,33 @@ func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) err
 	l.V(2).Info("retrieving workflow")
 	PopulateWorkflowDefaults(wf)
 
-	return nil
-}
-
-func PopulateWorkflowDefaults(wf *nbmpv2.Workflow) {
-	wf.Scheme = &nbmpv2.Scheme{
-		URI: nbmpv2.SchemaURI,
+	// validate
+	err := ValidateWorkflowRetrieve(wf)
+	if err != nil {
+		return err
 	}
+
+	// retrieve Kubernetes resources
+	w := &enginev1.Workflow{}
+	err = s.k8s.Get(ctx, client.ObjectKey{Name: wf.General.ID}, w)
+	if err != nil {
+		return apiErrorHandler(err)
+	}
+	if w.Labels[IsNBMPLabel] != "true" {
+		return ErrNotFound
+	}
+
+	tasks := &enginev1.TaskList{}
+	err = s.k8s.List(ctx, tasks, client.MatchingLabels{
+		IsNBMPLabel:            "true",
+		enginev1.WorkflowLabel: wf.General.ID,
+	})
+	if err != nil {
+		return apiErrorHandler(err)
+	}
+
+	// convert to NBMP workflow description document
+	// TODO: implement
+
+	return nil
 }
