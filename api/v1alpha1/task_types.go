@@ -148,8 +148,13 @@ type TaskStatus struct {
 	// A human readable message indicating why the Task is in this condition.
 	Message string `json:"message,omitempty"`
 
-	// Represents time when the Task controller started processing a Task. It is represented in RFC3339 form and is in
+	// Represents time when the Task controller first started processing a Task. It is represented in RFC3339 form and is in
 	// UTC.
+	// +optional
+	QueuedTime *metav1.Time `json:"queuedTime,omitempty"`
+
+	// Represents time when the Task controller transitioned to the "running" phase. It is represented in RFC3339 form and
+	// is in UTC.
 	// +optional
 	StartTime *metav1.Time `json:"startTime,omitempty"`
 

@@ -8867,9 +8867,15 @@ spec:
                 - Succeeded
                 - Failed
                 type: string
+              queuedTime:
+                description: Represents time when the Task controller first started
+                  processing a Task. It is represented in RFC3339 form and is in UTC.
+                format: date-time
+                type: string
               startTime:
-                description: Represents time when the Task controller started processing
-                  a Task. It is represented in RFC3339 form and is in UTC.
+                description: Represents time when the Task controller transitioned
+                  to the "running" phase. It is represented in RFC3339 form and is
+                  in UTC.
                 format: date-time
                 type: string
             required:

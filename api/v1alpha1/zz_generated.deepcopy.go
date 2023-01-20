@@ -1456,6 +1456,10 @@ func (in *TaskStatus) DeepCopyInto(out *TaskStatus) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.QueuedTime != nil {
+		in, out := &in.QueuedTime, &out.QueuedTime
+		*out = (*in).DeepCopy()
+	}
 	if in.StartTime != nil {
 		in, out := &in.StartTime, &out.StartTime
 		*out = (*in).DeepCopy()
