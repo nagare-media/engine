@@ -162,6 +162,8 @@ func (r *MediaProcessingEntityReconciler) reconcileClusterMediaProcessingEntity(
 
 func (r *MediaProcessingEntityReconciler) reconcileCondition(ctx context.Context, err error, mpe *enginev1.MediaProcessingEntity) {
 	log := logf.FromContext(ctx)
+
+	// TODO: patch conditions to keep transition times
 	now := metav1.Time{Time: time.Now()}
 	if err != nil {
 		log.Error(err, fmt.Sprintf("error reconciling %s", mpe.Kind))
@@ -175,14 +177,15 @@ func (r *MediaProcessingEntityReconciler) reconcileCondition(ctx context.Context
 			Status:             corev1.ConditionFalse,
 			LastTransitionTime: now,
 		}}
-	} else {
-		mpe.Status.Message = ""
-		mpe.Status.Conditions = []enginev1.MediaProcessingEntityCondition{{
-			Type:               enginev1.MediaProcessingEntityConditionTypeReady,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}}
+		return
 	}
+
+	mpe.Status.Message = ""
+	mpe.Status.Conditions = []enginev1.MediaProcessingEntityCondition{{
+		Type:               enginev1.MediaProcessingEntityConditionTypeReady,
+		Status:             corev1.ConditionTrue,
+		LastTransitionTime: now,
+	}}
 }
 
 func (r *MediaProcessingEntityReconciler) reconcileDelete(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (ctrl.Result, error) {
