@@ -36,8 +36,9 @@ const (
 type TaskReconciler struct {
 	client.Client
 
-	Scheme          *runtime.Scheme
-	JobEventChannel <-chan event.GenericEvent
+	Scheme                          *runtime.Scheme
+	JobEventChannel                 <-chan event.GenericEvent
+	MediaProcessingEntityReconciler *MediaProcessingEntityReconciler
 }
 
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch;create;update;patch;delete

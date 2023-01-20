@@ -137,13 +137,14 @@ func Execute() error {
 		return err
 	}
 	jobEventChannel := make(chan event.GenericEvent)
-	if err = (&controllers.MediaProcessingEntityReconciler{
+	mpeReconciler := &controllers.MediaProcessingEntityReconciler{
 		Client:          mgr.GetClient(),
 		Scheme:          mgr.GetScheme(),
 		LocalRESTConfig: restCfg,
 		ManagerOptions:  options,
 		JobEventChannel: jobEventChannel,
-	}).SetupWithManager(mgr); err != nil {
+	}
+	if err = mpeReconciler.SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MediaProcessingEntity")
 		return err
 	}
@@ -155,9 +156,10 @@ func Execute() error {
 		return err
 	}
 	if err = (&controllers.TaskReconciler{
-		Client:          mgr.GetClient(),
-		Scheme:          mgr.GetScheme(),
-		JobEventChannel: jobEventChannel,
+		Client:                          mgr.GetClient(),
+		Scheme:                          mgr.GetScheme(),
+		JobEventChannel:                 jobEventChannel,
+		MediaProcessingEntityReconciler: mpeReconciler,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Task")
 		return err
