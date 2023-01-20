@@ -27,6 +27,10 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
+const (
+	TaskControllerName = "nagare-media-engine-task-controller"
+)
+
 // TaskReconciler reconciles a Task object
 type TaskReconciler struct {
 	client.Client
@@ -57,6 +61,7 @@ func (r *TaskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 // SetupWithManager sets up the controller with the Manager.
 func (r *TaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
+		Named(TaskControllerName).
 		For(&enginev1.Task{}).
 		Complete(r)
 }

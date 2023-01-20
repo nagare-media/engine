@@ -27,6 +27,10 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
+const (
+	WorkflowControllerName = "nagare-media-engine-workflow-controller"
+)
+
 // WorkflowReconciler reconciles a Workflow object
 type WorkflowReconciler struct {
 	client.Client
@@ -57,6 +61,7 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 // SetupWithManager sets up the controller with the Manager.
 func (r *WorkflowReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
+		Named(WorkflowControllerName).
 		For(&enginev1.Workflow{}).
 		Complete(r)
 }
