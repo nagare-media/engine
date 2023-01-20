@@ -24,8 +24,6 @@ import (
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
-
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -169,18 +167,18 @@ func (r *MediaProcessingEntityReconciler) reconcileCondition(ctx context.Context
 		mpe.Status.Message = err.Error()
 		mpe.Status.Conditions = []enginev1.MediaProcessingEntityCondition{{
 			Type:               enginev1.MediaProcessingEntityConditionTypeFailed,
-			Status:             v1.ConditionTrue,
+			Status:             corev1.ConditionTrue,
 			LastTransitionTime: now,
 		}, {
 			Type:               enginev1.MediaProcessingEntityConditionTypeReady,
-			Status:             v1.ConditionFalse,
+			Status:             corev1.ConditionFalse,
 			LastTransitionTime: now,
 		}}
 	} else {
 		mpe.Status.Message = ""
 		mpe.Status.Conditions = []enginev1.MediaProcessingEntityCondition{{
 			Type:               enginev1.MediaProcessingEntityConditionTypeReady,
-			Status:             v1.ConditionTrue,
+			Status:             corev1.ConditionTrue,
 			LastTransitionTime: now,
 		}}
 	}
