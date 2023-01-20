@@ -466,6 +466,7 @@ func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) err
 	if err := ctrl.NewControllerManagedBy(mgr).
 		Named(ClusterMediaProcessingEntityControllerName).
 		For(&enginev1.ClusterMediaProcessingEntity{}).
+		Watches(&source.Channel{Source: r.cmpeManagerErr}, &handler.EnqueueRequestForObject{}).
 		Complete(reconcile.Func(r.reconcileClusterMediaProcessingEntity)); err != nil {
 		return err
 	}
