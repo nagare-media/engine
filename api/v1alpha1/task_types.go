@@ -26,6 +26,10 @@ import (
 )
 
 const (
+	TaskLabel = "engine.nagare.media/task"
+)
+
+const (
 	JobProtectionFinalizer = "engine.nagare.media/job-protection"
 )
 

@@ -57,6 +57,7 @@ type MediaProcessingEntityReconciler struct {
 	Scheme          *runtime.Scheme
 	LocalRESTConfig *rest.Config
 	ManagerOptions  manager.Options
+	JobEventChannel chan<- event.GenericEvent
 
 	mtx                sync.RWMutex
 	managers           map[meta.ObjectReference]manager.Manager
@@ -233,6 +234,16 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 		stabilizeDuration = 4 * time.Second
 	}
 	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// add job controller
+	if err = (&JobReconciler{
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
+		EventChannel: r.JobEventChannel,
+	}).SetupWithManager(mgr); err != nil {
+		log.Error(err, "unable to create controller", "controller", "Job")
 		return ctrl.Result{}, err
 	}
 

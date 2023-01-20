@@ -23,6 +23,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
@@ -34,7 +35,9 @@ const (
 // TaskReconciler reconciles a Task object
 type TaskReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+
+	Scheme          *runtime.Scheme
+	JobEventChannel <-chan event.GenericEvent
 }
 
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch;create;update;patch;delete
@@ -73,5 +76,6 @@ func (r *TaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(TaskControllerName).
 		For(&enginev1.Task{}).
+		Watches(&source.Channel{Source: r.JobEventChannel}, &handler.EnqueueRequestForObject{}).
 		Complete(r)
 }

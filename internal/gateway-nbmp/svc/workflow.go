@@ -186,7 +186,7 @@ func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) err
 	tasks := &enginev1.TaskList{}
 	err = s.k8s.List(ctx, tasks, client.MatchingLabels{
 		IsNBMPLabel:            "true",
-		enginev1.WorkflowLabel: wf.General.ID,
+		enginev1.WorkflowLabel: wf.General.ID, // TODO: WorkflowLabel should be namespace/ID
 	})
 	if err != nil {
 		return apiErrorHandler(err)

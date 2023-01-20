@@ -52,9 +52,6 @@ func (s *workflowService) wddToWorkflow(nbmpWf *nbmpv2.Workflow) (*enginev1.Work
 			Annotations: map[string]string{
 				IsNBMPLabel: "true",
 			},
-			Labels: map[string]string{
-				enginev1.WorkflowLabel: nbmpWf.General.ID,
-			},
 		},
 		Spec: enginev1.WorkflowSpec{
 			HumanReadable: &enginev1.HumanReadableWorkflowDescription{
@@ -348,9 +345,6 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 				Name: fr.Instance,
 				Annotations: map[string]string{
 					IsNBMPLabel: "true",
-				},
-				Labels: map[string]string{
-					enginev1.WorkflowLabel: nbmpWf.General.ID,
 				},
 			},
 			Spec: enginev1.TaskSpec{
