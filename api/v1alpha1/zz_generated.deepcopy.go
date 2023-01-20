@@ -1466,12 +1466,12 @@ func (in *TaskStatus) DeepCopyInto(out *TaskStatus) {
 	}
 	if in.MediaProcessingEntityRef != nil {
 		in, out := &in.MediaProcessingEntityRef, &out.MediaProcessingEntityRef
-		*out = new(meta.LocalObjectReference)
+		*out = new(meta.ObjectReference)
 		**out = **in
 	}
 	if in.FunctionRef != nil {
 		in, out := &in.FunctionRef, &out.FunctionRef
-		*out = new(meta.LocalObjectReference)
+		*out = new(meta.ObjectReference)
 		**out = **in
 	}
 	if in.JobRef != nil {

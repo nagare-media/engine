@@ -160,11 +160,11 @@ type TaskStatus struct {
 
 	// Reference to the selected MediaProcessingEntity.
 	// +optional
-	MediaProcessingEntityRef *meta.LocalObjectReference `json:"mediaProcessingEntityRef,omitempty"`
+	MediaProcessingEntityRef *meta.ObjectReference `json:"mediaProcessingEntityRef,omitempty"`
 
 	// Reference to the selected Function.
 	// +optional
-	FunctionRef *meta.LocalObjectReference `json:"functionRef,omitempty"`
+	FunctionRef *meta.ObjectReference `json:"functionRef,omitempty"`
 
 	// Reference to the Job.
 	// +optional
