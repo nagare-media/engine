@@ -33,7 +33,7 @@ var (
 	ErrSelectedMultiple = errors.New("selection returned multiple items")
 )
 
-func SelectLocalMediaProcessingEntityRef(ctx context.Context, c client.Client, namespace string, sel labels.Selector) (*meta.LocalObjectReference, error) {
+func SelectMediaProcessingEntityRef(ctx context.Context, c client.Client, namespace string, sel labels.Selector) (*meta.ObjectReference, error) {
 	// local MediaProcessingEntity
 	mpeList := &enginev1.MediaProcessingEntityList{}
 	if err := c.List(ctx, mpeList, client.InNamespace(namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
@@ -41,10 +41,11 @@ func SelectLocalMediaProcessingEntityRef(ctx context.Context, c client.Client, n
 	}
 
 	if len(mpeList.Items) == 1 {
-		return &meta.LocalObjectReference{
+		return &meta.ObjectReference{
 			APIVersion: enginev1.GroupVersion.String(),
 			Kind:       mpeList.Items[0].GroupVersionKind().Kind,
 			Name:       mpeList.Items[0].Name,
+			Namespace:  mpeList.Items[0].Namespace,
 		}, nil
 	} else if len(mpeList.Items) > 1 {
 		return nil, ErrSelectedMultiple
@@ -57,10 +58,11 @@ func SelectLocalMediaProcessingEntityRef(ctx context.Context, c client.Client, n
 	}
 
 	if len(cmpeList.Items) == 1 {
-		return &meta.LocalObjectReference{
+		return &meta.ObjectReference{
 			APIVersion: enginev1.GroupVersion.String(),
 			Kind:       cmpeList.Items[0].GroupVersionKind().Kind,
 			Name:       cmpeList.Items[0].Name,
+			Namespace:  cmpeList.Items[0].Namespace,
 		}, nil
 	} else if len(cmpeList.Items) > 1 {
 		return nil, ErrSelectedMultiple
