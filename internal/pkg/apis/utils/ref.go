@@ -69,50 +69,6 @@ func SelectLocalMediaProcessingEntityRef(ctx context.Context, c client.Client, n
 	return nil, nil
 }
 
-func ResolveRef(ctx context.Context, c client.Client, ref *meta.ObjectReference) (client.Object, error) {
-	lref := &meta.LocalObjectReference{
-		APIVersion: ref.APIVersion,
-		Kind:       ref.Kind,
-		Name:       ref.Name,
-	}
-	return ResolveLocalRef(ctx, c, ref.Namespace, lref)
-}
-
-func ResolveLocalRef(ctx context.Context, c client.Client, namespace string, ref *meta.LocalObjectReference) (client.Object, error) {
-	gv, err := schema.ParseGroupVersion(ref.APIVersion)
-	if err != nil {
-		return nil, err
-	}
-	if gv.Empty() {
-		// assume we talk about nagare media engine types
-		gv = enginev1.GroupVersion
-	}
-	gvk := gv.WithKind(ref.Kind)
-
-	runObj, err := c.Scheme().New(gvk)
-	if err != nil {
-		return nil, err
-	}
-
-	obj, ok := runObj.(client.Object)
-	if !ok {
-		return nil, errors.New("failed to convert runtime.Object to client.Object")
-	}
-
-	mapping, err := c.RESTMapper().RESTMapping(gvk.GroupKind(), gvk.Version)
-	if err != nil {
-		return nil, err
-	}
-
-	key := client.ObjectKey{Name: ref.Name}
-	if mapping.Scope.Name() == apimeta.RESTScopeNameNamespace {
-		key.Namespace = namespace
-	}
-
-	err = c.Get(ctx, key, obj)
-	return obj, err
-}
-
 func ToRef(obj client.Object) *meta.ObjectReference {
 	return &meta.ObjectReference{
 		APIVersion: obj.GetObjectKind().GroupVersionKind().GroupVersion().String(),
@@ -128,4 +84,58 @@ func ToLocalRef(obj client.Object) *meta.LocalObjectReference {
 		Kind:       obj.GetObjectKind().GroupVersionKind().Kind,
 		Name:       obj.GetName(),
 	}
+}
+
+func ResolveRef(ctx context.Context, c client.Client, ref *meta.ObjectReference) (client.Object, error) {
+	lref := ref.LocalObjectReference()
+	return ResolveLocalRef(ctx, c, ref.Namespace, &lref)
+}
+
+func ResolveLocalRef(ctx context.Context, c client.Client, namespace string, ref *meta.LocalObjectReference) (client.Object, error) {
+	obj, err := PartiallyResolveLocalRef(c, namespace, ref)
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.Get(ctx, client.ObjectKeyFromObject(obj), obj)
+	return obj, err
+}
+
+func PartiallyResolveRef(c client.Client, ref *meta.ObjectReference) (client.Object, error) {
+	lref := ref.LocalObjectReference()
+	return PartiallyResolveLocalRef(c, ref.Namespace, &lref)
+}
+
+func PartiallyResolveLocalRef(c client.Client, namespace string, ref *meta.LocalObjectReference) (client.Object, error) {
+	gv, err := schema.ParseGroupVersion(ref.APIVersion)
+	if err != nil {
+		return nil, err
+	}
+	if gv.Empty() {
+		// assume we talk about nagare media engine types
+		gv = enginev1.GroupVersion
+	}
+	gvk := gv.WithKind(ref.Kind)
+
+	mapping, err := c.RESTMapper().RESTMapping(gvk.GroupKind(), gvk.Version)
+	if err != nil {
+		return nil, err
+	}
+
+	runObj, err := c.Scheme().New(gvk)
+	if err != nil {
+		return nil, err
+	}
+
+	obj, ok := runObj.(client.Object)
+	if !ok {
+		return nil, errors.New("failed to convert runtime.Object to client.Object")
+	}
+
+	obj.SetName(ref.Name)
+	if mapping.Scope.Name() == apimeta.RESTScopeNameNamespace {
+		obj.SetNamespace(namespace)
+	}
+
+	return obj, nil
 }

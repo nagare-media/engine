@@ -16,6 +16,8 @@ limitations under the License.
 
 package meta
 
+import "k8s.io/apimachinery/pkg/types"
+
 // Reference to a local object.
 type LocalObjectReference struct {
 	// API version of the referred object.
@@ -28,6 +30,15 @@ type LocalObjectReference struct {
 
 	// Name of the referred object.
 	Name string `json:"name"`
+}
+
+func (ref LocalObjectReference) ObjectReference(namespace string) ObjectReference {
+	return ObjectReference{
+		APIVersion: ref.APIVersion,
+		Kind:       ref.Kind,
+		Name:       ref.Name,
+		Namespace:  namespace,
+	}
 }
 
 // Reference to an object.
@@ -46,6 +57,14 @@ type ObjectReference struct {
 	// Namespace of the referred object.
 	// +optional
 	Namespace string `json:"namespace,omitempty"`
+}
+
+func (ref ObjectReference) LocalObjectReference() LocalObjectReference {
+	return LocalObjectReference{
+		APIVersion: ref.APIVersion,
+		Kind:       ref.Kind,
+		Name:       ref.Name,
+	}
 }
 
 // Reference to an exact object including the UID.
