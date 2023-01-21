@@ -1769,6 +1769,10 @@ func (in *WorkflowStatus) DeepCopyInto(out *WorkflowStatus) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.QueuedTime != nil {
+		in, out := &in.QueuedTime, &out.QueuedTime
+		*out = (*in).DeepCopy()
+	}
 	if in.StartTime != nil {
 		in, out := &in.StartTime, &out.StartTime
 		*out = (*in).DeepCopy()
@@ -1776,6 +1780,26 @@ func (in *WorkflowStatus) DeepCopyInto(out *WorkflowStatus) {
 	if in.EndTime != nil {
 		in, out := &in.EndTime, &out.EndTime
 		*out = (*in).DeepCopy()
+	}
+	if in.Total != nil {
+		in, out := &in.Total, &out.Total
+		*out = new(int32)
+		**out = **in
+	}
+	if in.Active != nil {
+		in, out := &in.Active, &out.Active
+		*out = new(int32)
+		**out = **in
+	}
+	if in.Succeeded != nil {
+		in, out := &in.Succeeded, &out.Succeeded
+		*out = new(int32)
+		**out = **in
+	}
+	if in.Failed != nil {
+		in, out := &in.Failed, &out.Failed
+		*out = new(int32)
+		**out = **in
 	}
 }
 

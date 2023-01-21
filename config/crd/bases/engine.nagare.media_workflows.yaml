@@ -24,7 +24,7 @@ spec:
     - jsonPath: .spec.humanReadable.name
       name: Human Name
       type: string
-    - jsonPath: .status.conditions[?(@.status=="True")].type
+    - jsonPath: .status.phase
       name: Status
       type: string
     - description: CreationTimestamp is a timestamp representing the server time when
@@ -40,6 +40,18 @@ spec:
     - jsonPath: .status.endTime
       name: End
       type: date
+    - jsonPath: .status.total
+      name: Total
+      type: integer
+    - jsonPath: .status.active
+      name: Active
+      type: integer
+    - jsonPath: .status.succeeded
+      name: Succeeded
+      type: integer
+    - jsonPath: .status.failed
+      name: Failed
+      type: integer
     name: v1alpha1
     schema:
       openAPIV3Schema:
@@ -110,6 +122,11 @@ spec:
           status:
             description: Status of a Workflow.
             properties:
+              active:
+                description: The number of Tasks which reached phase "Initializing",
+                  "JobPending" or "Running".
+                format: int32
+                type: integer
               conditions:
                 description: The latest available observations of an object's current
                   state. When a Workflow fails, one of the conditions will have type
@@ -156,12 +173,43 @@ spec:
                   in RFC3339 form and is in UTC.
                 format: date-time
                 type: string
-              startTime:
-                description: Represents time when the Workflow controller started
+              failed:
+                description: The number of Tasks which reached phase "Failed".
+                format: int32
+                type: integer
+              message:
+                description: A human readable message indicating why the Workflow
+                  is in this condition.
+                type: string
+              phase:
+                description: The status of this Workflow.
+                enum:
+                - Initializing
+                - Running
+                - AwaitingCompletion
+                - Succeeded
+                - Failed
+                type: string
+              queuedTime:
+                description: Represents time when the Workflow controller first started
                   processing a Workflow. It is represented in RFC3339 form and is
                   in UTC.
                 format: date-time
                 type: string
+              startTime:
+                description: Represents time when the Workflow controller transitioned
+                  to the "running" phase. It is represented in RFC3339 form and is
+                  in UTC.
+                format: date-time
+                type: string
+              succeeded:
+                description: The number of Tasks which reached phase "Succeeded".
+                format: int32
+                type: integer
+              total:
+                description: The number of total Tasks.
+                format: int32
+                type: integer
             type: object
         type: object
     served: true
