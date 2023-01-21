@@ -438,6 +438,7 @@ func (r *MediaProcessingEntityReconciler) getManagerErr(ref *meta.ObjectReferenc
 	return r.managerErrs[*ref]
 }
 
+// TODO: emit Kubernetes events
 // SetupWithManager sets up the controller with the Manager.
 func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	r.managers = make(map[meta.ObjectReference]manager.Manager)

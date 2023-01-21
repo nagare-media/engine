@@ -655,6 +655,7 @@ func toFunctionObjectRef(lref *meta.LocalObjectReference, namespace string) (*me
 	return &ref, nil
 }
 
+// TODO: emit Kubernetes events
 // SetupWithManager sets up the controller with the Manager.
 func (r *TaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).

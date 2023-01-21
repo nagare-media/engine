@@ -301,6 +301,7 @@ func (r *WorkflowReconciler) reconcileFailedTask(ctx context.Context, wf *engine
 	}
 }
 
+// TODO: emit Kubernetes events
 // SetupWithManager sets up the controller with the Manager.
 func (r *WorkflowReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
