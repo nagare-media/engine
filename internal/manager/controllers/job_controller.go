@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nagare-media/engine/internal/manager/predicate"
 	batchv1 "k8s.io/api/batch/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,6 +32,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/manager/predicate"
 )
 
 const (

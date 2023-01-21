@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 

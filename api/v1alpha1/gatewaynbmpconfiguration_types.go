@@ -21,10 +21,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nagare-media/engine/pkg/apis/resources"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
+
+	"github.com/nagare-media/engine/pkg/apis/resources"
 )
 
 type GatewayNBMPConfigurationSpec struct {

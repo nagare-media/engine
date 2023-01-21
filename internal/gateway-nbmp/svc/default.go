@@ -16,9 +16,7 @@ limitations under the License.
 
 package svc
 
-import (
-	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
-)
+import nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 
 func PopulateWorkflowDefaults(wf *nbmpv2.Workflow) {
 	// Scheme
