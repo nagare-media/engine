@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"time"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrlCfg "sigs.k8s.io/controller-runtime/pkg/config/v1alpha1"
 )
@@ -29,6 +31,26 @@ type ControllerManagerConfiguration struct {
 
 	// ControllerManagerConfigurationSpec returns the configurations for controllers
 	ctrlCfg.ControllerManagerConfigurationSpec `json:",inline"`
+
+	// nagare media eninge specific configuration options
+	NagareMediaEngineControllerManagerConfiguration `json:",inline"`
+}
+
+type NagareMediaEngineControllerManagerConfiguration struct {
+	// Duration to wait after all Tasks of a Workflow terminated to mark the Workflow as successful. This helps mitigate
+	// race conditions and should not be too low. Defaults to "20s"
+	// +optional
+	WorkflowTerminationWaitingDuration *metav1.Duration `json:"workflowTerminationWaitingDuration,omitempty"`
+}
+
+func (c *ControllerManagerConfiguration) Default() {
+	if c.WorkflowTerminationWaitingDuration == nil {
+		c.WorkflowTerminationWaitingDuration = &metav1.Duration{Duration: 20 * time.Second}
+	}
+}
+
+func (c *ControllerManagerConfiguration) Validate() error {
+	return nil
 }
 
 func init() {

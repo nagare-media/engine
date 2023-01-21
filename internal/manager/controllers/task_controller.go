@@ -36,6 +36,7 @@ const (
 type TaskReconciler struct {
 	client.Client
 
+	Config                          enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme                          *runtime.Scheme
 	JobEventChannel                 <-chan event.GenericEvent
 	MediaProcessingEntityReconciler *MediaProcessingEntityReconciler

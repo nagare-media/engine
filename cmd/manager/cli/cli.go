@@ -78,7 +78,6 @@ func Execute() error {
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	var err error
-	// TODO: set default values
 	ctrlConfig := enginev1.ControllerManagerConfiguration{}
 	options := ctrl.Options{Scheme: scheme}
 	if configFile != "" {
@@ -87,6 +86,12 @@ func Execute() error {
 			setupLog.Error(err, "unable to load the config file")
 			return err
 		}
+	}
+
+	ctrlConfig.Default()
+	if err = ctrlConfig.Validate(); err != nil {
+		setupLog.Error(err, "invalid configuration")
+		return err
 	}
 
 	restCfg := ctrl.GetConfigOrDie()
@@ -138,6 +143,7 @@ func Execute() error {
 	}
 	jobEventChannel := make(chan event.GenericEvent)
 	mpeReconciler := &controllers.MediaProcessingEntityReconciler{
+		Config:          ctrlConfig.NagareMediaEngineControllerManagerConfiguration,
 		Client:          mgr.GetClient(),
 		Scheme:          mgr.GetScheme(),
 		LocalRESTConfig: restCfg,
@@ -149,6 +155,7 @@ func Execute() error {
 		return err
 	}
 	if err = (&controllers.WorkflowReconciler{
+		Config: ctrlConfig.NagareMediaEngineControllerManagerConfiguration,
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
@@ -156,6 +163,7 @@ func Execute() error {
 		return err
 	}
 	if err = (&controllers.TaskReconciler{
+		Config:                          ctrlConfig.NagareMediaEngineControllerManagerConfiguration,
 		Client:                          mgr.GetClient(),
 		Scheme:                          mgr.GetScheme(),
 		JobEventChannel:                 jobEventChannel,

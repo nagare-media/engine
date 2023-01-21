@@ -54,6 +54,7 @@ const (
 type MediaProcessingEntityReconciler struct {
 	client.Client
 
+	Config          enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme          *runtime.Scheme
 	LocalRESTConfig *rest.Config
 	ManagerOptions  manager.Options
@@ -242,6 +243,7 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 
 	// add job controller
 	if err = (&JobReconciler{
+		Config:       r.Config,
 		Client:       mgr.GetClient(),
 		Scheme:       mgr.GetScheme(),
 		EventChannel: r.JobEventChannel,

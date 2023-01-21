@@ -43,6 +43,7 @@ const (
 type JobReconciler struct {
 	client.Client
 
+	Config       enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme       *runtime.Scheme
 	EventChannel chan<- event.GenericEvent
 }
