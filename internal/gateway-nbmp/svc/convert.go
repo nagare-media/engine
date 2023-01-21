@@ -122,6 +122,8 @@ func (s *workflowService) wddToWorkflow(nbmpWf *nbmpv2.Workflow) (*enginev1.Work
 	}
 	wf.Spec.Config = &apiextensionsv1.JSON{Raw: cfgRaw}
 
+	// TODO: add media locations
+
 	return wf, nil
 }
 
