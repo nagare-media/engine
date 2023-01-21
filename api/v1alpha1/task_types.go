@@ -30,7 +30,7 @@ const (
 )
 
 const (
-	JobProtectionFinalizer = "engine.nagare.media/job-protection"
+	TaskProtectionFinalizer = "engine.nagare.media/task-protection"
 )
 
 // Specification of a Task.

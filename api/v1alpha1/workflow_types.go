@@ -30,6 +30,10 @@ const (
 	WorkflowLabel = "engine.nagare.media/workflow"
 )
 
+const (
+	WorkflowkProtectionFinalizer = "engine.nagare.media/workflow-protection"
+)
+
 // Specification of a Workflow.
 type WorkflowSpec struct {
 	// Human readable description of this Workflow.
