@@ -41,12 +41,7 @@ func SelectMediaProcessingEntityRef(ctx context.Context, c client.Client, namesp
 	}
 
 	if len(mpeList.Items) == 1 {
-		return &meta.ObjectReference{
-			APIVersion: enginev1.GroupVersion.String(),
-			Kind:       mpeList.Items[0].GroupVersionKind().Kind,
-			Name:       mpeList.Items[0].Name,
-			Namespace:  mpeList.Items[0].Namespace,
-		}, nil
+		return ToRef(&mpeList.Items[0]), nil
 	} else if len(mpeList.Items) > 1 {
 		return nil, ErrSelectedMultiple
 	}
@@ -58,12 +53,7 @@ func SelectMediaProcessingEntityRef(ctx context.Context, c client.Client, namesp
 	}
 
 	if len(cmpeList.Items) == 1 {
-		return &meta.ObjectReference{
-			APIVersion: enginev1.GroupVersion.String(),
-			Kind:       cmpeList.Items[0].GroupVersionKind().Kind,
-			Name:       cmpeList.Items[0].Name,
-			Namespace:  cmpeList.Items[0].Namespace,
-		}, nil
+		return ToRef(&cmpeList.Items[0]), nil
 	} else if len(cmpeList.Items) > 1 {
 		return nil, ErrSelectedMultiple
 	}
