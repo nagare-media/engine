@@ -8878,8 +8878,6 @@ spec:
                   in UTC.
                 format: date-time
                 type: string
-            required:
-            - phase
             type: object
         type: object
     served: true

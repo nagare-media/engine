@@ -134,7 +134,8 @@ var (
 // Status of a Task.
 type TaskStatus struct {
 	// The status of this Task.
-	Phase TaskPhase `json:"phase"`
+	// +optional
+	Phase TaskPhase `json:"phase,omitempty"`
 
 	// The latest available observations of an object's current state. When a Task fails, one of the conditions will have
 	// type "Failed" and status true. When a Task is completed, one of the conditions will have type "Complete" and status
