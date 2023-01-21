@@ -62,6 +62,34 @@ func SelectMediaProcessingEntityRef(ctx context.Context, c client.Client, namesp
 	return nil, nil
 }
 
+func SelectFunctionRef(ctx context.Context, c client.Client, namespace string, sel labels.Selector) (*meta.ObjectReference, error) {
+	// local Function
+	funcList := &enginev1.FunctionList{}
+	if err := c.List(ctx, funcList, client.InNamespace(namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
+		return nil, err
+	}
+
+	if len(funcList.Items) == 1 {
+		return ToRef(&funcList.Items[0]), nil
+	} else if len(funcList.Items) > 1 {
+		return nil, ErrSelectedMultiple
+	}
+
+	// ClusterFunction
+	cfuncList := &enginev1.ClusterFunctionList{}
+	if err := c.List(ctx, cfuncList, client.MatchingLabelsSelector{Selector: sel}); err != nil {
+		return nil, err
+	}
+
+	if len(cfuncList.Items) == 1 {
+		return ToRef(&cfuncList.Items[0]), nil
+	} else if len(cfuncList.Items) > 1 {
+		return nil, ErrSelectedMultiple
+	}
+
+	return nil, nil
+}
+
 func ToRef(obj client.Object) *meta.ObjectReference {
 	return &meta.ObjectReference{
 		APIVersion: obj.GetObjectKind().GroupVersionKind().GroupVersion().String(),
