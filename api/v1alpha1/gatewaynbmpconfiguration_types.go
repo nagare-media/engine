@@ -76,56 +76,56 @@ func init() {
 	SchemeBuilder.Register(&GatewayNBMPConfiguration{})
 }
 
-func (wc *GatewayNBMPConfiguration) Default() {
-	if wc.Webserver.BindAddress == nil {
-		wc.Webserver.BindAddress = pointer.String(":8080")
+func (c *GatewayNBMPConfiguration) Default() {
+	if c.Webserver.BindAddress == nil {
+		c.Webserver.BindAddress = pointer.String(":8080")
 	}
 
-	if wc.Webserver.ReadTimeout == nil {
-		wc.Webserver.ReadTimeout = pointer.Duration(time.Minute)
+	if c.Webserver.ReadTimeout == nil {
+		c.Webserver.ReadTimeout = pointer.Duration(time.Minute)
 	}
 
-	if wc.Webserver.WriteTimeout == nil {
-		wc.Webserver.WriteTimeout = pointer.Duration(time.Minute)
+	if c.Webserver.WriteTimeout == nil {
+		c.Webserver.WriteTimeout = pointer.Duration(time.Minute)
 	}
 
-	if wc.Webserver.IdleTimeout == nil {
-		wc.Webserver.IdleTimeout = pointer.Duration(time.Minute)
+	if c.Webserver.IdleTimeout == nil {
+		c.Webserver.IdleTimeout = pointer.Duration(time.Minute)
 	}
 
-	if wc.Webserver.Network == nil {
-		wc.Webserver.Network = pointer.String("tcp")
+	if c.Webserver.Network == nil {
+		c.Webserver.Network = pointer.String("tcp")
 	}
 
-	if wc.Services.DefaultKubernetesGPUResource == "" {
+	if c.Services.DefaultKubernetesGPUResource == "" {
 		// TODO: what should the default be?
-		wc.Services.DefaultKubernetesGPUResource = resources.NVIDIA_GPU
+		c.Services.DefaultKubernetesGPUResource = resources.NVIDIA_GPU
 	}
 }
 
-func (wc *GatewayNBMPConfiguration) Validate() error {
-	if wc.Webserver.BindAddress == nil {
+func (c *GatewayNBMPConfiguration) Validate() error {
+	if c.Webserver.BindAddress == nil {
 		return errors.New("missing webserver.bindAddress")
 	}
-	if wc.Webserver.ReadTimeout == nil {
+	if c.Webserver.ReadTimeout == nil {
 		return errors.New("missing webserver.readTimeout")
 	}
-	if wc.Webserver.WriteTimeout == nil {
+	if c.Webserver.WriteTimeout == nil {
 		return errors.New("missing webserver.writeTimeout")
 	}
-	if wc.Webserver.IdleTimeout == nil {
+	if c.Webserver.IdleTimeout == nil {
 		return errors.New("missing webserver.idleTimeout")
 	}
-	if wc.Webserver.Network == nil {
+	if c.Webserver.Network == nil {
 		return errors.New("missing webserver.network")
 	}
-	if wc.Webserver.PublicBaseURL != nil && strings.HasSuffix(*wc.Webserver.PublicBaseURL, "/") {
+	if c.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.Webserver.PublicBaseURL, "/") {
 		return errors.New("trailing slash in webserver.publicBaseURL")
 	}
-	if wc.Services.KubernetesNamespace == "" {
+	if c.Services.KubernetesNamespace == "" {
 		return errors.New("missing services.kubernetesNamespace")
 	}
-	if wc.Services.DefaultKubernetesGPUResource == "" {
+	if c.Services.DefaultKubernetesGPUResource == "" {
 		return errors.New("missing services.defaultKubernetesGPUResource")
 	}
 	return nil
