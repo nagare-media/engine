@@ -18,13 +18,21 @@ package controllers
 
 import (
 	"context"
+	"errors"
+	"time"
 
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/pkg/apis/utils"
 )
 
 const (
@@ -42,22 +50,255 @@ type WorkflowReconciler struct {
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows/finalizers,verbs=update
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the Workflow object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.1/pkg/reconcile
-func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, reterr error) {
+	log := logf.FromContext(ctx)
 
-	// TODO(user): your logic here
+	// fetch Workflow
+	wf := &enginev1.Workflow{}
+	if err := r.Client.Get(ctx, req.NamespacedName, wf); err != nil {
+		if apierrors.IsNotFound(err) {
+			// Object not found, return.  Created objects are automatically garbage collected.
+			// For additional cleanup logic use finalizers.
+			return ctrl.Result{}, nil
+		}
+		log.Error(err, "error fetching Workflow")
+		return ctrl.Result{}, err
+	}
+
+	// apply patches on return
+	oldWf := wf.DeepCopy()
+	defer func() {
+		r.reconcileCondition(ctx, reterr, wf)
+		apiErrs := kerrors.FilterOut(utils.FullPatch(ctx, r.Client, wf, oldWf), apierrors.IsNotFound)
+		if apiErrs != nil {
+			log.Error(apiErrs, "error patching Workflow")
+		}
+		reterr = kerrors.Flatten(kerrors.NewAggregate([]error{apiErrs, reterr}))
+	}()
+
+	// add finalizers
+	if !controllerutil.ContainsFinalizer(wf, enginev1.WorkflowkProtectionFinalizer) {
+		controllerutil.AddFinalizer(wf, enginev1.WorkflowkProtectionFinalizer)
+		return ctrl.Result{}, nil
+	}
+
+	// handle delete
+	if !wf.DeletionTimestamp.IsZero() {
+		return r.reconcileDelete(ctx, wf)
+	}
+
+	// handle normal reconciliation
+	return r.reconcile(ctx, wf)
+}
+
+func (r *WorkflowReconciler) reconcileCondition(ctx context.Context, err error, wf *enginev1.Workflow) {
+	log := logf.FromContext(ctx)
+
+	var phaseConditionStatus corev1.ConditionStatus
+	if err != nil {
+		log.Error(err, "error reconciling Workflow")
+		wf.Status.Message = err.Error()
+		phaseConditionStatus = corev1.ConditionFalse
+	} else {
+		wf.Status.Message = ""
+		phaseConditionStatus = corev1.ConditionTrue
+	}
+
+	// TODO: patch conditions to keep transition times
+	now := metav1.Time{Time: time.Now()}
+	switch wf.Status.Phase {
+	default:
+		wf.Status.Conditions = []enginev1.WorkflowCondition{}
+	case enginev1.WorkflowPhaseInitializing:
+		wf.Status.Conditions = []enginev1.WorkflowCondition{{
+			Type:               enginev1.WorkflowReady,
+			Status:             corev1.ConditionFalse,
+			LastTransitionTime: now,
+		}}
+	case enginev1.WorkflowPhaseRunning, enginev1.WorkflowPhaseAwaitingCompletion:
+		wf.Status.Conditions = []enginev1.WorkflowCondition{{
+			Type:               enginev1.WorkflowReady,
+			Status:             phaseConditionStatus,
+			LastTransitionTime: now,
+		}}
+	case enginev1.WorkflowPhaseSucceeded:
+		wf.Status.Conditions = []enginev1.WorkflowCondition{{
+			Type:               enginev1.WorkflowComplete,
+			Status:             corev1.ConditionTrue,
+			LastTransitionTime: now,
+		}, {
+			Type:               enginev1.WorkflowReady,
+			Status:             corev1.ConditionFalse,
+			LastTransitionTime: now,
+		}}
+	case enginev1.WorkflowPhaseFailed:
+		wf.Status.Conditions = []enginev1.WorkflowCondition{{
+			Type:               enginev1.WorkflowFailed,
+			Status:             corev1.ConditionTrue,
+			LastTransitionTime: now,
+		}, {
+			Type:               enginev1.WorkflowReady,
+			Status:             corev1.ConditionFalse,
+			LastTransitionTime: now,
+		}}
+	}
+}
+
+func (r *WorkflowReconciler) reconcileDelete(ctx context.Context, wf *enginev1.Workflow) (ctrl.Result, error) {
+	log := logf.FromContext(ctx)
+	log.Info("reconcile deleted Workflow")
+
+	// wait until all Task have terminated
+	if res, err := r.reconcileTasks(ctx, wf); err != nil {
+		return res, err
+	}
+	if wf.Status.Active != nil && *wf.Status.Active > 0 {
+		return ctrl.Result{}, errors.New("not all Tasks have terminated")
+	}
+
+	// remove finalizer
+	controllerutil.RemoveFinalizer(wf, enginev1.WorkflowkProtectionFinalizer)
 
 	return ctrl.Result{}, nil
+}
+
+func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflow) (ctrl.Result, error) {
+	log := logf.FromContext(ctx, "phase", wf.Status.Phase)
+	log.Info("reconcile Workflow")
+
+	if wf.Status.QueuedTime == nil {
+		wf.Status.QueuedTime = &metav1.Time{Time: time.Now()}
+	}
+
+	// set Workflow label for filtering
+	if wf.Labels == nil {
+		wf.Labels = make(map[string]string)
+	}
+	wf.Labels[enginev1.WorkflowLabel] = client.ObjectKeyFromObject(wf).String()
+
+	switch wf.Status.Phase {
+	default:
+		// empty or unknown phase -> move to initializing
+		wf.Status.Phase = enginev1.WorkflowPhaseInitializing
+		wf.Status.Total = nil
+		wf.Status.Active = nil
+		wf.Status.Succeeded = nil
+		wf.Status.Failed = nil
+
+	case enginev1.WorkflowPhaseInitializing:
+		if res, err := r.reconcileTasks(ctx, wf); err != nil {
+			return res, err
+		}
+
+		// as soon as we see Tasks belonging to this Workflow transition to running phase
+		if wf.Status.Total != nil && *wf.Status.Total > 0 {
+			wf.Status.Phase = enginev1.WorkflowPhaseRunning
+			wf.Status.StartTime = &metav1.Time{Time: time.Now()}
+		}
+
+	case enginev1.WorkflowPhaseRunning:
+		if res, err := r.reconcileTasks(ctx, wf); err != nil {
+			return res, err
+		}
+
+		// If we have no active Tasks, do not transition to succeeded directly as new Tasks could be created. This helps
+		// mitigate races during initial setup and very quick Tasks:
+		//   Workflow w is created
+		//   Task t1 is created
+		//   Task t1 terminates very quick
+		//   Workflow w is marked as successful
+		//   Task t2 is created and fails because w has already terminated
+		if wf.Status.Active != nil && *wf.Status.Active == 0 {
+			wf.Status.Phase = enginev1.WorkflowPhaseAwaitingCompletion
+			wf.Status.EndTime = &metav1.Time{Time: time.Now()}
+		}
+
+	case enginev1.WorkflowPhaseAwaitingCompletion:
+		if res, err := r.reconcileTasks(ctx, wf); err != nil {
+			return res, err
+		}
+
+		// check if indeed new Tasks have been created and are active
+		if wf.Status.Active != nil && *wf.Status.Active > 0 {
+			wf.Status.Phase = enginev1.WorkflowPhaseRunning
+			return ctrl.Result{}, nil
+		}
+
+		// check if we waited enough
+		if wf.Status.EndTime != nil {
+			// this state should not happen: move back to running to set end time
+			wf.Status.Phase = enginev1.WorkflowPhaseRunning
+			return ctrl.Result{}, nil
+		}
+
+		waitingDuration := time.Since(wf.Status.EndTime.Time)
+		remainingDuration := r.Config.WorkflowTerminationWaitingDuration.Duration - waitingDuration
+		if remainingDuration > 0 {
+			return ctrl.Result{RequeueAfter: remainingDuration}, nil
+		}
+
+		wf.Status.Phase = enginev1.WorkflowPhaseSucceeded
+
+	case enginev1.WorkflowPhaseSucceeded, enginev1.WorkflowPhaseFailed:
+		// Workflow has terminated: nothing to do
+	}
+
+	return ctrl.Result{}, nil
+}
+
+func (r *WorkflowReconciler) reconcileTasks(ctx context.Context, wf *enginev1.Workflow) (ctrl.Result, error) {
+	var total, active, succeeded, failed int32
+
+	// fetch Tasks
+	wfKey := client.ObjectKeyFromObject(wf)
+	taskList := &enginev1.TaskList{}
+	err := r.List(ctx, taskList, client.MatchingLabels{enginev1.WorkflowLabel: wfKey.String()})
+	if err != nil {
+		return ctrl.Result{}, nil
+	}
+
+	// check Tasks
+	total = int32(len(taskList.Items))
+	for _, task := range taskList.Items {
+		switch task.Status.Phase {
+		case enginev1.TaskPhaseInitializing, enginev1.TaskPhaseJobPending, enginev1.TaskPhaseRunning:
+			active++
+		case enginev1.TaskPhaseSucceeded:
+			succeeded++
+		case enginev1.TaskPhaseFailed:
+			failed++
+			r.reconcileFailedTask(ctx, wf, &task)
+		}
+	}
+
+	wf.Status.Total = &total
+	wf.Status.Active = &active
+	wf.Status.Succeeded = &succeeded
+	wf.Status.Failed = &failed
+
+	return ctrl.Result{}, nil
+}
+
+func (r *WorkflowReconciler) reconcileFailedTask(ctx context.Context, wf *enginev1.Workflow, task *enginev1.Task) {
+	if utils.WorkflowHasTerminated(wf) {
+		// ignore failed tasks if Workflow already terminated
+		return
+	}
+
+	// TODO: this should probably be handled by the task controller?
+
+	policy := enginev1.JobFailurePolicyActionFailWorkflow
+	if task.Spec.JobFailurePolicy != nil && task.Spec.JobFailurePolicy.DefaultAction != nil {
+		policy = *task.Spec.JobFailurePolicy.DefaultAction
+	}
+
+	switch policy {
+	case enginev1.JobFailurePolicyActionIgnore:
+	case enginev1.JobFailurePolicyActionFailWorkflow:
+		wf.Status.Phase = enginev1.WorkflowPhaseFailed
+	}
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -65,5 +306,6 @@ func (r *WorkflowReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(WorkflowControllerName).
 		For(&enginev1.Workflow{}).
+		Owns(&enginev1.Task{}).
 		Complete(r)
 }
