@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -70,6 +71,13 @@ func ToRef(obj client.Object) *meta.ObjectReference {
 	}
 }
 
+func ToExactRef(obj client.Object) *meta.ExactObjectReference {
+	return &meta.ExactObjectReference{
+		ObjectReference: *ToRef(obj),
+		UID:             obj.GetUID(),
+	}
+}
+
 func ToLocalRef(obj client.Object) *meta.LocalObjectReference {
 	return &meta.LocalObjectReference{
 		APIVersion: obj.GetObjectKind().GroupVersionKind().GroupVersion().String(),
@@ -81,6 +89,25 @@ func ToLocalRef(obj client.Object) *meta.LocalObjectReference {
 func ResolveRef(ctx context.Context, c client.Client, ref *meta.ObjectReference) (client.Object, error) {
 	lref := ref.LocalObjectReference()
 	return ResolveLocalRef(ctx, c, ref.Namespace, &lref)
+}
+
+func ResolveExactRef(ctx context.Context, c client.Client, ref *meta.ExactObjectReference) (client.Object, error) {
+	obj, err := ResolveRef(ctx, c, &ref.ObjectReference)
+	if err != nil {
+		return nil, err
+	}
+	if obj.GetUID() != ref.UID {
+		gv, err := schema.ParseGroupVersion(ref.APIVersion)
+		if err != nil {
+			return nil, err
+		}
+		mapping, err := c.RESTMapper().RESTMapping(gv.WithKind(ref.Kind).GroupKind(), gv.Version)
+		if err != nil {
+			return nil, err
+		}
+		return nil, apierrors.NewConflict(mapping.Resource.GroupResource(), ref.Name, errors.New("reference has conflicting UID"))
+	}
+	return obj, nil
 }
 
 func ResolveLocalRef(ctx context.Context, c client.Client, namespace string, ref *meta.LocalObjectReference) (client.Object, error) {
