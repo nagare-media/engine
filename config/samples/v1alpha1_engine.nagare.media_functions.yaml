@@ -6,7 +6,6 @@ metadata:
     app.kubernetes.io/name: function
     app.kubernetes.io/instance: sleep
     app.kubernetes.io/part-of: nagare-media-engine
-    app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: nagare-media-engine
     beta.engine.nagare.media/function-type: example
 spec:

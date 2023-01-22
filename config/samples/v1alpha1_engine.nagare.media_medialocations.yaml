@@ -7,7 +7,6 @@ metadata:
     app.kubernetes.io/name: medialocation
     app.kubernetes.io/instance: s3
     app.kubernetes.io/part-of: nagare-media-engine
-    app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: nagare-media-engine
   annotations:
     beta.engine.nagare.media/is-default-step-media-location: "true"
@@ -39,7 +38,6 @@ stringData:
 #     app.kubernetes.io/name: medialocation
 #     app.kubernetes.io/instance: rtmp
 #     app.kubernetes.io/part-of: nagare-media-engine
-#     app.kubernetes.io/managed-by: kustomize
 #     app.kubernetes.io/created-by: nagare-media-engine
 #   annotations:
 #     beta.engine.nagare.media/is-default-streaming-media-location: "true"
