@@ -1,7 +1,7 @@
 apiVersion: engine.nagare.media/v1alpha1
 kind: ClusterFunction
 metadata:
-  name: sleep-0-1-0
+  name: sleep-0.1.0
   labels:
     app.kubernetes.io/name: function
     app.kubernetes.io/instance: sleep
@@ -12,15 +12,17 @@ spec:
   version: 0.1.0+example
   template:
     spec:
-      restartPolicy: Never
-      containers:
-        - name: sleep
-          image: alpine
-          command: ["sleep",  "10m"]
-          resources:
-            requests:
-              cpu: 10m
-              memory: 16Mi
-            limits:
-              cpu: 100m
-              memory: 128Mi
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: sleep
+              image: alpine
+              command: ["sleep",  "10m"]
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
