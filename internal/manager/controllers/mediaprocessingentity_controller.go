@@ -332,7 +332,9 @@ func (r *MediaProcessingEntityReconciler) newLocalManager(ctx context.Context, m
 func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (manager.Manager, error) {
 	// shallow copy
 	secretRef := mpe.Spec.Remote.Kubeconfig.SecretRef
-	utils.NormalizeRef(r.Scheme, &secretRef.ObjectReference, &corev1.Secret{})
+	if err := utils.NormalizeRef(r.Scheme, &secretRef.ObjectReference, &corev1.Secret{}); err != nil {
+		return nil, err
+	}
 
 	// set namespace
 	if secretRef.Namespace == "" {

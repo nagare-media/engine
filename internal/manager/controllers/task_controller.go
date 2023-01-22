@@ -362,7 +362,9 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 		if err != nil {
 			return ctrl.Result{}, err
 		}
-		utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref)
+		if err = utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref); err != nil {
+			return ctrl.Result{}, err
+		}
 		task.Status.MediaProcessingEntityRef = ref
 		return ctrl.Result{}, nil
 	}
@@ -379,7 +381,9 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 			return ctrl.Result{}, err
 		}
 		if ref != nil {
-			utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref)
+			if err = utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref); err != nil {
+				return ctrl.Result{}, err
+			}
 			task.Status.MediaProcessingEntityRef = ref
 			return ctrl.Result{}, nil
 		}
@@ -389,7 +393,9 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 	if task.Spec.TaskTemplateRef != nil {
 		// shallow copy
 		ttRef := task.Spec.TaskTemplateRef
-		utils.NormalizeLocalTaskTemplateRef(r.Scheme, ttRef)
+		if err := utils.NormalizeLocalTaskTemplateRef(r.Scheme, ttRef); err != nil {
+			return ctrl.Result{}, err
+		}
 
 		// resolve TaskTemplate
 		ttObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, task.Spec.TaskTemplateRef)
@@ -418,7 +424,9 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 				if err != nil {
 					return ctrl.Result{}, err
 				}
-				utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref)
+				if err = utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref); err != nil {
+					return ctrl.Result{}, err
+				}
 				task.Status.MediaProcessingEntityRef = ref
 				return ctrl.Result{}, nil
 			}
@@ -435,7 +443,9 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 					return ctrl.Result{}, err
 				}
 				if ref != nil {
-					utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref)
+					if err = utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref); err != nil {
+						return ctrl.Result{}, err
+					}
 					task.Status.MediaProcessingEntityRef = ref
 					return ctrl.Result{}, nil
 				}
@@ -480,11 +490,13 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 
 	// 1. FunctionRef
 	if task.Spec.FunctionRef != nil {
-		ref, err := utils.LocalFunctionEntityToObjectRef(task.Spec.FunctionRef, task.Namespace)
+		ref, err := utils.LocalFunctionToObjectRef(task.Spec.FunctionRef, task.Namespace)
 		if err != nil {
 			return ctrl.Result{}, err
 		}
-		utils.NormalizeFunctionRef(r.Scheme, ref)
+		if err = utils.NormalizeFunctionRef(r.Scheme, ref); err != nil {
+			return ctrl.Result{}, err
+		}
 		task.Status.FunctionRef = ref
 		return ctrl.Result{}, nil
 	}
@@ -501,7 +513,9 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 			return ctrl.Result{}, err
 		}
 		if ref != nil {
-			utils.NormalizeFunctionRef(r.Scheme, ref)
+			if err = utils.NormalizeFunctionRef(r.Scheme, ref); err != nil {
+				return ctrl.Result{}, err
+			}
 			task.Status.FunctionRef = ref
 			return ctrl.Result{}, nil
 		}
@@ -511,7 +525,9 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 	if task.Spec.TaskTemplateRef != nil {
 		// shallow copy
 		ttRef := task.Spec.TaskTemplateRef
-		utils.NormalizeLocalTaskTemplateRef(r.Scheme, ttRef)
+		if err := utils.NormalizeLocalTaskTemplateRef(r.Scheme, ttRef); err != nil {
+			return ctrl.Result{}, err
+		}
 
 		ttObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, task.Spec.TaskTemplateRef)
 		if !apierrors.IsNotFound(err) {
@@ -535,11 +551,13 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 
 			// 3.1. FunctionRef
 			if ttFuncRef != nil {
-				ref, err := utils.LocalFunctionEntityToObjectRef(ttFuncRef, task.Namespace)
+				ref, err := utils.LocalFunctionToObjectRef(ttFuncRef, task.Namespace)
 				if err != nil {
 					return ctrl.Result{}, err
 				}
-				utils.NormalizeFunctionRef(r.Scheme, ref)
+				if err = utils.NormalizeFunctionRef(r.Scheme, ref); err != nil {
+					return ctrl.Result{}, err
+				}
 				task.Status.FunctionRef = ref
 				return ctrl.Result{}, nil
 			}
@@ -556,7 +574,9 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 					return ctrl.Result{}, err
 				}
 				if ref != nil {
-					utils.NormalizeFunctionRef(r.Scheme, ref)
+					if err = utils.NormalizeFunctionRef(r.Scheme, ref); err != nil {
+						return ctrl.Result{}, err
+					}
 					task.Status.FunctionRef = ref
 					return ctrl.Result{}, nil
 				}
@@ -662,7 +682,9 @@ func (r *TaskReconciler) normalizeStatusReferences(task *enginev1.Task) error {
 	}
 
 	if task.Status.JobRef != nil {
-		utils.NormalizeExactRef(r.Scheme, task.Status.JobRef, &batchv1.Job{})
+		if err := utils.NormalizeExactRef(r.Scheme, task.Status.JobRef, &batchv1.Job{}); err != nil {
+			return err
+		}
 	}
 
 	return nil

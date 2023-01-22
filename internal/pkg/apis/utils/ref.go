@@ -188,28 +188,28 @@ func PartiallyResolveLocalRef(c client.Client, namespace string, ref *meta.Local
 	return obj, nil
 }
 
-func NormalizeRef(s *runtime.Scheme, ref *meta.ObjectReference, obj client.Object) {
+func NormalizeRef(s *runtime.Scheme, ref *meta.ObjectReference, obj client.Object) error {
 	gvks, _, err := s.ObjectKinds(obj)
 	if err != nil {
-		// TODO: error is ignored
-		return
+		return err
 	}
 	ref.APIVersion = gvks[0].GroupVersion().String()
 	ref.Kind = gvks[0].Kind
+	return nil
 }
 
-func NormalizeExactRef(s *runtime.Scheme, ref *meta.ExactObjectReference, obj client.Object) {
-	NormalizeRef(s, &ref.ObjectReference, obj)
+func NormalizeExactRef(s *runtime.Scheme, ref *meta.ExactObjectReference, obj client.Object) error {
+	return NormalizeRef(s, &ref.ObjectReference, obj)
 }
 
-func NormalizeLocalRef(s *runtime.Scheme, ref *meta.LocalObjectReference, obj client.Object) {
+func NormalizeLocalRef(s *runtime.Scheme, ref *meta.LocalObjectReference, obj client.Object) error {
 	gvks, _, err := s.ObjectKinds(obj)
 	if err != nil {
-		// TODO: error is ignored
-		return
+		return err
 	}
 	ref.APIVersion = gvks[0].GroupVersion().String()
 	ref.Kind = gvks[0].Kind
+	return nil
 }
 
 func NormalizeFunctionRef(s *runtime.Scheme, ref *meta.ObjectReference) error {
@@ -296,15 +296,15 @@ func NormalizeLocalTaskTemplateRef(s *runtime.Scheme, ref *meta.LocalObjectRefer
 	return nil
 }
 
-func LocalFunctionEntityToObjectRef(lref *meta.LocalObjectReference, namespace string) (*meta.ObjectReference, error) {
+func LocalFunctionToObjectRef(lref *meta.LocalObjectReference, namespace string) (*meta.ObjectReference, error) {
 	funcNamespace := ""
 	switch lref.Kind {
-	case "FunctionEntity":
+	case "Function":
 		funcNamespace = namespace
-	case "ClusterFunctionEntity":
+	case "ClusterFunction":
 		// cluster scoped: does not have a namespace
 	default:
-		return nil, errors.New("FunctionEntity reference does not reference a FunctionEntity or ClusterFunctionEntity")
+		return nil, errors.New("Function reference does not reference a Function or ClusterFunction")
 	}
 	ref := lref.ObjectReference(funcNamespace)
 	return &ref, nil
