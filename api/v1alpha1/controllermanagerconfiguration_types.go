@@ -38,14 +38,22 @@ type ControllerManagerConfiguration struct {
 
 type NagareMediaEngineControllerManagerConfiguration struct {
 	// Duration to wait after all Tasks of a Workflow terminated to mark the Workflow as successful. This helps mitigate
-	// race conditions and should not be too low. Defaults to "20s"
+	// race conditions and should not be too low. Defaults to "20s".
 	// +optional
 	WorkflowTerminationWaitingDuration *metav1.Duration `json:"workflowTerminationWaitingDuration,omitempty"`
+
+	// Duration before marking a remove MediaProcessingEntity as ready. Local MediaProcessingEntities are marked as ready
+	// immediately. Defaults to "5s".
+	// +optional
+	RemoteMediaProcessingEntityStabilizingDuration *metav1.Duration `json:"remoteMediaProcessingEntityStabilizingDuration,omitempty"`
 }
 
 func (c *ControllerManagerConfiguration) Default() {
 	if c.WorkflowTerminationWaitingDuration == nil {
 		c.WorkflowTerminationWaitingDuration = &metav1.Duration{Duration: 20 * time.Second}
+	}
+	if c.RemoteMediaProcessingEntityStabilizingDuration == nil {
+		c.RemoteMediaProcessingEntityStabilizingDuration = &metav1.Duration{Duration: 5 * time.Second}
 	}
 }
 

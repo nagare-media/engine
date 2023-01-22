@@ -235,8 +235,8 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 		stabilizeDuration = 0
 		mgr, err = r.newLocalManager(ctx, mpe)
 	} else if mpe.Spec.Remote != nil {
+		stabilizeDuration = r.Config.RemoteMediaProcessingEntityStabilizingDuration.Duration
 		mgr, err = r.newRemoteManager(ctx, mpe)
-		stabilizeDuration = 4 * time.Second
 	}
 	if err != nil {
 		return ctrl.Result{}, err
