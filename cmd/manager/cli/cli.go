@@ -145,6 +145,7 @@ func Execute() error {
 	jobEventChannel := make(chan event.GenericEvent)
 	mpeReconciler := &controllers.MediaProcessingEntityReconciler{
 		Config:          ctrlConfig.NagareMediaEngineControllerManagerConfiguration,
+		APIReader:       mgr.GetAPIReader(),
 		Client:          mgr.GetClient(),
 		Scheme:          mgr.GetScheme(),
 		LocalRESTConfig: restCfg,
@@ -156,15 +157,17 @@ func Execute() error {
 		return err
 	}
 	if err = (&controllers.WorkflowReconciler{
-		Config: ctrlConfig.NagareMediaEngineControllerManagerConfiguration,
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Config:    ctrlConfig.NagareMediaEngineControllerManagerConfiguration,
+		APIReader: mgr.GetAPIReader(),
+		Client:    mgr.GetClient(),
+		Scheme:    mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Workflow")
 		return err
 	}
 	if err = (&controllers.TaskReconciler{
 		Config:                          ctrlConfig.NagareMediaEngineControllerManagerConfiguration,
+		APIReader:                       mgr.GetAPIReader(),
 		Client:                          mgr.GetClient(),
 		Scheme:                          mgr.GetScheme(),
 		JobEventChannel:                 jobEventChannel,

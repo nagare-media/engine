@@ -42,6 +42,7 @@ const (
 // WorkflowReconciler reconciles a Workflow object
 type WorkflowReconciler struct {
 	client.Client
+	APIReader client.Reader
 
 	Config enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme *runtime.Scheme

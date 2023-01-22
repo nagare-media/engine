@@ -49,6 +49,7 @@ const (
 // TaskReconciler reconciles a Task object
 type TaskReconciler struct {
 	client.Client
+	APIReader client.Reader
 
 	Config                          enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme                          *runtime.Scheme

@@ -42,6 +42,7 @@ const (
 // JobReconciler reconciles Job objects
 type JobReconciler struct {
 	client.Client
+	APIReader client.Reader
 
 	Config       enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme       *runtime.Scheme

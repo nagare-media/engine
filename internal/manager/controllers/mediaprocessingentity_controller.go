@@ -53,6 +53,7 @@ const (
 // MediaProcessingEntityReconciler reconciles MediaProcessingEntities and ClusterMediaProcessingEntities objects
 type MediaProcessingEntityReconciler struct {
 	client.Client
+	APIReader      client.Reader
 
 	Config          enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme          *runtime.Scheme
@@ -243,10 +244,11 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 
 	// add job controller
 	if err = (&JobReconciler{
-		Config:       r.Config,
-		Client:       mgr.GetClient(),
-		Scheme:       mgr.GetScheme(),
-		EventChannel: r.JobEventChannel,
+		Config:                   r.Config,
+		APIReader:                mgr.GetAPIReader(),
+		Client:                   mgr.GetClient(),
+		Scheme:                   mgr.GetScheme(),
+		EventChannel:             r.JobEventChannel,
 	}).SetupWithManager(mgr); err != nil {
 		log.Error(err, "unable to create controller", "controller", "Job")
 		return ctrl.Result{}, err
