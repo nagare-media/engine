@@ -33,6 +33,7 @@ import (
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/manager/predicate"
+	"github.com/nagare-media/engine/pkg/apis/meta"
 )
 
 const (
@@ -44,9 +45,10 @@ type JobReconciler struct {
 	client.Client
 	APIReader client.Reader
 
-	Config       enginev1.NagareMediaEngineControllerManagerConfiguration
-	Scheme       *runtime.Scheme
-	EventChannel chan<- event.GenericEvent
+	Config                   enginev1.NagareMediaEngineControllerManagerConfiguration
+	Scheme                   *runtime.Scheme
+	EventChannel             chan<- event.GenericEvent
+	MediaProcessingEntityRef *meta.ObjectReference
 }
 
 // +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch
@@ -90,10 +92,14 @@ func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 	return ctrl.Result{}, nil
 }
 
+func (r *JobReconciler) Name() string {
+	return fmt.Sprintf("%s-%s-%s", r.MediaProcessingEntityRef.Namespace, r.MediaProcessingEntityRef.Name, JobControllerName)
+}
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *JobReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		Named(JobControllerName).
+		Named(r.Name()).
 		For(&batchv1.Job{}).
 		WithEventFilter(predicate.HasLabels{enginev1.TaskLabel}).
 		Complete(r)

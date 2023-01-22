@@ -249,6 +249,7 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 		Client:                   mgr.GetClient(),
 		Scheme:                   mgr.GetScheme(),
 		EventChannel:             r.JobEventChannel,
+		MediaProcessingEntityRef: ref,
 	}).SetupWithManager(mgr); err != nil {
 		log.Error(err, "unable to create controller", "controller", "Job")
 		return ctrl.Result{}, err
