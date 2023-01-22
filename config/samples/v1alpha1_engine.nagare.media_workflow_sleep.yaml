@@ -1,0 +1,45 @@
+---
+apiVersion: engine.nagare.media/v1alpha1
+kind: Workflow
+metadata:
+  labels:
+    app.kubernetes.io/name: workflow
+    app.kubernetes.io/instance: e024e1c9-c6c0-4f27-8586-12a1888c84d6
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+  name: e024e1c9-c6c0-4f27-8586-12a1888c84d6
+spec:
+  humanReadable:
+    name: example-sleep
+    description: an example workflow
+  mediaLocations:
+    - name: s3
+      ref:
+        kind: ClusterMediaLocation
+        name: s3
+  config:
+    duration: 3m
+---
+apiVersion: engine.nagare.media/v1alpha1
+kind: Task
+metadata:
+  labels:
+    app.kubernetes.io/name: task
+    app.kubernetes.io/instance: b9385558-0f29-4883-a418-7176dece135e
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+  name: b9385558-0f29-4883-a418-7176dece135e
+spec:
+  humanReadable:
+    name: sleep
+    description: sleeps for some time
+  mediaProcessingEntityRef:
+    kind: ClusterMediaProcessingEntity
+    name: local-cluster
+  workflowRef:
+    name: e024e1c9-c6c0-4f27-8586-12a1888c84d6
+  functionRef:
+    kind: ClusterFunction
+    name: sleep-0.1.0
+  config:
+    duration: "{{ wf.cfg.duration }}"
