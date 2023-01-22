@@ -28,6 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
+	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -330,11 +331,21 @@ func (r *TaskReconciler) reconcileWorkflow(ctx context.Context, task *enginev1.T
 
 	// set owner reference
 	task.OwnerReferences = utils.EnsureOwnerRef(task.OwnerReferences, metav1.OwnerReference{
-		APIVersion: enginev1.GroupVersion.String(),
-		Kind:       wf.GroupVersionKind().Kind,
-		Name:       wf.Name,
-		UID:        wf.UID,
+		APIVersion:         enginev1.GroupVersion.String(),
+		Kind:               wf.GroupVersionKind().Kind,
+		Name:               wf.Name,
+		UID:                wf.UID,
+		Controller:         pointer.Bool(true),
+		BlockOwnerDeletion: pointer.Bool(true),
 	})
+
+	// is Workflow marked for deletion
+	if !wf.DeletionTimestamp.IsZero() {
+		// we have to delete this Task ourselves as we use blockOwnerDeletion
+		if err := r.Client.Delete(ctx, task, client.Preconditions{UID: &task.UID}); err != nil {
+			return ctrl.Result{}, fmt.Errorf("failed to delete Task: %w", err)
+		}
+	}
 
 	// set Workflow and Task label for filtering
 	if task.Labels == nil {
