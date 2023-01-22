@@ -41,6 +41,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	apiclient "github.com/nagare-media/engine/internal/manager/client"
 	"github.com/nagare-media/engine/internal/pkg/apis/utils"
 	"github.com/nagare-media/engine/pkg/apis/meta"
 )
@@ -54,6 +55,7 @@ const (
 type MediaProcessingEntityReconciler struct {
 	client.Client
 	APIReader      client.Reader
+	readOnlyClient client.Client
 
 	Config          enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme          *runtime.Scheme
@@ -182,10 +184,16 @@ func (r *MediaProcessingEntityReconciler) reconcileCondition(ctx context.Context
 		return
 	}
 
+	readyCondition := corev1.ConditionFalse
+	_, ready := r.GetManager(utils.ToRef(mpe))
+	if ready {
+		readyCondition = corev1.ConditionTrue
+	}
+
 	mpe.Status.Message = ""
 	mpe.Status.Conditions = []enginev1.MediaProcessingEntityCondition{{
 		Type:               enginev1.MediaProcessingEntityConditionTypeReady,
-		Status:             corev1.ConditionTrue,
+		Status:             readyCondition,
 		LastTransitionTime: now,
 	}}
 }
@@ -324,9 +332,10 @@ func (r *MediaProcessingEntityReconciler) newLocalManager(ctx context.Context, m
 func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (manager.Manager, error) {
 	// shallow copy
 	secretRef := mpe.Spec.Remote.Kubeconfig.SecretRef
+	utils.NormalizeRef(r.Scheme, &secretRef.ObjectReference, &corev1.Secret{})
 
 	// set namespace
-	if secretRef.Namespace == "" && mpe.Namespace != "" {
+	if secretRef.Namespace == "" {
 		if mpe.Namespace == "" {
 			// ClusterMediaProcessingEntity with no namespace
 			return nil, errors.New("remote ClusterMediaProcessingEntity secretRef has no namespace defined")
@@ -340,7 +349,7 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 	}
 
 	// resolve secret
-	secretObj, err := utils.ResolveRef(ctx, r.Client, &secretRef.ObjectReference)
+	secretObj, err := utils.ResolveRef(ctx, r.readOnlyClient, &secretRef.ObjectReference)
 	if err != nil {
 		return nil, err
 	}
@@ -381,18 +390,9 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
+	// shallow copy
 	opts := r.ManagerOptions
 	opts.Namespace = namespace
-
-	// set namespace
-	if mpe.Spec.Local.Namespace != "" {
-		opts.Namespace = mpe.Spec.Local.Namespace
-	} else if mpe.Namespace != "" {
-		opts.Namespace = mpe.Namespace
-	} else {
-		// ClusterMediaProcessingEntity with no namespace
-		return nil, errors.New("local ClusterMediaProcessingEntity has no namespace defined")
-	}
 
 	return manager.New(restConfig, opts)
 }
@@ -461,6 +461,9 @@ func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) err
 
 	// submanager should not create a webhook server
 	r.ManagerOptions.WebhookServer = nil
+
+	// create read-only client
+	r.readOnlyClient = apiclient.NewReadOnlyClient(r.APIReader, r.Scheme, r.Client.RESTMapper())
 
 	// MediaProcessingEntity controller
 	if err := ctrl.NewControllerManagedBy(mgr).

@@ -103,6 +103,11 @@ func (r *TaskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctr
 		return ctrl.Result{}, nil
 	}
 
+	// always normalize status references
+	if err := r.normalizeStatusReferences(task); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	// handle delete
 	if !task.DeletionTimestamp.IsZero() {
 		return r.reconcileDelete(ctx, task)
@@ -353,10 +358,11 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 
 	// 1. MediaProcessingEntityRef
 	if task.Spec.MediaProcessingEntityRef != nil {
-		ref, err := toMediaProcessingEntityObjectRef(task.Spec.MediaProcessingEntityRef, task.Namespace)
+		ref, err := utils.LocalMediaProcessingEntityToObjectRef(task.Spec.MediaProcessingEntityRef, task.Namespace)
 		if err != nil {
 			return ctrl.Result{}, err
 		}
+		utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref)
 		task.Status.MediaProcessingEntityRef = ref
 		return ctrl.Result{}, nil
 	}
@@ -373,6 +379,7 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 			return ctrl.Result{}, err
 		}
 		if ref != nil {
+			utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref)
 			task.Status.MediaProcessingEntityRef = ref
 			return ctrl.Result{}, nil
 		}
@@ -380,6 +387,11 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 
 	// 3. TaskTemplateRef
 	if task.Spec.TaskTemplateRef != nil {
+		// shallow copy
+		ttRef := task.Spec.TaskTemplateRef
+		utils.NormalizeLocalTaskTemplateRef(r.Scheme, ttRef)
+
+		// resolve TaskTemplate
 		ttObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, task.Spec.TaskTemplateRef)
 		if !apierrors.IsNotFound(err) {
 			if err != nil {
@@ -402,10 +414,11 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 
 			// 3.1. MediaProcessingEntityRef
 			if ttMPERef != nil {
-				ref, err := toMediaProcessingEntityObjectRef(ttMPERef, task.Namespace)
+				ref, err := utils.LocalMediaProcessingEntityToObjectRef(ttMPERef, task.Namespace)
 				if err != nil {
 					return ctrl.Result{}, err
 				}
+				utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref)
 				task.Status.MediaProcessingEntityRef = ref
 				return ctrl.Result{}, nil
 			}
@@ -422,6 +435,7 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 					return ctrl.Result{}, err
 				}
 				if ref != nil {
+					utils.NormalizeMediaProcessingEntityRef(r.Scheme, ref)
 					task.Status.MediaProcessingEntityRef = ref
 					return ctrl.Result{}, nil
 				}
@@ -432,11 +446,10 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 	// 4. default MediaProcessingEntity
 	mpeObj, err := utils.GetAnnotatedObject(ctx, r.Client, &enginev1.MediaProcessingEntity{},
 		enginev1.BetaIsDefaultStepMediaLocationAnnotation, "true", client.InNamespace(task.Namespace))
-	if err != nil && !apierrors.IsNotFound(err) {
-		return ctrl.Result{}, err
-	}
-
 	if !apierrors.IsNotFound(err) {
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 		mpe, ok := mpeObj.(*enginev1.MediaProcessingEntity)
 		if !ok {
 			return ctrl.Result{}, errors.New("unexpected object")
@@ -447,11 +460,10 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 	// 5. default ClusterMediaProcessingEntity
 	cmpeObj, err := utils.GetAnnotatedObject(ctx, r.Client, &enginev1.ClusterMediaProcessingEntity{},
 		enginev1.BetaIsDefaultStepMediaLocationAnnotation, "true")
-	if err != nil && !apierrors.IsNotFound(err) {
-		return ctrl.Result{}, err
-	}
-
 	if !apierrors.IsNotFound(err) {
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 		mpe, ok := cmpeObj.(*enginev1.ClusterMediaProcessingEntity)
 		if !ok {
 			return ctrl.Result{}, errors.New("unexpected object")
@@ -468,10 +480,11 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 
 	// 1. FunctionRef
 	if task.Spec.FunctionRef != nil {
-		ref, err := toFunctionObjectRef(task.Spec.FunctionRef, task.Namespace)
+		ref, err := utils.LocalFunctionEntityToObjectRef(task.Spec.FunctionRef, task.Namespace)
 		if err != nil {
 			return ctrl.Result{}, err
 		}
+		utils.NormalizeFunctionRef(r.Scheme, ref)
 		task.Status.FunctionRef = ref
 		return ctrl.Result{}, nil
 	}
@@ -488,6 +501,7 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 			return ctrl.Result{}, err
 		}
 		if ref != nil {
+			utils.NormalizeFunctionRef(r.Scheme, ref)
 			task.Status.FunctionRef = ref
 			return ctrl.Result{}, nil
 		}
@@ -495,6 +509,10 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 
 	// 3. TaskTemplateRef
 	if task.Spec.TaskTemplateRef != nil {
+		// shallow copy
+		ttRef := task.Spec.TaskTemplateRef
+		utils.NormalizeLocalTaskTemplateRef(r.Scheme, ttRef)
+
 		ttObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, task.Spec.TaskTemplateRef)
 		if !apierrors.IsNotFound(err) {
 			if err != nil {
@@ -517,10 +535,11 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 
 			// 3.1. FunctionRef
 			if ttFuncRef != nil {
-				ref, err := toFunctionObjectRef(ttFuncRef, task.Namespace)
+				ref, err := utils.LocalFunctionEntityToObjectRef(ttFuncRef, task.Namespace)
 				if err != nil {
 					return ctrl.Result{}, err
 				}
+				utils.NormalizeFunctionRef(r.Scheme, ref)
 				task.Status.FunctionRef = ref
 				return ctrl.Result{}, nil
 			}
@@ -537,6 +556,7 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 					return ctrl.Result{}, err
 				}
 				if ref != nil {
+					utils.NormalizeFunctionRef(r.Scheme, ref)
 					task.Status.FunctionRef = ref
 					return ctrl.Result{}, nil
 				}
@@ -628,32 +648,24 @@ func (r *TaskReconciler) getJobClientForTask(task *enginev1.Task) (client.Client
 	return c, nil
 }
 
-func toMediaProcessingEntityObjectRef(lref *meta.LocalObjectReference, namespace string) (*meta.ObjectReference, error) {
-	mpeNamespace := ""
-	switch lref.Kind {
-	case "MediaProcessingEntity":
-		mpeNamespace = namespace
-	case "ClusterMediaProcessingEntity":
-		// cluster scoped: does not have a namespace
-	default:
-		return nil, errors.New("mediaProcessingEntityRef does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
+func (r *TaskReconciler) normalizeStatusReferences(task *enginev1.Task) error {
+	if task.Status.MediaProcessingEntityRef != nil {
+		if err := utils.NormalizeMediaProcessingEntityRef(r.Scheme, task.Status.MediaProcessingEntityRef); err != nil {
+			return err
+		}
 	}
-	ref := lref.ObjectReference(mpeNamespace)
-	return &ref, nil
-}
 
-func toFunctionObjectRef(lref *meta.LocalObjectReference, namespace string) (*meta.ObjectReference, error) {
-	funcNamespace := ""
-	switch lref.Kind {
-	case "Function":
-		funcNamespace = namespace
-	case "ClusterFunction":
-		// cluster scoped: does not have a namespace
-	default:
-		return nil, errors.New("functionRef does not reference a Function or ClusterFunction")
+	if task.Status.FunctionRef != nil {
+		if err := utils.NormalizeFunctionRef(r.Scheme, task.Status.FunctionRef); err != nil {
+			return err
+		}
 	}
-	ref := lref.ObjectReference(funcNamespace)
-	return &ref, nil
+
+	if task.Status.JobRef != nil {
+		utils.NormalizeExactRef(r.Scheme, task.Status.JobRef, &batchv1.Job{})
+	}
+
+	return nil
 }
 
 // TODO: emit Kubernetes events
