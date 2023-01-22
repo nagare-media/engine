@@ -23,6 +23,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -185,4 +186,140 @@ func PartiallyResolveLocalRef(c client.Client, namespace string, ref *meta.Local
 	}
 
 	return obj, nil
+}
+
+func NormalizeRef(s *runtime.Scheme, ref *meta.ObjectReference, obj client.Object) {
+	gvks, _, err := s.ObjectKinds(obj)
+	if err != nil {
+		// TODO: error is ignored
+		return
+	}
+	ref.APIVersion = gvks[0].GroupVersion().String()
+	ref.Kind = gvks[0].Kind
+}
+
+func NormalizeExactRef(s *runtime.Scheme, ref *meta.ExactObjectReference, obj client.Object) {
+	NormalizeRef(s, &ref.ObjectReference, obj)
+}
+
+func NormalizeLocalRef(s *runtime.Scheme, ref *meta.LocalObjectReference, obj client.Object) {
+	gvks, _, err := s.ObjectKinds(obj)
+	if err != nil {
+		// TODO: error is ignored
+		return
+	}
+	ref.APIVersion = gvks[0].GroupVersion().String()
+	ref.Kind = gvks[0].Kind
+}
+
+func NormalizeFunctionRef(s *runtime.Scheme, ref *meta.ObjectReference) error {
+	var obj client.Object
+	switch ref.Kind {
+	case "Function":
+		obj = &enginev1.Function{}
+	case "ClusterFunction":
+		obj = &enginev1.ClusterFunction{}
+	default:
+		return errors.New("Function reference does not reference a Function or ClusterFunction")
+	}
+	NormalizeRef(s, ref, obj)
+	return nil
+}
+
+func NormalizeLocalFunctionRef(s *runtime.Scheme, ref *meta.LocalObjectReference) error {
+	var obj client.Object
+	switch ref.Kind {
+	case "Function":
+		obj = &enginev1.Function{}
+	case "ClusterFunction":
+		obj = &enginev1.ClusterFunction{}
+	default:
+		return errors.New("Function reference does not reference a Function or ClusterFunction")
+	}
+	NormalizeLocalRef(s, ref, obj)
+	return nil
+}
+
+func NormalizeMediaProcessingEntityRef(s *runtime.Scheme, ref *meta.ObjectReference) error {
+	var obj client.Object
+	switch ref.Kind {
+	case "MediaProcessingEntity":
+		obj = &enginev1.MediaProcessingEntity{}
+	case "ClusterMediaProcessingEntity":
+		obj = &enginev1.ClusterMediaProcessingEntity{}
+	default:
+		return errors.New("MediaProcessingEntity reference does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
+	}
+	NormalizeRef(s, ref, obj)
+	return nil
+}
+
+func NormalizeLocalMediaProcessingEntityRef(s *runtime.Scheme, ref *meta.LocalObjectReference) error {
+	var obj client.Object
+	switch ref.Kind {
+	case "MediaProcessingEntity":
+		obj = &enginev1.MediaProcessingEntity{}
+	case "ClusterMediaProcessingEntity":
+		obj = &enginev1.ClusterMediaProcessingEntity{}
+	default:
+		return errors.New("MediaProcessingEntity reference does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
+	}
+	NormalizeLocalRef(s, ref, obj)
+	return nil
+}
+
+func NormalizeTaskTemplateRef(s *runtime.Scheme, ref *meta.ObjectReference) error {
+	var obj client.Object
+	switch ref.Kind {
+	case "TaskTemplate":
+		obj = &enginev1.TaskTemplate{}
+	case "ClusterTaskTemplate":
+		obj = &enginev1.ClusterTaskTemplate{}
+	default:
+		return errors.New("TaskTemplate reference does not reference a TaskTemplate or ClusterTaskTemplate")
+	}
+	NormalizeRef(s, ref, obj)
+	return nil
+}
+
+func NormalizeLocalTaskTemplateRef(s *runtime.Scheme, ref *meta.LocalObjectReference) error {
+	var obj client.Object
+	switch ref.Kind {
+	case "TaskTemplate":
+		obj = &enginev1.TaskTemplate{}
+	case "ClusterTaskTemplate":
+		obj = &enginev1.ClusterTaskTemplate{}
+	default:
+		return errors.New("TaskTemplate reference does not reference a TaskTemplate or ClusterTaskTemplate")
+	}
+	NormalizeLocalRef(s, ref, obj)
+	return nil
+}
+
+func LocalFunctionEntityToObjectRef(lref *meta.LocalObjectReference, namespace string) (*meta.ObjectReference, error) {
+	funcNamespace := ""
+	switch lref.Kind {
+	case "FunctionEntity":
+		funcNamespace = namespace
+	case "ClusterFunctionEntity":
+		// cluster scoped: does not have a namespace
+	default:
+		return nil, errors.New("FunctionEntity reference does not reference a FunctionEntity or ClusterFunctionEntity")
+	}
+	ref := lref.ObjectReference(funcNamespace)
+	return &ref, nil
+}
+
+func LocalMediaProcessingEntityToObjectRef(lref *meta.LocalObjectReference, namespace string) (*meta.ObjectReference, error) {
+	mpeNamespace := ""
+	switch lref.Kind {
+	case "MediaProcessingEntity":
+		mpeNamespace = namespace
+	case "ClusterMediaProcessingEntity":
+		// cluster scoped: does not have a namespace
+	default:
+		return nil, errors.New("MediaProcessingEntity reference does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
+	}
+	ref := lref.ObjectReference(mpeNamespace)
+	return &ref, nil
 }
