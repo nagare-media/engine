@@ -12,7 +12,8 @@ metadata:
   annotations:
     beta.engine.nagare.media/is-default-media-processing-entity: "true"
 spec:
-  local: {}
+  local:
+    namespace: default
 ---
 apiVersion: engine.nagare.media/v1alpha1
 kind: MediaProcessingEntity
