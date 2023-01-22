@@ -177,7 +177,7 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 	if wf.Labels == nil {
 		wf.Labels = make(map[string]string)
 	}
-	wf.Labels[enginev1.WorkflowLabel] = client.ObjectKeyFromObject(wf).String()
+	wf.Labels[enginev1.WorkflowLabel] = utils.ObjectLabelRef(wf)
 
 	switch wf.Status.Phase {
 	default:
@@ -253,9 +253,8 @@ func (r *WorkflowReconciler) reconcileTasks(ctx context.Context, wf *enginev1.Wo
 	var total, active, succeeded, failed int32
 
 	// fetch Tasks
-	wfKey := client.ObjectKeyFromObject(wf)
 	taskList := &enginev1.TaskList{}
-	err := r.List(ctx, taskList, client.MatchingLabels{enginev1.WorkflowLabel: wfKey.String()})
+	err := r.List(ctx, taskList, client.MatchingLabels{enginev1.WorkflowLabel: utils.ObjectLabelRef(wf)})
 	if err != nil {
 		return ctrl.Result{}, nil
 	}

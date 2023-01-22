@@ -340,8 +340,8 @@ func (r *TaskReconciler) reconcileWorkflow(ctx context.Context, task *enginev1.T
 	if task.Labels == nil {
 		task.Labels = make(map[string]string)
 	}
-	task.Labels[enginev1.WorkflowLabel] = client.ObjectKeyFromObject(wf).String()
-	task.Labels[enginev1.TaskLabel] = client.ObjectKeyFromObject(task).String()
+	task.Labels[enginev1.WorkflowLabel] = utils.ObjectLabelRef(wf)
+	task.Labels[enginev1.TaskLabel] = utils.ObjectLabelRef(task)
 
 	// check termination status of Workflow
 	if utils.WorkflowHasTerminated(wf) && utils.TaskIsActive(task) {
@@ -682,9 +682,8 @@ func (r *TaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func (r *TaskReconciler) mapWorkflowToTaskRequests(wf client.Object) []reconcile.Request {
 	ctx := context.Background()
 
-	wfKey := client.ObjectKeyFromObject(wf)
 	taskList := &enginev1.TaskList{}
-	err := r.List(ctx, taskList, client.MatchingLabels{enginev1.WorkflowLabel: wfKey.String()})
+	err := r.List(ctx, taskList, client.MatchingLabels{enginev1.WorkflowLabel: utils.ObjectLabelRef(wf)})
 	if err != nil {
 		return nil
 	}
