@@ -45,6 +45,7 @@ manifests:
     paths:
       - config/skaffold
 deploy:
+  kubeContext: kind-nagare-media-mgmt
   kubectl:
     flags:
       apply:
