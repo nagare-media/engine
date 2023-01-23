@@ -19,13 +19,11 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	batchv1 "k8s.io/api/batch/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
@@ -55,6 +53,7 @@ type JobReconciler struct {
 
 func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := logf.FromContext(ctx)
+	log.Info("reconcile Job")
 
 	// fetch Job
 	job := &batchv1.Job{}
@@ -70,21 +69,11 @@ func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 
 	// Reconciliation logic is handled by task controller. However, this it is managed by another manager connected to the
 	// management cluster. We therefore use an event channel to trigger a reconciliation of the accompanying task.
-
-	taskKey := job.Labels[enginev1.TaskLabel]
-
-	if n := strings.Count(taskKey, string(types.Separator)); n != 1 {
-		err := fmt.Errorf("task label %s is illformed", enginev1.TaskLabel)
-		log.Error(err, "error determining Task")
-		return ctrl.Result{}, err
-	}
-
-	i := strings.Index(taskKey, string(types.Separator))
 	r.EventChannel <- event.GenericEvent{
 		Object: &metav1.PartialObjectMetadata{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      taskKey[:i],
-				Namespace: taskKey[i+1:],
+				Name:      job.Labels[enginev1.TaskNameLabel],
+				Namespace: job.Labels[enginev1.TaskNamespaceLabel],
 			},
 		},
 	}
@@ -101,6 +90,6 @@ func (r *JobReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(r.Name()).
 		For(&batchv1.Job{}).
-		WithEventFilter(predicate.HasLabels{enginev1.TaskLabel}).
+		WithEventFilter(predicate.HasLabels{enginev1.TaskNamespaceLabel, enginev1.TaskNameLabel}).
 		Complete(r)
 }

@@ -324,8 +324,7 @@ func (r *TaskReconciler) reconcileTerminatedTask(ctx context.Context, task *engi
 func (r *TaskReconciler) reconcileWorkflow(ctx context.Context, task *enginev1.Task) (ctrl.Result, error) {
 	// fetch Workflow
 	wf := &enginev1.Workflow{}
-	wfKey := client.ObjectKey{Namespace: task.Namespace, Name: task.Spec.WorkflowRef.Name}
-	if err := r.Client.Get(ctx, wfKey, wf); err != nil {
+	if err := r.Client.Get(ctx, client.ObjectKey{Namespace: task.Namespace, Name: task.Spec.WorkflowRef.Name}, wf); err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to fetch Workflow: %w", err)
 	}
 
@@ -351,8 +350,10 @@ func (r *TaskReconciler) reconcileWorkflow(ctx context.Context, task *enginev1.T
 	if task.Labels == nil {
 		task.Labels = make(map[string]string)
 	}
-	task.Labels[enginev1.WorkflowLabel] = utils.ObjectLabelRef(wf)
-	task.Labels[enginev1.TaskLabel] = utils.ObjectLabelRef(task)
+	task.Labels[enginev1.WorkflowNamespaceLabel] = wf.Namespace
+	task.Labels[enginev1.WorkflowNameLabel] = wf.Name
+	task.Labels[enginev1.TaskNamespaceLabel] = task.Namespace
+	task.Labels[enginev1.TaskNameLabel] = task.Name
 
 	// check termination status of Workflow
 	if utils.WorkflowHasTerminated(wf) && utils.TaskIsActive(task) {
@@ -716,7 +717,10 @@ func (r *TaskReconciler) mapWorkflowToTaskRequests(wf client.Object) []reconcile
 	ctx := context.Background()
 
 	taskList := &enginev1.TaskList{}
-	err := r.List(ctx, taskList, client.MatchingLabels{enginev1.WorkflowLabel: utils.ObjectLabelRef(wf)})
+	err := r.List(ctx, taskList, client.MatchingLabels{
+		enginev1.WorkflowNamespaceLabel: wf.GetNamespace(),
+		enginev1.WorkflowNameLabel:      wf.GetName(),
+	})
 	if err != nil {
 		return nil
 	}

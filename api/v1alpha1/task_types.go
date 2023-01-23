@@ -26,7 +26,13 @@ import (
 )
 
 const (
-	TaskLabel = "engine.nagare.media/task"
+	// Label automatically assigned by nagare media engine indicating the task namespace. This allows quick filtering
+	// for a specific task.
+	TaskNamespaceLabel = "engine.nagare.media/task-namespace"
+
+	// Label automatically assigned by nagare media engine indicating the task namespace. This allows quick filtering
+	// for a specific task.
+	TaskNameLabel = "engine.nagare.media/task-name"
 )
 
 const (

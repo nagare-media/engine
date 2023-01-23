@@ -25,9 +25,13 @@ import (
 )
 
 const (
-	// Label automatically assigned to Workflows and Tasks by nagare media engine indicating the workflow ID. This allows
-	// quick filtering for a specific workflow.
-	WorkflowLabel = "engine.nagare.media/workflow"
+	// Label automatically assigned by nagare media engine indicating the workflow namespace. This allows quick filtering
+	// for a specific workflow.
+	WorkflowNamespaceLabel = "engine.nagare.media/workflow-namespace"
+
+	// Label automatically assigned by nagare media engine indicating the workflow name. This allows quick filtering for a
+	// specific workflow.
+	WorkflowNameLabel = "engine.nagare.media/workflow-name"
 )
 
 const (
