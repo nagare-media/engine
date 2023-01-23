@@ -155,21 +155,21 @@ type HTTPAuthConfig struct {
 type HTTPBasicAuth struct {
 	// Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
 	// MediaLocation can only reference Secrets from its own Namespace.
-	SecretRef meta.ObjectReference `json:"secretRef"`
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
 // Configuration of an HTTP digest authentication method.
 type HTTPDigestAuth struct {
 	// Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
 	// MediaLocation can only reference Secrets from its own Namespace.
-	SecretRef meta.ObjectReference `json:"secretRef"`
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
 // Configuration of an HTTP bearer token authentication method.
 type HTTPToken struct {
 	// Reference to a Secret that contains the key "token". Only references to Secrets are allowed. A MediaLocation can
 	// only reference Secrets from its own Namespace.
-	SecretRef meta.ObjectReference `json:"secretRef"`
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 
 	// Name of the HTTP header the token should be passed to. The default is "Authorization".
 	// +kubebuilder:default="Authorization"
@@ -217,7 +217,7 @@ type S3AuthConfig struct {
 type AWSAuth struct {
 	// Reference to a Secret that contains the keys "accessKeyID" and "secretAccessKey". Only references to Secrets are
 	// allowed. A MediaLocation can only reference Secrets from its own Namespace.
-	SecretRef meta.ObjectReference `json:"secretRef"`
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
 // Configuration of an Opencast media location. Opencast version 13.x and newer is required.
@@ -312,13 +312,13 @@ type RTMPAuthConfig struct {
 type RTMPBasicAuth struct {
 	// Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
 	// MediaLocation can only reference Secrets from its own Namespace.
-	SecretRef meta.ObjectReference `json:"secretRef"`
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
 type RTMPStreamingKeyAuth struct {
 	// Reference to a Secret that contains the key "streamingKey". Only references to Secrets are allowed. A MediaLocation
 	// can only reference Secrets from its own Namespace.
-	SecretRef meta.ObjectReference `json:"secretRef"`
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
 // Configuration of an RTSP media location.
@@ -362,7 +362,7 @@ type RTSPAuthConfig struct {
 type RTSPBasicAuth struct {
 	// Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
 	// MediaLocation can only reference Secrets from its own Namespace.
-	SecretRef meta.ObjectReference `json:"secretRef"`
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
 // Configuration of a RIST media location.
@@ -394,7 +394,7 @@ type RISTEncryption struct {
 
 	// Reference to a Secret that contains the key "secret". Only references to Secrets are allowed. A MediaLocation can
 	// only reference Secrets from its own Namespace.
-	SecretRef meta.ObjectReference `json:"secretRef"`
+	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
 // Specifies a header.

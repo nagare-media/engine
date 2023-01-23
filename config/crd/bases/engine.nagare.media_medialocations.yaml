@@ -61,6 +61,9 @@ spec:
                               apiVersion:
                                 description: API version of the referred object.
                                 type: string
+                              key:
+                                description: Key within the ConfigMap or Secret.
+                                type: string
                               kind:
                                 description: Kind of the referred object.
                                 type: string
@@ -87,6 +90,9 @@ spec:
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
+                                type: string
+                              key:
+                                description: Key within the ConfigMap or Secret.
                                 type: string
                               kind:
                                 description: Kind of the referred object.
@@ -124,6 +130,9 @@ spec:
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
+                                type: string
+                              key:
+                                description: Key within the ConfigMap or Secret.
                                 type: string
                               kind:
                                 description: Kind of the referred object.
@@ -263,6 +272,9 @@ spec:
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
+                                type: string
+                              key:
+                                description: Key within the ConfigMap or Secret.
                                 type: string
                               kind:
                                 description: Kind of the referred object.
@@ -416,6 +428,9 @@ spec:
                           apiVersion:
                             description: API version of the referred object.
                             type: string
+                          key:
+                            description: Key within the ConfigMap or Secret.
+                            type: string
                           kind:
                             description: Kind of the referred object.
                             type: string
@@ -474,6 +489,9 @@ spec:
                               apiVersion:
                                 description: API version of the referred object.
                                 type: string
+                              key:
+                                description: Key within the ConfigMap or Secret.
+                                type: string
                               kind:
                                 description: Kind of the referred object.
                                 type: string
@@ -501,6 +519,9 @@ spec:
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
+                                type: string
+                              key:
+                                description: Key within the ConfigMap or Secret.
                                 type: string
                               kind:
                                 description: Kind of the referred object.
@@ -594,6 +615,9 @@ spec:
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
+                                type: string
+                              key:
+                                description: Key within the ConfigMap or Secret.
                                 type: string
                               kind:
                                 description: Kind of the referred object.
@@ -699,6 +723,9 @@ spec:
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
+                                type: string
+                              key:
+                                description: Key within the ConfigMap or Secret.
                                 type: string
                               kind:
                                 description: Kind of the referred object.

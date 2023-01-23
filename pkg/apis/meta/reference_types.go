@@ -16,7 +16,11 @@ limitations under the License.
 
 package meta
 
-import "k8s.io/apimachinery/pkg/types"
+import (
+	"encoding/json"
+
+	"k8s.io/apimachinery/pkg/types"
+)
 
 // Reference to a local object.
 type LocalObjectReference struct {
@@ -82,4 +86,64 @@ type ConfigMapOrSecretReference struct {
 	// Key within the ConfigMap or Secret.
 	// +optional
 	Key string `json:"key,omitempty"`
+
+	// Resolved data from ConfigMap or Secret.
+	Data map[string][]byte `json:"-"`
+
+	// Flag indicating whether to include resolved ConfigMap or Secret data into JSON output.
+	includeData bool `json:"-"`
+}
+
+type resolvedConfigMapOrSecretReference struct {
+	ObjectReference `json:",inline"`
+	Key             string            `json:"key,omitempty"`
+	Data            map[string][]byte `json:"data,omitempty"`
+}
+
+type unresolvedConfigMapOrSecretReference struct {
+	ObjectReference `json:",inline"`
+	Key             string `json:"key,omitempty"`
+}
+
+var (
+	_ json.Marshaler   = &ConfigMapOrSecretReference{}
+	_ json.Unmarshaler = &ConfigMapOrSecretReference{}
+)
+
+func (r *ConfigMapOrSecretReference) SetIncludeData(includeData bool) {
+	r.includeData = includeData
+}
+
+func (r *ConfigMapOrSecretReference) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return json.Marshal(nil)
+	}
+
+	var data any
+	if r.includeData {
+		data = resolvedConfigMapOrSecretReference{
+			ObjectReference: r.ObjectReference,
+			Key:             r.Key,
+			Data:            r.Data,
+		}
+	} else {
+		data = unresolvedConfigMapOrSecretReference{
+			ObjectReference: r.ObjectReference,
+			Key:             r.Key,
+		}
+	}
+
+	return json.Marshal(data)
+}
+
+func (r *ConfigMapOrSecretReference) UnmarshalJSON(b []byte) error {
+	tmp := resolvedConfigMapOrSecretReference{}
+	err := json.Unmarshal(b, &tmp)
+	if err != nil {
+		return err
+	}
+	r.ObjectReference = tmp.ObjectReference
+	r.Key = tmp.Key
+	r.Data = tmp.Data
+	return nil
 }
