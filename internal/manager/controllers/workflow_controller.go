@@ -229,7 +229,7 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 		}
 
 		// check if we waited enough
-		if wf.Status.EndTime != nil {
+		if wf.Status.EndTime == nil {
 			// this state should not happen: move back to running to set end time
 			wf.Status.Phase = enginev1.WorkflowPhaseRunning
 			return ctrl.Result{}, nil
