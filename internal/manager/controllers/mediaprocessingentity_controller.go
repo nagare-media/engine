@@ -64,12 +64,64 @@ type MediaProcessingEntityReconciler struct {
 	JobEventChannel chan<- event.GenericEvent
 
 	mtx                sync.RWMutex
-	managers           map[meta.ObjectReference]manager.Manager
+	managers           map[meta.ObjectReference]Manager
 	managerCancelFuncs map[meta.ObjectReference]context.CancelFunc
 	managerErrs        map[meta.ObjectReference]error
 
 	mpeManagerErr  chan event.GenericEvent
 	cmpeManagerErr chan event.GenericEvent
+}
+
+type Manager interface {
+	manager.Manager
+
+	IsRemote() bool
+	IsLocal() bool
+	Namespace() string
+}
+
+type mpeManager struct {
+	manager.Manager
+	remote    bool
+	namespace string
+}
+
+func (m *mpeManager) IsRemote() bool {
+	return m.remote
+}
+
+func (m *mpeManager) IsLocal() bool {
+	return !m.remote
+}
+
+func (m *mpeManager) Namespace() string {
+	return m.namespace
+}
+
+type Client interface {
+	client.Client
+
+	IsRemote() bool
+	IsLocal() bool
+	Namespace() string
+}
+
+type mpeClient struct {
+	client.Client
+	remote    bool
+	namespace string
+}
+
+func (c *mpeClient) IsRemote() bool {
+	return c.remote
+}
+
+func (c *mpeClient) IsLocal() bool {
+	return !c.remote
+}
+
+func (c *mpeClient) Namespace() string {
+	return c.namespace
 }
 
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities,verbs=get;list;watch;create;update;patch;delete
@@ -235,7 +287,7 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 	}
 
 	// create manager
-	var mgr manager.Manager
+	var mgr Manager
 	var stabilizeDuration time.Duration
 	var err error
 
@@ -263,13 +315,11 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 		return ctrl.Result{}, err
 	}
 
-	// add manager
-	mgrCtx, cancel := context.WithCancel(ctx)
-	r.addManager(ref, mgr, cancel)
-
 	// start manager
+	mgrCtx, cancel := context.WithCancel(ctx)
 	stopped := make(chan struct{})
 	go func() {
+		defer cancel()
 		err := mgr.Start(mgrCtx)
 		r.mtx.Lock()
 		r.managerErrs[*ref] = err
@@ -306,13 +356,15 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 		}
 	case <-time.After(stabilizeDuration):
 		// no error: assuming manager started successfully
+		// TODO: there could still be a race with a manager failing just after stabilizeDuration
+		r.addManager(ref, mgr, cancel)
 	}
 
 	// MediaProcessingEntity is ready
 	return ctrl.Result{}, nil
 }
 
-func (r *MediaProcessingEntityReconciler) newLocalManager(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (manager.Manager, error) {
+func (r *MediaProcessingEntityReconciler) newLocalManager(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (Manager, error) {
 	// shallow copy
 	opts := r.ManagerOptions
 
@@ -326,10 +378,19 @@ func (r *MediaProcessingEntityReconciler) newLocalManager(ctx context.Context, m
 		return nil, errors.New("local ClusterMediaProcessingEntity has no namespace defined")
 	}
 
-	return manager.New(r.LocalRESTConfig, opts)
+	mgr, err := manager.New(r.LocalRESTConfig, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &mpeManager{
+		Manager:   mgr,
+		remote:    false,
+		namespace: opts.Namespace,
+	}, nil
 }
 
-func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (manager.Manager, error) {
+func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (Manager, error) {
 	// shallow copy
 	secretRef := mpe.Spec.Remote.Kubeconfig.SecretRef
 	if err := utils.NormalizeRef(r.Scheme, &secretRef.ObjectReference, &corev1.Secret{}); err != nil {
@@ -396,25 +457,38 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 	opts := r.ManagerOptions
 	opts.Namespace = namespace
 
-	return manager.New(restConfig, opts)
+	mgr, err := manager.New(restConfig, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &mpeManager{
+		Manager:   mgr,
+		remote:    true,
+		namespace: opts.Namespace,
+	}, nil
 }
 
-func (r *MediaProcessingEntityReconciler) GetClient(ref *meta.ObjectReference) (client.Client, bool) {
+func (r *MediaProcessingEntityReconciler) GetClient(ref *meta.ObjectReference) (Client, bool) {
 	mgr, ok := r.GetManager(ref)
 	if !ok {
 		return nil, false
 	}
-	return mgr.GetClient(), true
+	return &mpeClient{
+		Client:    mgr.GetClient(),
+		remote:    mgr.IsRemote(),
+		namespace: mgr.Namespace(),
+	}, true
 }
 
-func (r *MediaProcessingEntityReconciler) GetManager(ref *meta.ObjectReference) (manager.Manager, bool) {
+func (r *MediaProcessingEntityReconciler) GetManager(ref *meta.ObjectReference) (Manager, bool) {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
 	mgr, ok := r.managers[*ref]
 	return mgr, ok
 }
 
-func (r *MediaProcessingEntityReconciler) addManager(ref *meta.ObjectReference, mgr manager.Manager, cancel context.CancelFunc) {
+func (r *MediaProcessingEntityReconciler) addManager(ref *meta.ObjectReference, mgr Manager, cancel context.CancelFunc) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 
@@ -446,7 +520,7 @@ func (r *MediaProcessingEntityReconciler) getManagerErr(ref *meta.ObjectReferenc
 // TODO: emit Kubernetes events
 // SetupWithManager sets up the controller with the Manager.
 func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	r.managers = make(map[meta.ObjectReference]manager.Manager)
+	r.managers = make(map[meta.ObjectReference]Manager)
 	r.managerCancelFuncs = make(map[meta.ObjectReference]context.CancelFunc)
 	r.managerErrs = make(map[meta.ObjectReference]error)
 	r.mpeManagerErr = make(chan event.GenericEvent)

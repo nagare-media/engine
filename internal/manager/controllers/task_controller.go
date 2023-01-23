@@ -674,7 +674,7 @@ func (r *TaskReconciler) resolveJobRef(ctx context.Context, task *enginev1.Task)
 	return job, nil
 }
 
-func (r *TaskReconciler) getJobClientForTask(task *enginev1.Task) (client.Client, error) {
+func (r *TaskReconciler) getJobClientForTask(task *enginev1.Task) (Client, error) {
 	c, ok := r.MediaProcessingEntityReconciler.GetClient(task.Status.MediaProcessingEntityRef)
 	if !ok {
 		return nil, errors.New("MediaProcessingEntity does not exist or is not ready")
