@@ -16,14 +16,52 @@ limitations under the License.
 
 package functions
 
-type ConfigCommon struct {
-	// +optional
-	Inputs map[string]MediaRef `json:"inputs,omitempty"`
+import (
+	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/models.go/base"
+)
 
-	// +optional
-	Outputs map[string]MediaRef `json:"outputs,omitempty"`
+type SecretConfig struct {
+	Workflow       Workflow                                `json:"workflow,omitempty"`
+	Task           Task                                    `json:"task,omitempty"`
+	MediaLocations map[string]enginev1.MediaLocationConfig `json:"mediaLocations,omitempty"`
+	System         System                                  `json:"system,omitempty"`
+}
+
+type Workflow struct {
+	Info   WorkflowInfo   `json:"info,omitempty"`
+	Config map[string]any `json:"config,omitempty"`
+}
+
+type WorkflowInfo struct {
+	Name string `json:"name,omitempty"`
+}
+
+type Task struct {
+	Info   TaskInfo       `json:"info,omitempty"`
+	Config map[string]any `json:"config,omitempty"`
+}
+
+type TaskInfo struct {
+	Name string `json:"name,omitempty"`
+}
+
+type System struct {
+	NATS NATS `json:"nats,omitempty"`
+}
+
+type NATS struct {
+	URL      base.URI `json:"url,omitempty"`
+	Username string   `json:"username,omitempty"`
+	Password string   `json:"password,omitempty"`
+	// TODO: add other auth methods
+}
+
+type GenericFunctionConfig struct {
+	Inputs  map[string]any `json:"inputs,omitempty"`
+	Outputs map[string]any `json:"outputs,omitempty"`
 }
 
 type MediaRef struct {
-	URL string `json:"url"`
+	URL string `json:"url,omitempty"`
 }

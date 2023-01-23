@@ -234,9 +234,9 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 		}
 
 		// task config
-		ioCfg := functions.ConfigCommon{
-			Inputs:  make(map[string]functions.MediaRef),
-			Outputs: make(map[string]functions.MediaRef),
+		ioCfg := functions.GenericFunctionConfig{
+			Inputs:  make(map[string]any),
+			Outputs: make(map[string]any),
 		}
 
 		// execution mode
