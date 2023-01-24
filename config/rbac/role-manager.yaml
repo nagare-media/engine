@@ -8,9 +8,16 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - configmaps
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
   - secrets
   verbs:
   - create
+  - delete
   - get
   - patch
   - update
@@ -30,6 +37,14 @@ rules:
   - engine.nagare.media
   resources:
   - clusterfunctions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - clustermedialocations
   verbs:
   - get
   - list
@@ -80,6 +95,14 @@ rules:
   - engine.nagare.media
   resources:
   - functions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - engine.nagare.media
+  resources:
+  - medialocations
   verbs:
   - get
   - list
