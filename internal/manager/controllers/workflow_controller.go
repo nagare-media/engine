@@ -247,7 +247,7 @@ func (r *WorkflowReconciler) reconcileTasks(ctx context.Context, wf *enginev1.Wo
 	total = int32(len(taskList.Items))
 	for _, task := range taskList.Items {
 		switch task.Status.Phase {
-		case enginev1.TaskPhaseInitializing, enginev1.TaskPhaseJobPending, enginev1.TaskPhaseRunning:
+		default:
 			active++
 		case enginev1.TaskPhaseSucceeded:
 			succeeded++
