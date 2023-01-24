@@ -185,6 +185,9 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 			return res, err
 		}
 
+		// TODO: ensure trace is started
+		// TODO: ensure NATS stream exist
+
 		// If we have no active Tasks, do not transition to succeeded directly as new Tasks could be created. This helps
 		// mitigate races during initial setup and very quick Tasks:
 		//   Workflow w is created
@@ -225,6 +228,8 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 
 	case enginev1.WorkflowPhaseSucceeded, enginev1.WorkflowPhaseFailed:
 		// Workflow has terminated: nothing to do
+		// TODO: stop trace
+		// TODO: delete NATS stream
 	}
 
 	return ctrl.Result{}, nil
