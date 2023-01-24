@@ -18,10 +18,14 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
+	"sigs.k8s.io/kustomize/kyaml/yaml/merge2"
+	"sigs.k8s.io/yaml"
 )
 
 func FullServerSideApply(ctx context.Context, c client.Client, obj client.Object, manager string) error {
@@ -61,9 +65,69 @@ func FullPatch(ctx context.Context, c client.Client, obj, oldObj client.Object) 
 }
 
 func Patch(ctx context.Context, c client.Client, obj, oldObj client.Object) error {
-	return c.Patch(ctx, obj.DeepCopyObject().(client.Object), client.MergeFrom(oldObj))
+	patch := client.MergeFrom(oldObj)
+	changed, err := HasChangesIn(obj, patch, []string{"metadata", "spec"})
+	if err != nil {
+		return err
+	}
+	if !changed {
+		return nil
+	}
+	return c.Patch(ctx, obj, patch)
 }
 
 func PatchStatus(ctx context.Context, c client.Client, obj, oldObj client.Object) error {
-	return c.Status().Patch(ctx, obj.DeepCopyObject().(client.Object), client.MergeFrom(oldObj))
+	patch := client.MergeFrom(oldObj)
+	changed, err := HasChangesIn(obj, patch, []string{"status"})
+	if err != nil {
+		return err
+	}
+	if !changed {
+		return nil
+	}
+	return c.Status().Patch(ctx, obj, patch)
+}
+
+func HasChangesIn(obj client.Object, patch client.Patch, keys []string) (bool, error) {
+	diff, err := patch.Data(obj)
+	if err != nil {
+		return false, err
+	}
+
+	diffMap := make(map[string]any)
+	if err = json.Unmarshal(diff, &diffMap); err != nil {
+		return false, err
+	}
+
+	for _, key := range keys {
+		if _, changed := diffMap[key]; changed {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func StrategicMerge(original, modified, patchedObj any) error {
+	var yamlOriginal, yamlModified []byte
+	var yamlPatched string
+	var err error
+
+	if yamlOriginal, err = yaml.Marshal(original); err != nil {
+		return err
+	}
+
+	if yamlModified, err = yaml.Marshal(modified); err != nil {
+		return err
+	}
+
+	if yamlPatched, err = merge2.MergeStrings(string(yamlModified), string(yamlOriginal), true, kyaml.MergeOptions{}); err != nil {
+		return err
+	}
+
+	if err = yaml.Unmarshal([]byte(yamlPatched), patchedObj); err != nil {
+		return err
+	}
+
+	return nil
 }

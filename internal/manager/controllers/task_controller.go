@@ -18,12 +18,14 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -39,7 +41,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	apiclient "github.com/nagare-media/engine/internal/manager/client"
 	"github.com/nagare-media/engine/internal/pkg/apis/utils"
+	"github.com/nagare-media/engine/pkg/apis/functions"
 	"github.com/nagare-media/engine/pkg/apis/meta"
 )
 
@@ -50,7 +54,8 @@ const (
 // TaskReconciler reconciles a Task object
 type TaskReconciler struct {
 	client.Client
-	APIReader client.Reader
+	APIReader      client.Reader
+	readOnlyClient client.Client
 
 	Config                          enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme                          *runtime.Scheme
@@ -80,7 +85,10 @@ func (r *TaskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctr
 
 	// fetch Task
 	task := &enginev1.Task{}
-	if err := r.Client.Get(ctx, req.NamespacedName, task); err != nil {
+	// TODO: There is a race between channel watch events from the Job controller and the Task informer. Reading from
+	// Client could return stale data. APIReader will read directly from the API server but does not use the cache. This
+	// should be synced in process.
+	if err := r.APIReader.Get(ctx, req.NamespacedName, task); err != nil {
 		if apierrors.IsNotFound(err) {
 			// Object not found, return.  Created objects are automatically garbage collected.
 			// For additional cleanup logic use finalizers.
@@ -213,8 +221,6 @@ func (r *TaskReconciler) reconcile(ctx context.Context, task *enginev1.Task) (ct
 		if res, err := r.reconcileRunningJob(ctx, task); err != nil {
 			return res, err
 		}
-		// transition to Succeeded or Failed or just make sure everything is still running
-		task.Status.EndTime = &metav1.Time{Time: time.Now()}
 
 	case enginev1.TaskPhaseSucceeded, enginev1.TaskPhaseFailed:
 		if res, err := r.reconcileTerminatedTask(ctx, task, false); err != nil {
@@ -267,7 +273,7 @@ func (r *TaskReconciler) reconcileTerminatedTask(ctx context.Context, task *engi
 		// We want to keep the job around if the Task still exist and it also already terminated. This allows to read logs
 		// and see more details than on a Task.
 		if forceDeleteJob || utils.JobIsActive(job) {
-			if err := c.Delete(ctx, job, client.Preconditions{UID: &task.Status.JobRef.UID}); err != nil {
+			if err := c.Delete(ctx, job, client.Preconditions{UID: &task.Status.JobRef.UID}, client.PropagationPolicy(metav1.DeletePropagationBackground)); err != nil {
 				switch {
 				case apierrors.IsNotFound(err):
 					// already deleted so nothing to do
@@ -572,8 +578,313 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 }
 
 func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1.Task) (ctrl.Result, error) {
-	// TODO: implement
-	return ctrl.Result{}, errors.New("not implemented")
+	log := logf.FromContext(ctx, "phase", task.Status.Phase)
+
+	if task.Status.MediaProcessingEntityRef == nil || task.Status.FunctionRef == nil {
+		// wrong phase: go back
+		task.Status.Phase = enginev1.TaskPhaseInitializing
+		return ctrl.Result{}, nil
+	}
+
+	// TODO: it would probably be better to use labels + list instead of relying on JobRef.
+
+	if task.Status.JobRef != nil {
+		// wrong phase: go forward
+		task.Status.Phase = enginev1.TaskPhaseRunning
+		return ctrl.Result{}, nil
+	}
+
+	// fetch Workflow
+	wf := &enginev1.Workflow{}
+	if err := r.Client.Get(ctx, client.ObjectKey{Namespace: task.Namespace, Name: task.Spec.WorkflowRef.Name}, wf); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// resolve Function
+	var funcSpec enginev1.FunctionSpec
+	funcObj, err := utils.ResolveRef(ctx, r.Client, task.Status.FunctionRef)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	switch f := funcObj.(type) {
+	case *enginev1.ClusterFunction:
+		funcSpec = f.Spec
+	case *enginev1.Function:
+		funcSpec = f.Spec
+	default:
+		return ctrl.Result{}, errors.New("functionRef does not reference a Function or ClusterFunction")
+	}
+
+	// resolve TaskTemplate
+	var ttSpec *enginev1.TaskTemplateSpec
+	if task.Spec.TaskTemplateRef != nil {
+		ttObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, task.Spec.TaskTemplateRef)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		switch tt := ttObj.(type) {
+		case *enginev1.ClusterTaskTemplate:
+			ttSpec = &tt.Spec
+		case *enginev1.TaskTemplate:
+			ttSpec = &tt.Spec
+		default:
+			return ctrl.Result{}, errors.New("taskTemplateRef does not reference a TaskTemplate or ClusterTaskTemplate")
+		}
+	}
+
+	// get correct API client
+	jobClient, err := r.getJobClientForTask(task)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// check if function only runs on local MPEs
+	if funcSpec.LocalMediaProcessingEntitiesOnly && jobClient.IsRemote() {
+		return ctrl.Result{}, errors.New("localMediaProcessingEntitiesOnly is true, but selected MediaProcessingEntity is remote")
+	}
+
+	// construct Secret
+	data := &functions.SecretData{
+		Workflow: functions.Workflow{
+			Info: functions.WorkflowInfo{
+				Name: wf.Name,
+			},
+		},
+		Task: functions.Task{
+			Info: functions.TaskInfo{
+				Name: task.Name,
+			},
+		},
+		System: functions.System{
+			NATS: r.Config.NATS,
+		},
+	}
+
+	// add Workflow configuration
+	wfCfgMap := make(map[string]any)
+	if wf.Spec.Config != nil {
+		if err = json.Unmarshal(wf.Spec.Config.Raw, &wfCfgMap); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+	data.Workflow.Config = wfCfgMap
+
+	// add Task configuration (merge of Function, TaskTemplate and Task configuration)
+	taskCfgMap := make(map[string]any)
+	taskCfgPatches := make([]*apiextensionsv1.JSON, 0, 3)
+	taskCfgPatches = append(taskCfgPatches, funcSpec.DefaultConfig)
+	if ttSpec != nil {
+		taskCfgPatches = append(taskCfgPatches, ttSpec.Config)
+	}
+	taskCfgPatches = append(taskCfgPatches, task.Spec.Config)
+	for _, patch := range taskCfgPatches {
+		if patch != nil {
+			newTaskCfgMap := make(map[string]any)
+			if err = utils.StrategicMerge(taskCfgMap, patch, &newTaskCfgMap); err != nil {
+				return ctrl.Result{}, err
+			}
+			taskCfgMap = newTaskCfgMap
+		}
+	}
+	data.Task.Config = taskCfgMap
+
+	// add MediaLocations
+	data.MediaLocations = make(map[string]enginev1.MediaLocationConfig, len(wf.Spec.MediaLocations))
+	for _, mlRef := range wf.Spec.MediaLocations {
+		mlObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, &mlRef.Ref)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+
+		var mlCfg *enginev1.MediaLocationConfig
+		switch ml := mlObj.(type) {
+		case *enginev1.ClusterMediaLocation:
+			mlCfg = &ml.Spec.MediaLocationConfig
+		case *enginev1.MediaLocation:
+			mlCfg = &ml.Spec.MediaLocationConfig
+		default:
+			return ctrl.Result{}, errors.New("mediaProcessingEntityRef does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
+		}
+
+		// resolve MediaLocation secrets
+		switch {
+		case mlCfg.HTTP != nil:
+			if mlCfg.HTTP.Auth != nil {
+				if mlCfg.HTTP.Auth.Basic != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.HTTP.Auth.Basic.SecretRef, task); err != nil {
+						return ctrl.Result{}, err
+					}
+				}
+				if mlCfg.HTTP.Auth.Digest != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.HTTP.Auth.Digest.SecretRef, task); err != nil {
+						return ctrl.Result{}, err
+					}
+				}
+				if mlCfg.HTTP.Auth.Token != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.HTTP.Auth.Token.SecretRef, task); err != nil {
+						return ctrl.Result{}, err
+					}
+				}
+			}
+		case mlCfg.S3 != nil:
+			if mlCfg.S3.Auth.AWS != nil {
+				if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.S3.Auth.AWS.SecretRef, task); err != nil {
+					return ctrl.Result{}, err
+				}
+			}
+		case mlCfg.Opencast != nil:
+			if mlCfg.Opencast.Auth.Basic != nil {
+				if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.Opencast.Auth.Basic.SecretRef, task); err != nil {
+					return ctrl.Result{}, err
+				}
+			}
+		case mlCfg.RTMP != nil:
+			if mlCfg.RTMP.Auth != nil {
+				if mlCfg.RTMP.Auth.Basic != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.RTMP.Auth.Basic.SecretRef, task); err != nil {
+						return ctrl.Result{}, err
+					}
+				}
+				if mlCfg.RTMP.Auth.StreamingKey != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.RTMP.Auth.StreamingKey.SecretRef, task); err != nil {
+						return ctrl.Result{}, err
+					}
+				}
+			}
+		case mlCfg.RTSP != nil:
+			if mlCfg.RTSP.Auth != nil {
+				if mlCfg.RTSP.Auth.Basic != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.RTSP.Auth.Basic.SecretRef, task); err != nil {
+						return ctrl.Result{}, err
+					}
+				}
+			}
+		case mlCfg.RIST != nil:
+			if mlCfg.RIST.Encryption != nil {
+				if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.RIST.Encryption.SecretRef, task); err != nil {
+					return ctrl.Result{}, err
+				}
+			}
+		}
+
+		data.MediaLocations[mlRef.Name] = *mlCfg
+	}
+
+	// create Secret
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			// TODO: should we use fix names with collision detection?
+			GenerateName: task.Name + "-",
+			Namespace:    jobClient.Namespace(),
+			Labels: map[string]string{
+				enginev1.WorkflowNamespaceLabel: wf.Namespace,
+				enginev1.WorkflowNameLabel:      wf.Name,
+				enginev1.TaskNamespaceLabel:     task.Namespace,
+				enginev1.TaskNameLabel:          task.Name,
+			},
+		},
+		Data: map[string][]byte{
+			"data.json": jsonData,
+		},
+	}
+	if err = jobClient.Create(ctx, secret); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// construct Job
+	jobTemplate := funcSpec.Template.DeepCopy()
+
+	// patch Job with change from TaskTemplate and Task
+	jobTemplatePatches := make([]*batchv1.JobTemplateSpec, 0, 2)
+	if ttSpec != nil {
+		jobTemplatePatches = append(jobTemplatePatches, ttSpec.TemplatePatches)
+	}
+	jobTemplatePatches = append(jobTemplatePatches, task.Spec.TemplatePatches)
+	for _, patch := range jobTemplatePatches {
+		if patch != nil {
+			newJobTemplate := &batchv1.JobTemplateSpec{}
+			if err = utils.StrategicMerge(jobTemplate, patch, newJobTemplate); err != nil {
+				return ctrl.Result{}, err
+			}
+			jobTemplate = newJobTemplate
+		}
+	}
+
+	// add Job labels
+	if jobTemplate.ObjectMeta.Labels == nil {
+		jobTemplate.ObjectMeta.Labels = make(map[string]string)
+	}
+	jobTemplate.ObjectMeta.Labels[enginev1.WorkflowNamespaceLabel] = wf.Namespace
+	jobTemplate.ObjectMeta.Labels[enginev1.WorkflowNameLabel] = wf.Name
+	jobTemplate.ObjectMeta.Labels[enginev1.TaskNamespaceLabel] = task.Namespace
+	jobTemplate.ObjectMeta.Labels[enginev1.TaskNameLabel] = task.Name
+
+	// add data volume
+	jobTemplate.Spec.Template.Spec.Volumes = append(jobTemplate.Spec.Template.Spec.Volumes, corev1.Volume{
+		Name: "nagare-media-engine-task-data",
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: secret.Name,
+			},
+		},
+	})
+	for _, containers := range [][]corev1.Container{jobTemplate.Spec.Template.Spec.InitContainers, jobTemplate.Spec.Template.Spec.Containers} {
+		for i := range containers {
+			c := &containers[i]
+			c.VolumeMounts = append(c.VolumeMounts, corev1.VolumeMount{
+				Name:      "nagare-media-engine-task-data",
+				MountPath: "/run/secrets/engine.nagare.media/task",
+				ReadOnly:  true,
+			})
+		}
+	}
+
+	// set misc Job properties
+	jobTemplate.Spec.TTLSecondsAfterFinished = pointer.Int32(24 * 60 * 60) // = 1 day // TODO: adopt as config
+
+	// create Job
+	job := &batchv1.Job{
+		ObjectMeta: metav1.ObjectMeta{
+			// TODO: should we use fix names with collision detection?
+			GenerateName: task.Name + "-",
+			Namespace:    jobClient.Namespace(),
+			Labels:       jobTemplate.ObjectMeta.Labels,
+			Annotations:  jobTemplate.ObjectMeta.Annotations,
+		},
+		Spec: jobTemplate.Spec,
+	}
+	if err = jobClient.Create(ctx, job); err != nil {
+		errSec := jobClient.Delete(ctx, secret, client.Preconditions{UID: &secret.UID})
+		if errSec != nil && !apierrors.IsNotFound(errSec) && !apierrors.IsConflict(errSec) {
+			err = kerrors.NewAggregate([]error{err, errSec})
+		}
+		return ctrl.Result{}, err
+	}
+
+	// set Job reference
+	task.Status.JobRef = utils.ToExactRef(job)
+
+	// set Secret owner to Job
+	secret.OwnerReferences = utils.EnsureOwnerRef(secret.OwnerReferences, metav1.OwnerReference{
+		APIVersion: batchv1.SchemeGroupVersion.String(),
+		Kind:       "Job",
+		Name:       job.Name,
+		UID:        job.UID,
+		// Don't set controller as secret is not managed by job controller. Kubernetes will take care of garbage collection
+		// automatically.
+	})
+	if err = jobClient.Update(ctx, secret); err != nil {
+		// we have to ignore this as this could lead to the creation of duplicate Jobs
+		log.Error(err, "failed to set owner reference on secret: ignoring leaked secret")
+		return ctrl.Result{}, nil
+	}
+
+	return ctrl.Result{}, nil
 }
 
 func (r *TaskReconciler) reconcileRunningJob(ctx context.Context, task *enginev1.Task) (ctrl.Result, error) {
@@ -673,9 +984,21 @@ func (r *TaskReconciler) normalizeStatusReferences(task *enginev1.Task) error {
 	return nil
 }
 
+func (r *TaskReconciler) prepareSecretRefForSecretData(ctx context.Context, ref *meta.ConfigMapOrSecretReference, task *enginev1.Task) error {
+	ref.Namespace = task.Namespace
+	if err := utils.ResolveSecretRefInline(ctx, r.readOnlyClient, ref); err != nil {
+		return err
+	}
+	ref.SetMarshalOnlyData(true)
+	return nil
+}
+
 // TODO: emit Kubernetes events
 // SetupWithManager sets up the controller with the Manager.
 func (r *TaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	// create read-only client
+	r.readOnlyClient = apiclient.NewReadOnlyClient(r.APIReader, r.Scheme, r.Client.RESTMapper())
+
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(TaskControllerName).
 		For(&enginev1.Task{}).
