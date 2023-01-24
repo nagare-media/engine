@@ -56,7 +56,8 @@ type ObjectReference struct {
 	Kind string `json:"kind,omitempty"`
 
 	// Name of the referred object.
-	Name string `json:"name"`
+	// +optional
+	Name string `json:"name,omitempty"`
 
 	// Namespace of the referred object.
 	// +optional
@@ -90,8 +91,8 @@ type ConfigMapOrSecretReference struct {
 	// Resolved data from ConfigMap or Secret.
 	Data map[string][]byte `json:"-"`
 
-	// Flag indicating whether to include resolved ConfigMap or Secret data into JSON output.
-	includeData bool `json:"-"`
+	// Flag indicating whether to only include resolved ConfigMap or Secret data in JSON output.
+	dataOnly bool `json:"-"`
 }
 
 type resolvedConfigMapOrSecretReference struct {
@@ -110,8 +111,8 @@ var (
 	_ json.Unmarshaler = &ConfigMapOrSecretReference{}
 )
 
-func (r *ConfigMapOrSecretReference) SetIncludeData(includeData bool) {
-	r.includeData = includeData
+func (r *ConfigMapOrSecretReference) SetMarshalOnlyData(dataOnly bool) {
+	r.dataOnly = dataOnly
 }
 
 func (r *ConfigMapOrSecretReference) MarshalJSON() ([]byte, error) {
@@ -120,11 +121,9 @@ func (r *ConfigMapOrSecretReference) MarshalJSON() ([]byte, error) {
 	}
 
 	var data any
-	if r.includeData {
+	if r.dataOnly {
 		data = resolvedConfigMapOrSecretReference{
-			ObjectReference: r.ObjectReference,
-			Key:             r.Key,
-			Data:            r.Data,
+			Data: r.Data,
 		}
 	} else {
 		data = unresolvedConfigMapOrSecretReference{

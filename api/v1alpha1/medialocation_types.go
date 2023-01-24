@@ -292,7 +292,7 @@ type RTMPMediaLocation struct {
 
 	// RTMP authentication configuration.
 	// +optional
-	Auth RTMPAuthConfig `json:"auth,omitempty"`
+	Auth *RTMPAuthConfig `json:"auth,omitempty"`
 }
 
 // Configuration of an RTMP authentication method.
@@ -345,7 +345,7 @@ type RTSPMediaLocation struct {
 
 	// RTSP authentication configuration.
 	// +optional
-	Auth RTSPAuthConfig `json:"auth,omitempty"`
+	Auth *RTSPAuthConfig `json:"auth,omitempty"`
 }
 
 // Configuration of an RTSP authentication method.
@@ -407,11 +407,12 @@ type Header struct {
 	// +optional
 	Value *string `json:"value,omitempty"`
 
+	// TODO: implement
 	// Reference to a ConfigMap or Secret that contains the specified key. Only references to ConfigMaps or Secrets are
 	// allowed. A MediaLocation can only reference Objects from its own Namespace. This field is required if value is not
 	// specified. If both are specified, value has precedence.
 	// +optional
-	ValueFrom *meta.ConfigMapOrSecretReference `json:"valueFrom,omitempty"`
+	// ValueFrom *meta.ConfigMapOrSecretReference `json:"valueFrom,omitempty"`
 }
 
 // Specifies a URL query argument.
@@ -424,11 +425,12 @@ type QueryArg struct {
 	// +optional
 	Value *string `json:"value,omitempty"`
 
+	// TODO: implement
 	// Reference to a ConfigMap or Secret that contains the specified key. Only references to ConfigMaps or Secrets are
 	// allowed. A MediaLocation can only reference Objects from its own Namespace. This field is required if value is not
 	// specified. If both are specified, value has precedence.
 	// +optional
-	ValueFrom *meta.ConfigMapOrSecretReference `json:"valueFrom,omitempty"`
+	// // ValueFrom *meta.ConfigMapOrSecretReference `json:"valueFrom,omitempty"`
 }
 
 // +kubebuilder:object:root=true

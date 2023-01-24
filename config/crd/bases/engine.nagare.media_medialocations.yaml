@@ -73,8 +73,6 @@ spec:
                               namespace:
                                 description: Namespace of the referred object.
                                 type: string
-                            required:
-                            - name
                             type: object
                         required:
                         - secretRef
@@ -103,8 +101,6 @@ spec:
                               namespace:
                                 description: Namespace of the referred object.
                                 type: string
-                            required:
-                            - name
                             type: object
                         required:
                         - secretRef
@@ -143,8 +139,6 @@ spec:
                               namespace:
                                 description: Namespace of the referred object.
                                 type: string
-                            required:
-                            - name
                             type: object
                         required:
                         - secretRef
@@ -170,31 +164,6 @@ spec:
                             if valueFrom is not specified. If both are specified,
                             value has precedence.
                           type: string
-                        valueFrom:
-                          description: Reference to a ConfigMap or Secret that contains
-                            the specified key. Only references to ConfigMaps or Secrets
-                            are allowed. A MediaLocation can only reference Objects
-                            from its own Namespace. This field is required if value
-                            is not specified. If both are specified, value has precedence.
-                          properties:
-                            apiVersion:
-                              description: API version of the referred object.
-                              type: string
-                            key:
-                              description: Key within the ConfigMap or Secret.
-                              type: string
-                            kind:
-                              description: Kind of the referred object.
-                              type: string
-                            name:
-                              description: Name of the referred object.
-                              type: string
-                            namespace:
-                              description: Namespace of the referred object.
-                              type: string
-                          required:
-                          - name
-                          type: object
                       required:
                       - name
                       type: object
@@ -217,31 +186,6 @@ spec:
                             required if valueFrom is not specified. If both are specified,
                             value has precedence.
                           type: string
-                        valueFrom:
-                          description: Reference to a ConfigMap or Secret that contains
-                            the specified key. Only references to ConfigMaps or Secrets
-                            are allowed. A MediaLocation can only reference Objects
-                            from its own Namespace. This field is required if value
-                            is not specified. If both are specified, value has precedence.
-                          properties:
-                            apiVersion:
-                              description: API version of the referred object.
-                              type: string
-                            key:
-                              description: Key within the ConfigMap or Secret.
-                              type: string
-                            kind:
-                              description: Kind of the referred object.
-                              type: string
-                            name:
-                              description: Name of the referred object.
-                              type: string
-                            namespace:
-                              description: Namespace of the referred object.
-                              type: string
-                          required:
-                          - name
-                          type: object
                       required:
                       - name
                       type: object
@@ -285,8 +229,6 @@ spec:
                               namespace:
                                 description: Namespace of the referred object.
                                 type: string
-                            required:
-                            - name
                             type: object
                         required:
                         - secretRef
@@ -316,31 +258,6 @@ spec:
                             if valueFrom is not specified. If both are specified,
                             value has precedence.
                           type: string
-                        valueFrom:
-                          description: Reference to a ConfigMap or Secret that contains
-                            the specified key. Only references to ConfigMaps or Secrets
-                            are allowed. A MediaLocation can only reference Objects
-                            from its own Namespace. This field is required if value
-                            is not specified. If both are specified, value has precedence.
-                          properties:
-                            apiVersion:
-                              description: API version of the referred object.
-                              type: string
-                            key:
-                              description: Key within the ConfigMap or Secret.
-                              type: string
-                            kind:
-                              description: Kind of the referred object.
-                              type: string
-                            name:
-                              description: Name of the referred object.
-                              type: string
-                            namespace:
-                              description: Namespace of the referred object.
-                              type: string
-                          required:
-                          - name
-                          type: object
                       required:
                       - name
                       type: object
@@ -363,31 +280,6 @@ spec:
                             required if valueFrom is not specified. If both are specified,
                             value has precedence.
                           type: string
-                        valueFrom:
-                          description: Reference to a ConfigMap or Secret that contains
-                            the specified key. Only references to ConfigMaps or Secrets
-                            are allowed. A MediaLocation can only reference Objects
-                            from its own Namespace. This field is required if value
-                            is not specified. If both are specified, value has precedence.
-                          properties:
-                            apiVersion:
-                              description: API version of the referred object.
-                              type: string
-                            key:
-                              description: Key within the ConfigMap or Secret.
-                              type: string
-                            kind:
-                              description: Kind of the referred object.
-                              type: string
-                            name:
-                              description: Name of the referred object.
-                              type: string
-                            namespace:
-                              description: Namespace of the referred object.
-                              type: string
-                          required:
-                          - name
-                          type: object
                       required:
                       - name
                       type: object
@@ -440,8 +332,6 @@ spec:
                           namespace:
                             description: Namespace of the referred object.
                             type: string
-                        required:
-                        - name
                         type: object
                       type:
                         description: Encryption type.
@@ -501,8 +391,6 @@ spec:
                               namespace:
                                 description: Namespace of the referred object.
                                 type: string
-                            required:
-                            - name
                             type: object
                         required:
                         - secretRef
@@ -532,8 +420,6 @@ spec:
                               namespace:
                                 description: Namespace of the referred object.
                                 type: string
-                            required:
-                            - name
                             type: object
                         required:
                         - secretRef
@@ -559,31 +445,6 @@ spec:
                             required if valueFrom is not specified. If both are specified,
                             value has precedence.
                           type: string
-                        valueFrom:
-                          description: Reference to a ConfigMap or Secret that contains
-                            the specified key. Only references to ConfigMaps or Secrets
-                            are allowed. A MediaLocation can only reference Objects
-                            from its own Namespace. This field is required if value
-                            is not specified. If both are specified, value has precedence.
-                          properties:
-                            apiVersion:
-                              description: API version of the referred object.
-                              type: string
-                            key:
-                              description: Key within the ConfigMap or Secret.
-                              type: string
-                            kind:
-                              description: Kind of the referred object.
-                              type: string
-                            name:
-                              description: Name of the referred object.
-                              type: string
-                            namespace:
-                              description: Namespace of the referred object.
-                              type: string
-                          required:
-                          - name
-                          type: object
                       required:
                       - name
                       type: object
@@ -628,8 +489,6 @@ spec:
                               namespace:
                                 description: Namespace of the referred object.
                                 type: string
-                            required:
-                            - name
                             type: object
                         required:
                         - secretRef
@@ -655,31 +514,6 @@ spec:
                             required if valueFrom is not specified. If both are specified,
                             value has precedence.
                           type: string
-                        valueFrom:
-                          description: Reference to a ConfigMap or Secret that contains
-                            the specified key. Only references to ConfigMaps or Secrets
-                            are allowed. A MediaLocation can only reference Objects
-                            from its own Namespace. This field is required if value
-                            is not specified. If both are specified, value has precedence.
-                          properties:
-                            apiVersion:
-                              description: API version of the referred object.
-                              type: string
-                            key:
-                              description: Key within the ConfigMap or Secret.
-                              type: string
-                            kind:
-                              description: Kind of the referred object.
-                              type: string
-                            name:
-                              description: Name of the referred object.
-                              type: string
-                            namespace:
-                              description: Namespace of the referred object.
-                              type: string
-                          required:
-                          - name
-                          type: object
                       required:
                       - name
                       type: object
@@ -736,8 +570,6 @@ spec:
                               namespace:
                                 description: Namespace of the referred object.
                                 type: string
-                            required:
-                            - name
                             type: object
                         required:
                         - secretRef
