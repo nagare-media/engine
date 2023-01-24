@@ -15,7 +15,7 @@ spec:
   mediaLocations:
     - name: s3
       ref:
-        kind: ClusterMediaLocation
+        kind: MediaLocation
         name: s3
   config:
     duration: 3m
@@ -34,12 +34,81 @@ spec:
     name: sleep
     description: sleeps for some time
   mediaProcessingEntityRef:
-    kind: ClusterMediaProcessingEntity
+    kind: MediaProcessingEntity
     name: local-cluster
   workflowRef:
     name: e024e1c9-c6c0-4f27-8586-12a1888c84d6
   functionRef:
-    kind: ClusterFunction
+    kind: Function
     name: sleep-0.1.0
   config:
-    duration: "{{ wf.cfg.duration }}"
+    duration: "{{ .Workflow.Config.duration }}"
+  templatePatches:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sleep
+              command: ["sh", "-c", "cat /run/secrets/engine.nagare.media/task/data.json; sleep 5s"]
+---
+apiVersion: engine.nagare.media/v1alpha1
+kind: Task
+metadata:
+  labels:
+    app.kubernetes.io/name: task
+    app.kubernetes.io/instance: 730e8639-3b6e-4759-96f5-24f2645635e1
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+  name: 730e8639-3b6e-4759-96f5-24f2645635e1
+spec:
+  humanReadable:
+    name: sleep-longer
+    description: sleeps for some time
+  mediaProcessingEntityRef:
+    kind: MediaProcessingEntity
+    name: local-cluster
+  workflowRef:
+    name: e024e1c9-c6c0-4f27-8586-12a1888c84d6
+  functionRef:
+    kind: Function
+    name: sleep-0.1.0
+  config:
+    duration: "{{ .Workflow.Config.duration }}"
+  templatePatches:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sleep
+              command: ["sh", "-c", "cat /run/secrets/engine.nagare.media/task/data.json; sleep 30s"]
+---
+apiVersion: engine.nagare.media/v1alpha1
+kind: Task
+metadata:
+  labels:
+    app.kubernetes.io/name: task
+    app.kubernetes.io/instance: 0d750fc5-21e8-4a0c-9a82-047f5cd66b14
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+  name: 0d750fc5-21e8-4a0c-9a82-047f5cd66b14
+spec:
+  humanReadable:
+    name: sleep-even-longer
+    description: sleeps for some time
+  mediaProcessingEntityRef:
+    kind: MediaProcessingEntity
+    name: local-cluster
+  workflowRef:
+    name: e024e1c9-c6c0-4f27-8586-12a1888c84d6
+  functionRef:
+    kind: Function
+    name: sleep-0.1.0
+  config:
+    duration: "{{ .Workflow.Config.duration }}"
+  templatePatches:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sleep
+              command: ["sh", "-c", "cat /run/secrets/engine.nagare.media/task/data.json; sleep 1m"]

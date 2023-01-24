@@ -1,6 +1,6 @@
 ---
 apiVersion: engine.nagare.media/v1alpha1
-kind: ClusterMediaLocation
+kind: MediaLocation
 metadata:
   name: s3
   labels:

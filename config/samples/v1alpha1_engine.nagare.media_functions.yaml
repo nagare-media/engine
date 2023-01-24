@@ -1,5 +1,5 @@
 apiVersion: engine.nagare.media/v1alpha1
-kind: ClusterFunction
+kind: Function
 metadata:
   name: sleep-0.1.0
   labels:
@@ -18,7 +18,7 @@ spec:
           containers:
             - name: sleep
               image: alpine
-              command: ["sleep",  "10m"]
+              command: ["sleep", "3m"]
               resources:
                 requests:
                   cpu: 10m

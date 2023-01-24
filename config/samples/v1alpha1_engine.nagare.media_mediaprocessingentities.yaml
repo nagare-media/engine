@@ -1,6 +1,6 @@
 ---
 apiVersion: engine.nagare.media/v1alpha1
-kind: ClusterMediaProcessingEntity
+kind: MediaProcessingEntity
 metadata:
   name: local-cluster
   labels:
