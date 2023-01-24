@@ -27,7 +27,7 @@ import (
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-func SvcErrorHandler(c *fiber.Ctx, obj interface{}, svcErr error) error {
+func SvcErrorHandler(c *fiber.Ctx, obj any, svcErr error) error {
 	var s int
 	switch svcErr {
 	case svc.ErrInvalid:

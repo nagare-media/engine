@@ -438,7 +438,7 @@ func (s *workflowService) functionRestrictionToJobTemplateSpec(fr *nbmpv2.Functi
 	return js, nil
 }
 
-func containsStreamID(streamID string, obj interface{}) bool {
+func containsStreamID(streamID string, obj any) bool {
 	switch mps := obj.(type) {
 	case []nbmpv2.MediaParameter:
 		for _, mp := range mps {
