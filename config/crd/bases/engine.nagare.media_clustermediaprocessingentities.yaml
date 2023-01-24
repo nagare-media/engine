@@ -85,8 +85,6 @@ spec:
                           namespace:
                             description: Namespace of the referred object.
                             type: string
-                        required:
-                        - name
                         type: object
                     required:
                     - secretRef
@@ -103,12 +101,7 @@ spec:
                   state. When a connection to a MediaProcessingEntity is established,
                   one of the conditions will have type "Ready" and status true.
                 items:
-                  description: Description of the current MediaProcessingEntity status.
                   properties:
-                    lastProbeTime:
-                      description: Last time the condition was checked.
-                      format: date-time
-                      type: string
                     lastTransitionTime:
                       description: Last time the condition transit from one status
                         to another.
@@ -125,10 +118,7 @@ spec:
                       description: Status of the condition, one of True, False, Unknown.
                       type: string
                     type:
-                      description: Type of MediaProcessingEntity condition.
-                      enum:
-                      - Ready
-                      - Failed
+                      description: Type of condition.
                       type: string
                   required:
                   - status

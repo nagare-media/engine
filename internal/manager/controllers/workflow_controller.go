@@ -107,43 +107,23 @@ func (r *WorkflowReconciler) reconcileCondition(ctx context.Context, err error, 
 		phaseConditionStatus = corev1.ConditionTrue
 	}
 
-	// TODO: patch conditions to keep transition times
-	now := metav1.Time{Time: time.Now()}
 	switch wf.Status.Phase {
 	default:
-		wf.Status.Conditions = []enginev1.WorkflowCondition{}
+		wf.Status.Conditions = []enginev1.Condition{}
+
 	case enginev1.WorkflowPhaseInitializing:
-		wf.Status.Conditions = []enginev1.WorkflowCondition{{
-			Type:               enginev1.WorkflowReady,
-			Status:             corev1.ConditionFalse,
-			LastTransitionTime: now,
-		}}
+		wf.Status.Conditions = utils.MarkConditionFalse(wf.Status.Conditions, enginev1.WorkflowReadyConditionType)
+
 	case enginev1.WorkflowPhaseRunning, enginev1.WorkflowPhaseAwaitingCompletion:
-		wf.Status.Conditions = []enginev1.WorkflowCondition{{
-			Type:               enginev1.WorkflowReady,
-			Status:             phaseConditionStatus,
-			LastTransitionTime: now,
-		}}
+		wf.Status.Conditions = utils.MarkCondition(wf.Status.Conditions, enginev1.WorkflowReadyConditionType, phaseConditionStatus)
+
 	case enginev1.WorkflowPhaseSucceeded:
-		wf.Status.Conditions = []enginev1.WorkflowCondition{{
-			Type:               enginev1.WorkflowComplete,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}, {
-			Type:               enginev1.WorkflowReady,
-			Status:             corev1.ConditionFalse,
-			LastTransitionTime: now,
-		}}
+		wf.Status.Conditions = utils.MarkConditionFalse(wf.Status.Conditions, enginev1.WorkflowReadyConditionType)
+		wf.Status.Conditions = utils.MarkConditionTrue(wf.Status.Conditions, enginev1.WorkflowCompleteConditionType)
+
 	case enginev1.WorkflowPhaseFailed:
-		wf.Status.Conditions = []enginev1.WorkflowCondition{{
-			Type:               enginev1.WorkflowFailed,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}, {
-			Type:               enginev1.WorkflowReady,
-			Status:             corev1.ConditionFalse,
-			LastTransitionTime: now,
-		}}
+		wf.Status.Conditions = utils.MarkConditionFalse(wf.Status.Conditions, enginev1.WorkflowReadyConditionType)
+		wf.Status.Conditions = utils.MarkConditionTrue(wf.Status.Conditions, enginev1.WorkflowFailedConditionType)
 	}
 }
 

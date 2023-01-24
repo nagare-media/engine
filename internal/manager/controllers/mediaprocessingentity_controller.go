@@ -219,20 +219,11 @@ func (r *MediaProcessingEntityReconciler) reconcileClusterMediaProcessingEntity(
 func (r *MediaProcessingEntityReconciler) reconcileCondition(ctx context.Context, err error, mpe *enginev1.MediaProcessingEntity) {
 	log := logf.FromContext(ctx)
 
-	// TODO: patch conditions to keep transition times
-	now := metav1.Time{Time: time.Now()}
 	if err != nil {
 		log.Error(err, fmt.Sprintf("error reconciling %s", mpe.Kind))
 		mpe.Status.Message = err.Error()
-		mpe.Status.Conditions = []enginev1.MediaProcessingEntityCondition{{
-			Type:               enginev1.MediaProcessingEntityConditionTypeFailed,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}, {
-			Type:               enginev1.MediaProcessingEntityConditionTypeReady,
-			Status:             corev1.ConditionFalse,
-			LastTransitionTime: now,
-		}}
+		mpe.Status.Conditions = utils.MarkConditionTrue(mpe.Status.Conditions, enginev1.MediaProcessingEntityFailedConditionType)
+		mpe.Status.Conditions = utils.MarkConditionFalse(mpe.Status.Conditions, enginev1.MediaProcessingEntityReadyConditionType)
 		return
 	}
 
@@ -243,11 +234,8 @@ func (r *MediaProcessingEntityReconciler) reconcileCondition(ctx context.Context
 	}
 
 	mpe.Status.Message = ""
-	mpe.Status.Conditions = []enginev1.MediaProcessingEntityCondition{{
-		Type:               enginev1.MediaProcessingEntityConditionTypeReady,
-		Status:             readyCondition,
-		LastTransitionTime: now,
-	}}
+	mpe.Status.Conditions = utils.DeleteCondition(mpe.Status.Conditions, enginev1.MediaProcessingEntityFailedConditionType)
+	mpe.Status.Conditions = utils.MarkCondition(mpe.Status.Conditions, enginev1.MediaProcessingEntityReadyConditionType, readyCondition)
 }
 
 func (r *MediaProcessingEntityReconciler) reconcileDelete(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (ctrl.Result, error) {

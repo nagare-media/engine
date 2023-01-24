@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	batchv1 "k8s.io/api/batch/v1"
-	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -150,7 +149,7 @@ type TaskStatus struct {
 	// +patchMergeKey=type
 	// +patchStrategy=merge
 	// +listType=atomic
-	Conditions []TaskCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
+	Conditions []Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
 
 	// A human readable message indicating why the Task is in this condition.
 	Message string `json:"message,omitempty"`
@@ -194,46 +193,18 @@ const (
 	TaskPhaseFailed       TaskPhase = "Failed"
 )
 
-// Description of the current Task status.
-type TaskCondition struct {
-	// Type of Task condition.
-	Type TaskConditionType `json:"type"`
-
-	// Status of the condition, one of True, False, Unknown.
-	Status corev1.ConditionStatus `json:"status"`
-
-	// Last time the condition was checked.
-	// +optional
-	LastProbeTime metav1.Time `json:"lastProbeTime,omitempty"`
-
-	// Last time the condition transit from one status to another.
-	// +optional
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-
-	// (brief) reason for the condition's last transition.
-	// +optional
-	Reason string `json:"reason,omitempty"`
-
-	// Human readable message indicating details about last transition.
-	// +optional
-	Message string `json:"message,omitempty"`
-}
-
-// +kubebuilder:validation:Enum=Initialized;Ready;Complete;Failed
-type TaskConditionType string
-
 var (
-	// TaskConditionTypeInitialized means the Task has been processed by the Task controller and a Job was created.
-	TaskConditionTypeInitialized TaskConditionType = "Initialized"
+	// TaskInitializedConditionType means the Task has been processed by the Task controller and a Job was created.
+	TaskInitializedConditionType ConditionType = "Initialized"
 
-	// TaskConditionTypeReady means the Task has been processed by the Task controller and a Job was created.
-	TaskConditionTypeReady TaskConditionType = "Ready"
+	// TaskReadyConditionType means the Task has been processed by the Task controller and a Job was created.
+	TaskReadyConditionType ConditionType = "Ready"
 
-	// TaskConditionTypeComplete means the Task has completed its execution.
-	TaskConditionTypeComplete TaskConditionType = "Complete"
+	// TaskCompleteConditionType means the Task has completed its execution.
+	TaskCompleteConditionType ConditionType = "Complete"
 
-	// TaskConditionTypeFailed means the Task has failed its execution.
-	TaskConditionTypeFailed TaskConditionType = "Failed"
+	// TaskFailedConditionType means the Task has failed its execution.
+	TaskFailedConditionType ConditionType = "Failed"
 )
 
 // +kubebuilder:object:root=true

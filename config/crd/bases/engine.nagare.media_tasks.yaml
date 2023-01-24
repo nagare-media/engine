@@ -8762,12 +8762,7 @@ spec:
                   and status true. When a Task is completed, one of the conditions
                   will have type "Complete" and status true.
                 items:
-                  description: Description of the current Task status.
                   properties:
-                    lastProbeTime:
-                      description: Last time the condition was checked.
-                      format: date-time
-                      type: string
                     lastTransitionTime:
                       description: Last time the condition transit from one status
                         to another.
@@ -8784,12 +8779,7 @@ spec:
                       description: Status of the condition, one of True, False, Unknown.
                       type: string
                     type:
-                      description: Type of Task condition.
-                      enum:
-                      - Initialized
-                      - Ready
-                      - Complete
-                      - Failed
+                      description: Type of condition.
                       type: string
                   required:
                   - status
@@ -8819,8 +8809,6 @@ spec:
                   namespace:
                     description: Namespace of the referred object.
                     type: string
-                required:
-                - name
                 type: object
               jobRef:
                 description: Reference to the Job.
@@ -8841,7 +8829,6 @@ spec:
                     description: UID of the object.
                     type: string
                 required:
-                - name
                 - uid
                 type: object
               mediaProcessingEntityRef:
@@ -8859,8 +8846,6 @@ spec:
                   namespace:
                     description: Namespace of the referred object.
                     type: string
-                required:
-                - name
                 type: object
               message:
                 description: A human readable message indicating why the Task is in

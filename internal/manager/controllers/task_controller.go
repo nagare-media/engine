@@ -133,61 +133,29 @@ func (r *TaskReconciler) reconcileCondition(ctx context.Context, err error, task
 		phaseConditionStatus = corev1.ConditionTrue
 	}
 
-	// TODO: patch conditions to keep transition times
-	now := metav1.Time{Time: time.Now()}
 	switch task.Status.Phase {
 	default:
-		task.Status.Conditions = []enginev1.TaskCondition{}
+		task.Status.Conditions = []enginev1.Condition{}
+
 	case enginev1.TaskPhaseInitializing:
-		task.Status.Conditions = []enginev1.TaskCondition{{
-			Type:               enginev1.TaskConditionTypeInitialized,
-			Status:             corev1.ConditionFalse,
-			LastTransitionTime: now,
-		}}
+		task.Status.Conditions = utils.MarkConditionFalse(task.Status.Conditions, enginev1.TaskInitializedConditionType)
+
 	case enginev1.TaskPhaseJobPending:
-		task.Status.Conditions = []enginev1.TaskCondition{{
-			Type:               enginev1.TaskConditionTypeInitialized,
-			Status:             phaseConditionStatus,
-			LastTransitionTime: now,
-		}}
+		task.Status.Conditions = utils.MarkCondition(task.Status.Conditions, enginev1.TaskInitializedConditionType, phaseConditionStatus)
+
 	case enginev1.TaskPhaseRunning:
-		task.Status.Conditions = []enginev1.TaskCondition{{
-			Type:               enginev1.TaskConditionTypeReady,
-			Status:             phaseConditionStatus,
-			LastTransitionTime: now,
-		}, {
-			Type:               enginev1.TaskConditionTypeInitialized,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}}
+		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskInitializedConditionType)
+		task.Status.Conditions = utils.MarkCondition(task.Status.Conditions, enginev1.TaskReadyConditionType, phaseConditionStatus)
+
 	case enginev1.TaskPhaseSucceeded:
-		task.Status.Conditions = []enginev1.TaskCondition{{
-			Type:               enginev1.TaskConditionTypeComplete,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}, {
-			Type:               enginev1.TaskConditionTypeReady,
-			Status:             corev1.ConditionFalse,
-			LastTransitionTime: now,
-		}, {
-			Type:               enginev1.TaskConditionTypeInitialized,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}}
+		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskInitializedConditionType)
+		task.Status.Conditions = utils.MarkConditionFalse(task.Status.Conditions, enginev1.TaskReadyConditionType)
+		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskCompleteConditionType)
+
 	case enginev1.TaskPhaseFailed:
-		task.Status.Conditions = []enginev1.TaskCondition{{
-			Type:               enginev1.TaskConditionTypeFailed,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}, {
-			Type:               enginev1.TaskConditionTypeReady,
-			Status:             corev1.ConditionFalse,
-			LastTransitionTime: now,
-		}, {
-			Type:               enginev1.TaskConditionTypeInitialized,
-			Status:             corev1.ConditionTrue,
-			LastTransitionTime: now,
-		}}
+		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskInitializedConditionType)
+		task.Status.Conditions = utils.MarkConditionFalse(task.Status.Conditions, enginev1.TaskReadyConditionType)
+		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskFailedConditionType)
 	}
 }
 

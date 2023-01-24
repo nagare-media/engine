@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -90,7 +89,7 @@ type WorkflowStatus struct {
 	// +patchMergeKey=type
 	// +patchStrategy=merge
 	// +listType=atomic
-	Conditions []WorkflowCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
+	Conditions []Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
 
 	// A human readable message indicating why the Workflow is in this condition.
 	Message string `json:"message,omitempty"`
@@ -138,42 +137,15 @@ const (
 	WorkflowPhaseFailed             WorkflowPhase = "Failed"
 )
 
-type WorkflowCondition struct {
-	// Type of Workflow condition.
-	Type WorkflowConditionType `json:"type"`
-
-	// Status of the condition, one of True, False, Unknown.
-	Status corev1.ConditionStatus `json:"status"`
-
-	// Last time the condition was checked.
-	// +optional
-	LastProbeTime metav1.Time `json:"lastProbeTime,omitempty"`
-
-	// Last time the condition transit from one status to another.
-	// +optional
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-
-	// (brief) reason for the condition's last transition.
-	// +optional
-	Reason string `json:"reason,omitempty"`
-
-	// Human readable message indicating details about last transition.
-	// +optional
-	Message string `json:"message,omitempty"`
-}
-
-// +kubebuilder:validation:Enum=Ready;Complete;Failed
-type WorkflowConditionType string
-
 const (
-	// WorkflowReady means the Workflow has been processed by the Workflow controller.
-	WorkflowReady = "Ready"
+	// WorkflowReadyConditionType means the Workflow has been processed by the Workflow controller.
+	WorkflowReadyConditionType ConditionType = "Ready"
 
-	// WorkflowComplete means the Workflow has completed its execution.
-	WorkflowComplete = "Complete"
+	// WorkflowCompleteConditionType means the Workflow has completed its execution.
+	WorkflowCompleteConditionType ConditionType = "Complete"
 
-	// WorkflowFailed means the Workflow has failed its execution.
-	WorkflowFailed = "Failed"
+	// WorkflowFailedConditionType means the Workflow has failed its execution.
+	WorkflowFailedConditionType ConditionType = "Failed"
 )
 
 // +kubebuilder:object:root=true

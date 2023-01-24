@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
@@ -96,47 +95,19 @@ type MediaProcessingEntityStatus struct {
 	// +patchMergeKey=type
 	// +patchStrategy=merge
 	// +listType=atomic
-	Conditions []MediaProcessingEntityCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
+	Conditions []Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
 
 	// A human readable message indicating why the MediaProcessingEntity is in this condition.
 	Message string `json:"message,omitempty"`
 }
 
-// Description of the current MediaProcessingEntity status.
-type MediaProcessingEntityCondition struct {
-	// Type of MediaProcessingEntity condition.
-	Type MediaProcessingEntityConditionType `json:"type"`
-
-	// Status of the condition, one of True, False, Unknown.
-	Status corev1.ConditionStatus `json:"status"`
-
-	// Last time the condition was checked.
-	// +optional
-	LastProbeTime metav1.Time `json:"lastProbeTime,omitempty"`
-
-	// Last time the condition transit from one status to another.
-	// +optional
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-
-	// (brief) reason for the condition's last transition.
-	// +optional
-	Reason string `json:"reason,omitempty"`
-
-	// Human readable message indicating details about last transition.
-	// +optional
-	Message string `json:"message,omitempty"`
-}
-
-// +kubebuilder:validation:Enum=Ready;Failed
-type MediaProcessingEntityConditionType string
-
 var (
-	// MediaProcessingEntityConditionTypeReady means the a connection to the MediaProcessingEntity could be established.
-	MediaProcessingEntityConditionTypeReady MediaProcessingEntityConditionType = "Ready"
+	// MediaProcessingEntityReadyConditionType means the a connection to the MediaProcessingEntity could be established.
+	MediaProcessingEntityReadyConditionType ConditionType = "Ready"
 
-	// MediaProcessingEntityConditionTypeReady means the a connection to the MediaProcessingEntity could not be
+	// MediaProcessingEntityFailedConditionType means the a connection to the MediaProcessingEntity could not be
 	// established.
-	MediaProcessingEntityConditionTypeFailed MediaProcessingEntityConditionType = "Failed"
+	MediaProcessingEntityFailedConditionType ConditionType = "Failed"
 )
 
 // +kubebuilder:object:root=true
