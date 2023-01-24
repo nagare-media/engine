@@ -400,13 +400,8 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 	}
 
 	// resolve secret
-	secretObj, err := utils.ResolveRef(ctx, r.readOnlyClient, &secretRef.ObjectReference)
-	if err != nil {
+	if err := utils.ResolveSecretRefInline(ctx, r.readOnlyClient, &secretRef); err != nil {
 		return nil, err
-	}
-	secret, ok := secretObj.(*corev1.Secret)
-	if !ok {
-		return nil, errors.New("secretRef does not reference a Secret")
 	}
 
 	// get kubeconfig
@@ -414,9 +409,9 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 	if secretRef.Key != "" {
 		secretKey = secretRef.Key
 	}
-	kubeconfig := secret.Data[secretKey]
+	kubeconfig := secretRef.Data[secretKey]
 	if kubeconfig == nil {
-		return nil, fmt.Errorf("Secret '%s/%s' has no key '%s'", secret.Namespace, secret.Name, secretKey)
+		return nil, fmt.Errorf("Secret '%s/%s' has no key '%s'", secretRef.Namespace, secretRef.Name, secretKey)
 	}
 
 	// create REST config and read out namespace

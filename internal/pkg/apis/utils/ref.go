@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/labels"
@@ -147,6 +148,58 @@ func ResolveLocalRef(ctx context.Context, c client.Client, namespace string, ref
 
 	err = c.Get(ctx, client.ObjectKeyFromObject(obj), obj)
 	return obj, err
+}
+
+func ResolveSecretRefInline(ctx context.Context, c client.Client, ref *meta.ConfigMapOrSecretReference) error {
+	// force reference to Secret
+	r := ref.DeepCopy()
+	r.APIVersion = corev1.SchemeGroupVersion.String()
+	r.Kind = "Secret"
+
+	err := ResolveConfigMapOrSecretRefInline(ctx, c, r)
+	if err != nil {
+		return err
+	}
+	ref.Data = r.Data
+	return nil
+}
+
+func ResolveConfigMapRefInline(ctx context.Context, c client.Client, ref *meta.ConfigMapOrSecretReference) error {
+	// force reference to ConfigMap
+	r := ref.DeepCopy()
+	r.APIVersion = corev1.SchemeGroupVersion.String()
+	r.Kind = "ConfigMap"
+
+	err := ResolveConfigMapOrSecretRefInline(ctx, c, r)
+	if err != nil {
+		return err
+	}
+	ref.Data = r.Data
+	return nil
+}
+
+func ResolveConfigMapOrSecretRefInline(ctx context.Context, c client.Client, ref *meta.ConfigMapOrSecretReference) error {
+	obj, err := ResolveRef(ctx, c, &ref.ObjectReference)
+	if err != nil {
+		return err
+	}
+
+	switch o := obj.(type) {
+	case *corev1.Secret:
+		ref.Data = o.Data
+	case *corev1.ConfigMap:
+		data := make(map[string][]byte)
+		for k, v := range o.Data {
+			data[k] = []byte(v)
+		}
+		for k, v := range o.BinaryData {
+			data[k] = v
+		}
+	default:
+		return errors.New("ConfigMapOrSecretReference does not reference a ConfigMap or Secret")
+	}
+
+	return nil
 }
 
 func PartiallyResolveRef(c client.Client, ref *meta.ObjectReference) (client.Object, error) {
