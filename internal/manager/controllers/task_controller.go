@@ -855,6 +855,9 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 			Namespace:    jobClient.Namespace(),
 			Labels:       jobTemplate.ObjectMeta.Labels,
 			Annotations:  jobTemplate.ObjectMeta.Annotations,
+			Finalizers: []string{
+				enginev1.JobProtectionFinalizer,
+			},
 		},
 		Spec: jobTemplate.Spec,
 	}
@@ -903,6 +906,7 @@ func (r *TaskReconciler) reconcileRunningJob(ctx context.Context, task *enginev1
 		case apierrors.IsNotFound(err):
 			// job no longer exists: go back
 			task.Status.Phase = enginev1.TaskPhaseJobPending
+			task.Status.JobRef = nil
 			return ctrl.Result{}, nil
 		case apierrors.IsConflict(err):
 			// conflicting job reference: log and adopt this job

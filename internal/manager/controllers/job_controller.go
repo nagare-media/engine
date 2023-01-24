@@ -26,6 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -49,7 +50,7 @@ type JobReconciler struct {
 	MediaProcessingEntityRef *meta.ObjectReference
 }
 
-// +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch
+// +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;update
 
 func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := logf.FromContext(ctx)
@@ -67,13 +68,26 @@ func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		return ctrl.Result{}, err
 	}
 
+	// get Task infos
+	taskName := job.Labels[enginev1.TaskNameLabel]
+	taskNamespace := job.Labels[enginev1.TaskNamespaceLabel]
+
+	// handle delete
+	if !job.DeletionTimestamp.IsZero() {
+		// remove finalizer
+		controllerutil.RemoveFinalizer(job, enginev1.JobProtectionFinalizer)
+		if err := r.Client.Update(ctx, job); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
 	// Reconciliation logic is handled by task controller. However, this it is managed by another manager connected to the
 	// management cluster. We therefore use an event channel to trigger a reconciliation of the accompanying task.
 	r.EventChannel <- event.GenericEvent{
 		Object: &metav1.PartialObjectMetadata{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      job.Labels[enginev1.TaskNameLabel],
-				Namespace: job.Labels[enginev1.TaskNamespaceLabel],
+				Name:      taskName,
+				Namespace: taskNamespace,
 			},
 		},
 	}
