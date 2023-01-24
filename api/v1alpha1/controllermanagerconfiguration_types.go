@@ -21,6 +21,8 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrlCfg "sigs.k8s.io/controller-runtime/pkg/config/v1alpha1"
+
+	"github.com/nagare-media/models.go/base"
 )
 
 // +kubebuilder:object:root=true
@@ -46,6 +48,16 @@ type NagareMediaEngineControllerManagerConfiguration struct {
 	// immediately. Defaults to "5s".
 	// +optional
 	RemoteMediaProcessingEntityStabilizingDuration *metav1.Duration `json:"remoteMediaProcessingEntityStabilizingDuration,omitempty"`
+
+	// NATS connection configuration.
+	NATS NATSConfig `json:"nats"`
+}
+
+type NATSConfig struct {
+	// TODO: add other auth methods
+	URL      base.URI `json:"url"`
+	Username string   `json:"username"`
+	Password string   `json:"password"`
 }
 
 func (c *ControllerManagerConfiguration) Default() {

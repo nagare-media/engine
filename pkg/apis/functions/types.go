@@ -16,12 +16,9 @@ limitations under the License.
 
 package functions
 
-import (
-	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
-	"github.com/nagare-media/models.go/base"
-)
+import enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 
-type SecretConfig struct {
+type SecretData struct {
 	Workflow       Workflow                                `json:"workflow,omitempty"`
 	Task           Task                                    `json:"task,omitempty"`
 	MediaLocations map[string]enginev1.MediaLocationConfig `json:"mediaLocations,omitempty"`
@@ -47,14 +44,7 @@ type TaskInfo struct {
 }
 
 type System struct {
-	NATS NATS `json:"nats,omitempty"`
-}
-
-type NATS struct {
-	URL      base.URI `json:"url,omitempty"`
-	Username string   `json:"username,omitempty"`
-	Password string   `json:"password,omitempty"`
-	// TODO: add other auth methods
+	NATS enginev1.NATSConfig `json:"nats,omitempty"`
 }
 
 type GenericFunctionConfig struct {
