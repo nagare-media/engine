@@ -152,7 +152,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	k8sCache, err := cache.New(k8sCfg, cache.Options{Scheme: scheme, Mapper: mapper})
+	k8sCache, err := cache.New(k8sCfg, cache.Options{Scheme: scheme, Mapper: mapper, Namespace: cfg.Services.KubernetesNamespace})
 	if err != nil {
 		return err
 	}
