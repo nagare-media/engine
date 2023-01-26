@@ -578,7 +578,7 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 }
 
 func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1.Task) (ctrl.Result, error) {
-	log := logf.FromContext(ctx, "phase", task.Status.Phase)
+	log := logf.FromContext(ctx)
 
 	if task.Status.MediaProcessingEntityRef == nil || task.Status.FunctionRef == nil {
 		// wrong phase: go back
