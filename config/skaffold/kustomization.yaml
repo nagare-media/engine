@@ -4,7 +4,7 @@ bases:
 - ../default
 
 resources:
-  - gateway-nbmp_ingress.yaml
+- gateway-nbmp_ingress.yaml
 
 patchesStrategicMerge:
 - patches/manager.yaml

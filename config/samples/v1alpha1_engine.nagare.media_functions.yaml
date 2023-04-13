@@ -18,7 +18,10 @@ spec:
           containers:
             - name: sleep
               image: alpine
-              command: ["sleep", "3m"]
+              command:
+                - sh
+                - -c
+                - t=$(shuf -i 50-120 -n 1); echo "sleeping for $t second(s)"; sleep $t
               resources:
                 requests:
                   cpu: 10m

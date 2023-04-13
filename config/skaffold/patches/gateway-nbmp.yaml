@@ -13,5 +13,9 @@ spec:
         args:
         - "--config=gateway-nbmp_configuration.yaml"
         - "--zap-devel"
-        - "--zap-stacktrace-level=error"
+        - "--zap-stacktrace-level=panic"
         - "--zap-log-level=2"
+        resources:
+          limits:
+            cpu: 4
+            memory: 4Gi
