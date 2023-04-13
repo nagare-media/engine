@@ -25,7 +25,7 @@ BUILD_DATE     ?= $(shell date -u +"%Y-%m-%dT%TZ")
 IMAGE_REGISTRY ?= $(shell cat build/package/image/IMAGE_REGISTRY)
 IMAGE_TAG      ?= $(VERSION)
 
-TESTENV_K8S_VERSION                   ?= 1.26.0
+TESTENV_K8S_VERSION                   ?= 1.27.0
 TESTENV_INGRESS_NGINX_VERSION         ?= 4.4.0  # Helm chart versions
 TESTENV_CERT_MANAGER_VERSION          ?= 1.10.1 # Helm chart versions
 TESTENV_KUBE_PROMETHEUS_STACK_VERSION ?= 43.2.0 # Helm chart versions
