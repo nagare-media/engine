@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.11.1
+    controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
   name: functions.engine.nagare.media
 spec:
@@ -2266,7 +2266,8 @@ spec:
                                             that are used by this container. \n This
                                             is an alpha field and requires enabling
                                             the DynamicResourceAllocation feature
-                                            gate. \n This field is immutable."
+                                            gate. \n This field is immutable. It can
+                                            only be set for containers."
                                           items:
                                             description: ResourceClaim references
                                               one entry in PodSpec.ResourceClaims.
@@ -3775,7 +3776,8 @@ spec:
                                             that are used by this container. \n This
                                             is an alpha field and requires enabling
                                             the DynamicResourceAllocation feature
-                                            gate. \n This field is immutable."
+                                            gate. \n This field is immutable. It can
+                                            only be set for containers."
                                           items:
                                             description: ResourceClaim references
                                               one entry in PodSpec.ResourceClaims.
@@ -5325,7 +5327,8 @@ spec:
                                             that are used by this container. \n This
                                             is an alpha field and requires enabling
                                             the DynamicResourceAllocation feature
-                                            gate. \n This field is immutable."
+                                            gate. \n This field is immutable. It can
+                                            only be set for containers."
                                           items:
                                             description: ResourceClaim references
                                               one entry in PodSpec.ResourceClaims.
@@ -7309,7 +7312,8 @@ spec:
                                                         and requires enabling the
                                                         DynamicResourceAllocation
                                                         feature gate. \n This field
-                                                        is immutable."
+                                                        is immutable. It can only
+                                                        be set for containers."
                                                       items:
                                                         description: ResourceClaim
                                                           references one entry in
