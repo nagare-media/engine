@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (tt *TaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -44,24 +45,24 @@ func (tt *TaskTemplate) Default() {
 var _ webhook.Validator = &TaskTemplate{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (tt *TaskTemplate) ValidateCreate() error {
+func (tt *TaskTemplate) ValidateCreate() (admission.Warnings, error) {
 	return tt.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (tt *TaskTemplate) ValidateUpdate(old runtime.Object) error {
+func (tt *TaskTemplate) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldTT, ok := old.(*TaskTemplate)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a TaskTemplate but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a TaskTemplate but got a %T", old))
 	}
 	return tt.validate(oldTT)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (tt *TaskTemplate) ValidateDelete() error {
-	return nil
+func (tt *TaskTemplate) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (tt *TaskTemplate) validate(old *TaskTemplate) error {
-	return nil
+func (tt *TaskTemplate) validate(old *TaskTemplate) (admission.Warnings, error) {
+	return nil, nil
 }

@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/kustomize/kyaml/yaml/merge2"
@@ -40,7 +40,7 @@ func FullServerSideApply(ctx context.Context, c client.Client, obj client.Object
 func ServerSideApply(ctx context.Context, c client.Client, obj client.Object, manager string) error {
 	obj.SetManagedFields(nil)
 	return c.Patch(ctx, obj, client.Apply, &client.PatchOptions{
-		Force:        pointer.Bool(true),
+		Force:        ptr.To[bool](true),
 		FieldManager: manager,
 	})
 }
@@ -49,7 +49,7 @@ func ServerSideApplyStatus(ctx context.Context, c client.Client, obj client.Obje
 	obj.SetManagedFields(nil)
 	return c.Status().Patch(ctx, obj, client.Apply, &client.SubResourcePatchOptions{
 		PatchOptions: client.PatchOptions{
-			Force:        pointer.Bool(true),
+			Force:        ptr.To[bool](true),
 			FieldManager: manager,
 		},
 	})

@@ -31,12 +31,14 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
@@ -54,8 +56,8 @@ const (
 // MediaProcessingEntityReconciler reconciles MediaProcessingEntities and ClusterMediaProcessingEntities objects
 type MediaProcessingEntityReconciler struct {
 	client.Client
-	APIReader      client.Reader
-	readOnlyClient client.Client
+	APIReader         client.Reader
+	readOnlyAPIClient client.Client
 
 	Config          enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme          *runtime.Scheme
@@ -357,13 +359,19 @@ func (r *MediaProcessingEntityReconciler) newLocalManager(ctx context.Context, m
 	opts := r.ManagerOptions
 
 	// set namespace
+	var namespace string
 	if mpe.Spec.Local.Namespace != "" {
-		opts.Namespace = mpe.Spec.Local.Namespace
+		namespace = mpe.Spec.Local.Namespace
 	} else if mpe.Namespace != "" {
-		opts.Namespace = mpe.Namespace
+		namespace = mpe.Namespace
 	} else {
 		// ClusterMediaProcessingEntity with no namespace
 		return nil, errors.New("local ClusterMediaProcessingEntity has no namespace defined")
+	}
+	opts.Cache = cache.Options{
+		DefaultNamespaces: map[string]cache.Config{
+			namespace: {},
+		},
 	}
 
 	mgr, err := manager.New(r.LocalRESTConfig, opts)
@@ -374,7 +382,7 @@ func (r *MediaProcessingEntityReconciler) newLocalManager(ctx context.Context, m
 	return &mpeManager{
 		Manager:   mgr,
 		remote:    false,
-		namespace: opts.Namespace,
+		namespace: namespace,
 	}, nil
 }
 
@@ -400,7 +408,7 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 	}
 
 	// resolve secret
-	if err := utils.ResolveSecretRefInline(ctx, r.readOnlyClient, &secretRef); err != nil {
+	if err := utils.ResolveSecretRefInline(ctx, r.readOnlyAPIClient, &secretRef); err != nil {
 		return nil, err
 	}
 
@@ -438,7 +446,11 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 	}
 	// shallow copy
 	opts := r.ManagerOptions
-	opts.Namespace = namespace
+	opts.Cache = cache.Options{
+		DefaultNamespaces: map[string]cache.Config{
+			namespace: {},
+		},
+	}
 
 	mgr, err := manager.New(restConfig, opts)
 	if err != nil {
@@ -448,7 +460,7 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 	return &mpeManager{
 		Manager:   mgr,
 		remote:    true,
-		namespace: opts.Namespace,
+		namespace: namespace,
 	}, nil
 }
 
@@ -513,7 +525,7 @@ func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) err
 	r.ManagerOptions.LeaderElection = false
 
 	// submanager should not bind for metrics metrics
-	r.ManagerOptions.MetricsBindAddress = "0"
+	r.ManagerOptions.Metrics = metricsserver.Options{BindAddress: "0"}
 
 	// submanager should not bind for metrics metrics
 	r.ManagerOptions.HealthProbeBindAddress = "0"
@@ -522,13 +534,13 @@ func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) err
 	r.ManagerOptions.WebhookServer = nil
 
 	// create read-only client
-	r.readOnlyClient = apiclient.NewReadOnlyClient(r.APIReader, r.Scheme, r.Client.RESTMapper())
+	r.readOnlyAPIClient = apiclient.NewReadOnlyClient(r.APIReader, r.Scheme, r.Client.RESTMapper())
 
 	// MediaProcessingEntity controller
 	if err := ctrl.NewControllerManagedBy(mgr).
 		Named(MediaProcessingEntityControllerName).
 		For(&enginev1.MediaProcessingEntity{}).
-		Watches(&source.Channel{Source: r.mpeManagerErr}, &handler.EnqueueRequestForObject{}).
+		WatchesRawSource(&source.Channel{Source: r.mpeManagerErr}, &handler.EnqueueRequestForObject{}).
 		Complete(reconcile.Func(r.reconcileMediaProcessingEntity)); err != nil {
 		return err
 	}
@@ -537,7 +549,7 @@ func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) err
 	if err := ctrl.NewControllerManagedBy(mgr).
 		Named(ClusterMediaProcessingEntityControllerName).
 		For(&enginev1.ClusterMediaProcessingEntity{}).
-		Watches(&source.Channel{Source: r.cmpeManagerErr}, &handler.EnqueueRequestForObject{}).
+		WatchesRawSource(&source.Channel{Source: r.cmpeManagerErr}, &handler.EnqueueRequestForObject{}).
 		Complete(reconcile.Func(r.reconcileClusterMediaProcessingEntity)); err != nil {
 		return err
 	}

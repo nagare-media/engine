@@ -26,6 +26,9 @@ consoleIngress:
   hosts:
     - minio.local.gd
 
+resources:
+  requests: ~
+
 users:
   - accessKey: MLYEAE6AES7IUSL4APYL
     secretKey: snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H

@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (w *Workflow) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -44,24 +45,24 @@ func (w *Workflow) Default() {
 var _ webhook.Validator = &Workflow{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (w *Workflow) ValidateCreate() error {
+func (w *Workflow) ValidateCreate() (admission.Warnings, error) {
 	return w.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (w *Workflow) ValidateUpdate(old runtime.Object) error {
+func (w *Workflow) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldW, ok := old.(*Workflow)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a Workflow but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Workflow but got a %T", old))
 	}
 	return w.validate(oldW)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (w *Workflow) ValidateDelete() error {
-	return nil
+func (w *Workflow) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (w *Workflow) validate(old *Workflow) error {
-	return nil
+func (w *Workflow) validate(old *Workflow) (admission.Warnings, error) {
+	return nil, nil
 }

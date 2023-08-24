@@ -25,6 +25,7 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/rest"
 
 	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
@@ -147,28 +148,38 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	k8sCfg := ctrl.GetConfigOrDie()
 
-	mapper, err := apiutil.NewDynamicRESTMapper(k8sCfg)
+	restClient, err := rest.HTTPClientFor(k8sCfg)
 	if err != nil {
 		return err
 	}
 
-	k8sCache, err := cache.New(k8sCfg, cache.Options{Scheme: scheme, Mapper: mapper, Namespace: cfg.Services.KubernetesNamespace})
+	mapper, err := apiutil.NewDynamicRESTMapper(k8sCfg, restClient)
 	if err != nil {
 		return err
 	}
 
-	k8sClient, err := client.New(k8sCfg, client.Options{Scheme: scheme, Mapper: mapper})
-	if err != nil {
-		return err
-	}
-	k8sClient = client.NewNamespacedClient(k8sClient, cfg.Services.KubernetesNamespace)
-	k8sClient, err = client.NewDelegatingClient(client.NewDelegatingClientInput{
-		CacheReader: k8sCache,
-		Client:      k8sClient,
+	k8sCache, err := cache.New(k8sCfg, cache.Options{
+		Scheme: scheme,
+		Mapper: mapper,
+		DefaultNamespaces: map[string]cache.Config{
+			cfg.Services.KubernetesNamespace: {},
+		},
 	})
 	if err != nil {
 		return err
 	}
+
+	k8sClient, err := client.New(k8sCfg, client.Options{
+		Scheme: scheme,
+		Mapper: mapper,
+		Cache: &client.CacheOptions{
+			Reader: k8sCache,
+		},
+	})
+	if err != nil {
+		return err
+	}
+	k8sClient = client.NewNamespacedClient(k8sClient, cfg.Services.KubernetesNamespace)
 
 	// create components
 

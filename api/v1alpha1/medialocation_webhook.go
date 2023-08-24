@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (ml *MediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -46,25 +47,25 @@ func (ml *MediaLocation) Default() {
 var _ webhook.Validator = &MediaLocation{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (ml *MediaLocation) ValidateCreate() error {
+func (ml *MediaLocation) ValidateCreate() (admission.Warnings, error) {
 	return ml.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (ml *MediaLocation) ValidateUpdate(old runtime.Object) error {
+func (ml *MediaLocation) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldML, ok := old.(*MediaLocation)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a MediaLocation but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaLocation but got a %T", old))
 	}
 	return ml.validate(oldML)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (ml *MediaLocation) ValidateDelete() error {
-	return nil
+func (ml *MediaLocation) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (ml *MediaLocation) validate(old *MediaLocation) error {
+func (ml *MediaLocation) validate(old *MediaLocation) (admission.Warnings, error) {
 	var allErrs field.ErrorList
 	specPath := field.NewPath("spec")
 
@@ -94,7 +95,7 @@ func (ml *MediaLocation) validate(old *MediaLocation) error {
 	}
 
 	if len(allErrs) == 0 {
-		return nil
+		return nil, nil
 	}
-	return apierrors.NewInvalid(GroupVersion.WithKind("MediaLocation").GroupKind(), ml.Name, allErrs)
+	return nil, apierrors.NewInvalid(GroupVersion.WithKind("MediaLocation").GroupKind(), ml.Name, allErrs)
 }

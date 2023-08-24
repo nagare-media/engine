@@ -1,7 +1,6 @@
-componentConfig: true
 domain: engine.nagare.media
 layout:
-- go.kubebuilder.io/v3
+- go.kubebuilder.io/v4
 projectName: nagare-media-engine
 repo: github.com/nagare-media/engine
 resources:

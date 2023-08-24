@@ -29,7 +29,7 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/pkg/apis/functions"
@@ -55,8 +55,8 @@ func (s *workflowService) wddToWorkflow(nbmpWf *nbmpv2.Workflow) (*enginev1.Work
 		},
 		Spec: enginev1.WorkflowSpec{
 			HumanReadable: &enginev1.HumanReadableWorkflowDescription{
-				Name:        pointer.String(strings.Clone(nbmpWf.General.Name)),
-				Description: pointer.String(strings.Clone(nbmpWf.General.Description)),
+				Name:        ptr.To[string](strings.Clone(nbmpWf.General.Name)),
+				Description: ptr.To[string](strings.Clone(nbmpWf.General.Description)),
 			},
 		},
 	}
@@ -351,8 +351,8 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 			},
 			Spec: enginev1.TaskSpec{
 				HumanReadable: &enginev1.HumanReadableTaskDescription{
-					Name:        pointer.String(strings.Clone(fr.General.Name)),
-					Description: pointer.String(strings.Clone(fr.General.Description)),
+					Name:        ptr.To[string](strings.Clone(fr.General.Name)),
+					Description: ptr.To[string](strings.Clone(fr.General.Description)),
 				},
 				MediaProcessingEntitySelector: mpeSel,
 				WorkflowRef:                   meta.LocalObjectReference{Name: wf.Name},

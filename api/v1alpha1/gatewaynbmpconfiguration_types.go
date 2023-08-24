@@ -23,7 +23,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	"github.com/nagare-media/engine/pkg/apis/resources"
 )
@@ -79,23 +79,23 @@ func init() {
 
 func (c *GatewayNBMPConfiguration) Default() {
 	if c.Webserver.BindAddress == nil {
-		c.Webserver.BindAddress = pointer.String(":8080")
+		c.Webserver.BindAddress = ptr.To[string](":8080")
 	}
 
 	if c.Webserver.ReadTimeout == nil {
-		c.Webserver.ReadTimeout = pointer.Duration(time.Minute)
+		c.Webserver.ReadTimeout = ptr.To[time.Duration](time.Minute)
 	}
 
 	if c.Webserver.WriteTimeout == nil {
-		c.Webserver.WriteTimeout = pointer.Duration(time.Minute)
+		c.Webserver.WriteTimeout = ptr.To[time.Duration](time.Minute)
 	}
 
 	if c.Webserver.IdleTimeout == nil {
-		c.Webserver.IdleTimeout = pointer.Duration(time.Minute)
+		c.Webserver.IdleTimeout = ptr.To[time.Duration](time.Minute)
 	}
 
 	if c.Webserver.Network == nil {
-		c.Webserver.Network = pointer.String("tcp")
+		c.Webserver.Network = ptr.To[string]("tcp")
 	}
 
 	if c.Services.DefaultKubernetesGPUResource == "" {

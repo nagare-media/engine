@@ -32,6 +32,7 @@ type ControllerManagerConfiguration struct {
 	metav1.TypeMeta `json:",inline"`
 
 	// ControllerManagerConfigurationSpec returns the configurations for controllers
+	// TODO: migrate to custom struct
 	ctrlCfg.ControllerManagerConfigurationSpec `json:",inline"`
 
 	// nagare media eninge specific configuration options

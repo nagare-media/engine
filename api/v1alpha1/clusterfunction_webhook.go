@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (cf *ClusterFunction) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -45,24 +46,24 @@ func (cf *ClusterFunction) Default() {
 var _ webhook.Validator = &ClusterFunction{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (cf *ClusterFunction) ValidateCreate() error {
+func (cf *ClusterFunction) ValidateCreate() (admission.Warnings, error) {
 	return cf.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (cf *ClusterFunction) ValidateUpdate(old runtime.Object) error {
+func (cf *ClusterFunction) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldCF, ok := old.(*ClusterFunction)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterFunction but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterFunction but got a %T", old))
 	}
 	return cf.validate(oldCF)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (cf *ClusterFunction) ValidateDelete() error {
-	return nil
+func (cf *ClusterFunction) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (cf *ClusterFunction) validate(old *ClusterFunction) error {
+func (cf *ClusterFunction) validate(old *ClusterFunction) (admission.Warnings, error) {
 	return (*Function)(cf).validate((*Function)(old))
 }

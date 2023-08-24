@@ -30,7 +30,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -54,8 +54,8 @@ const (
 // TaskReconciler reconciles a Task object
 type TaskReconciler struct {
 	client.Client
-	APIReader      client.Reader
-	readOnlyClient client.Client
+	APIReader         client.Reader
+	readOnlyAPIClient client.Client
 
 	Config                          enginev1.NagareMediaEngineControllerManagerConfiguration
 	Scheme                          *runtime.Scheme
@@ -311,8 +311,8 @@ func (r *TaskReconciler) reconcileWorkflow(ctx context.Context, task *enginev1.T
 		Kind:               wf.GroupVersionKind().Kind,
 		Name:               wf.Name,
 		UID:                wf.UID,
-		Controller:         pointer.Bool(true),
-		BlockOwnerDeletion: pointer.Bool(true),
+		Controller:         ptr.To[bool](true),
+		BlockOwnerDeletion: ptr.To[bool](true),
 	})
 
 	// is Workflow marked for deletion
@@ -492,6 +492,7 @@ func (r *TaskReconciler) reconcileFunction(ctx context.Context, task *enginev1.T
 
 	// 2. FunctionSelector
 	if task.Spec.FunctionSelector != nil {
+		// TODO: sort results by function version number
 		sel, err := metav1.LabelSelectorAsSelector(task.Spec.FunctionSelector)
 		if err != nil {
 			return ctrl.Result{}, err
@@ -845,7 +846,7 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 	}
 
 	// set misc Job properties
-	jobTemplate.Spec.TTLSecondsAfterFinished = pointer.Int32(24 * 60 * 60) // = 1 day // TODO: adopt as config
+	jobTemplate.Spec.TTLSecondsAfterFinished = ptr.To[int32](24 * 60 * 60) // = 1 day // TODO: adopt as config
 
 	// create Job
 	job := &batchv1.Job{
@@ -990,7 +991,7 @@ func (r *TaskReconciler) normalizeStatusReferences(task *enginev1.Task) error {
 
 func (r *TaskReconciler) prepareSecretRefForSecretData(ctx context.Context, ref *meta.ConfigMapOrSecretReference, task *enginev1.Task) error {
 	ref.Namespace = task.Namespace
-	if err := utils.ResolveSecretRefInline(ctx, r.readOnlyClient, ref); err != nil {
+	if err := utils.ResolveSecretRefInline(ctx, r.readOnlyAPIClient, ref); err != nil {
 		return err
 	}
 	ref.SetMarshalOnlyData(true)
@@ -1001,19 +1002,17 @@ func (r *TaskReconciler) prepareSecretRefForSecretData(ctx context.Context, ref 
 // SetupWithManager sets up the controller with the Manager.
 func (r *TaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	// create read-only client
-	r.readOnlyClient = apiclient.NewReadOnlyClient(r.APIReader, r.Scheme, r.Client.RESTMapper())
+	r.readOnlyAPIClient = apiclient.NewReadOnlyClient(r.APIReader, r.Scheme, r.Client.RESTMapper())
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(TaskControllerName).
 		For(&enginev1.Task{}).
-		Watches(&source.Kind{Type: &enginev1.Workflow{}}, handler.EnqueueRequestsFromMapFunc(r.mapWorkflowToTaskRequests)).
-		Watches(&source.Channel{Source: r.JobEventChannel}, &handler.EnqueueRequestForObject{}).
+		Watches(&enginev1.Workflow{}, handler.EnqueueRequestsFromMapFunc(r.mapWorkflowToTaskRequests)).
+		WatchesRawSource(&source.Channel{Source: r.JobEventChannel}, &handler.EnqueueRequestForObject{}).
 		Complete(r)
 }
 
-func (r *TaskReconciler) mapWorkflowToTaskRequests(wf client.Object) []reconcile.Request {
-	ctx := context.Background()
-
+func (r *TaskReconciler) mapWorkflowToTaskRequests(ctx context.Context, wf client.Object) []reconcile.Request {
 	taskList := &enginev1.TaskList{}
 	err := r.List(ctx, taskList, client.MatchingLabels{
 		enginev1.WorkflowNamespaceLabel: wf.GetNamespace(),

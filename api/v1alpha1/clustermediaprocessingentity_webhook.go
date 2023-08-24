@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (cmpe *ClusterMediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -45,24 +46,24 @@ func (cmpe *ClusterMediaProcessingEntity) Default() {
 var _ webhook.Validator = &ClusterMediaProcessingEntity{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (cmpe *ClusterMediaProcessingEntity) ValidateCreate() error {
+func (cmpe *ClusterMediaProcessingEntity) ValidateCreate() (admission.Warnings, error) {
 	return cmpe.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (cmpe *ClusterMediaProcessingEntity) ValidateUpdate(old runtime.Object) error {
+func (cmpe *ClusterMediaProcessingEntity) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldCMPE, ok := old.(*ClusterMediaProcessingEntity)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaProcessingEntity but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaProcessingEntity but got a %T", old))
 	}
 	return cmpe.validate(oldCMPE)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (cmpe *ClusterMediaProcessingEntity) ValidateDelete() error {
-	return nil
+func (cmpe *ClusterMediaProcessingEntity) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (cmpe *ClusterMediaProcessingEntity) validate(old *ClusterMediaProcessingEntity) error {
+func (cmpe *ClusterMediaProcessingEntity) validate(old *ClusterMediaProcessingEntity) (admission.Warnings, error) {
 	return (*MediaProcessingEntity)(cmpe).validate((*MediaProcessingEntity)(old))
 }

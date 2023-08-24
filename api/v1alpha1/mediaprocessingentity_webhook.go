@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (mpe *MediaProcessingEntity) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -44,24 +45,24 @@ func (mpe *MediaProcessingEntity) Default() {
 var _ webhook.Validator = &MediaProcessingEntity{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (mpe *MediaProcessingEntity) ValidateCreate() error {
+func (mpe *MediaProcessingEntity) ValidateCreate() (admission.Warnings, error) {
 	return mpe.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (mpe *MediaProcessingEntity) ValidateUpdate(old runtime.Object) error {
+func (mpe *MediaProcessingEntity) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldMPE, ok := old.(*MediaProcessingEntity)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a MediaProcessingEntity but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaProcessingEntity but got a %T", old))
 	}
 	return mpe.validate(oldMPE)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (mpe *MediaProcessingEntity) ValidateDelete() error {
-	return nil
+func (mpe *MediaProcessingEntity) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (mpe *MediaProcessingEntity) validate(old *MediaProcessingEntity) error {
-	return nil
+func (mpe *MediaProcessingEntity) validate(old *MediaProcessingEntity) (admission.Warnings, error) {
+	return nil, nil
 }

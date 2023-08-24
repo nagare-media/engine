@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (f *Function) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -45,25 +46,25 @@ func (f *Function) Default() {
 var _ webhook.Validator = &Function{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (f *Function) ValidateCreate() error {
+func (f *Function) ValidateCreate() (admission.Warnings, error) {
 	return f.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (f *Function) ValidateUpdate(old runtime.Object) error {
+func (f *Function) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldF, ok := old.(*Function)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a Function but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Function but got a %T", old))
 	}
 	return f.validate(oldF)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (f *Function) ValidateDelete() error {
-	return nil
+func (f *Function) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (f *Function) validate(old *Function) error {
+func (f *Function) validate(old *Function) (admission.Warnings, error) {
 	var allErrs field.ErrorList
 	specPath := field.NewPath("spec")
 
@@ -77,7 +78,7 @@ func (f *Function) validate(old *Function) error {
 	}
 
 	if len(allErrs) == 0 {
-		return nil
+		return nil, nil
 	}
-	return apierrors.NewInvalid(GroupVersion.WithKind("Function").GroupKind(), f.Name, allErrs)
+	return nil, apierrors.NewInvalid(GroupVersion.WithKind("Function").GroupKind(), f.Name, allErrs)
 }

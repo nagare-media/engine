@@ -22,7 +22,9 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
 
 var _ client.Client = &readOnlyClient{}
@@ -76,4 +78,12 @@ func (c *readOnlyClient) Scheme() *runtime.Scheme {
 
 func (c *readOnlyClient) RESTMapper() meta.RESTMapper {
 	return c.restMapper
+}
+
+func (c *readOnlyClient) GroupVersionKindFor(obj runtime.Object) (schema.GroupVersionKind, error) {
+	return apiutil.GVKForObject(obj, c.scheme)
+}
+
+func (c *readOnlyClient) IsObjectNamespaced(obj runtime.Object) (bool, error) {
+	return apiutil.IsObjectNamespaced(obj, c.scheme, c.restMapper)
 }

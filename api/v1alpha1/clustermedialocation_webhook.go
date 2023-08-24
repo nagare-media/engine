@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (cml *ClusterMediaLocation) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -45,24 +46,24 @@ func (cml *ClusterMediaLocation) Default() {
 var _ webhook.Validator = &ClusterMediaLocation{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (cml *ClusterMediaLocation) ValidateCreate() error {
+func (cml *ClusterMediaLocation) ValidateCreate() (admission.Warnings, error) {
 	return cml.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (cml *ClusterMediaLocation) ValidateUpdate(old runtime.Object) error {
+func (cml *ClusterMediaLocation) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldCML, ok := old.(*ClusterMediaLocation)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaLocation but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaLocation but got a %T", old))
 	}
 	return cml.validate(oldCML)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (cml *ClusterMediaLocation) ValidateDelete() error {
-	return nil
+func (cml *ClusterMediaLocation) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (cml *ClusterMediaLocation) validate(old *ClusterMediaLocation) error {
+func (cml *ClusterMediaLocation) validate(old *ClusterMediaLocation) (admission.Warnings, error) {
 	return (*MediaLocation)(cml).validate((*MediaLocation)(old))
 }

@@ -25,16 +25,16 @@ BUILD_DATE     ?= $(shell date -u +"%Y-%m-%dT%TZ")
 IMAGE_REGISTRY ?= $(shell cat build/package/image/IMAGE_REGISTRY)
 IMAGE_TAG      ?= $(VERSION)
 
-TESTENV_K8S_VERSION                   ?= 1.27.0
-TESTENV_INGRESS_NGINX_VERSION         ?= 4.4.0  # Helm chart versions
-TESTENV_CERT_MANAGER_VERSION          ?= 1.10.1 # Helm chart versions
-TESTENV_KUBE_PROMETHEUS_STACK_VERSION ?= 43.2.0 # Helm chart versions
-TESTENV_TEMPO_VERSION                 ?= 0.16.8 # Helm chart versions
-TESTENV_MINIO_VERSION                 ?= 5.0.4  # Helm chart versions
-TESTENV_NATS_VERSION                  ?= 0.19.4 # Helm chart versions
+TESTENV_K8S_VERSION                   ?= 1.28.0
+TESTENV_INGRESS_NGINX_VERSION         ?= 4.7.1  # Helm chart versions
+TESTENV_CERT_MANAGER_VERSION          ?= 1.12.3 # Helm chart versions
+TESTENV_KUBE_PROMETHEUS_STACK_VERSION ?= 48.3.3 # Helm chart versions
+TESTENV_TEMPO_VERSION                 ?= 1.5.1  # Helm chart versions
+TESTENV_MINIO_VERSION                 ?= 5.0.13 # Helm chart versions
+TESTENV_NATS_VERSION                  ?= 1.0.2  # Helm chart versions
 
-KUSTOMIZE_VERSION        ?= v3.10.0
-CONTROLLER_TOOLS_VERSION ?= v0.11.3
+KUSTOMIZE_VERSION        ?= v5.1.1
+CONTROLLER_TOOLS_VERSION ?= v0.13.0
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 
 # Do not change

@@ -2,16 +2,16 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: controller-manager-metrics
-  namespace: system
   labels:
     control-plane: controller-manager
     app.kubernetes.io/name: servicemonitor
-    app.kubernetes.io/instance: controller-manager-metrics
+    app.kubernetes.io/instance: controller-manager-metrics-monitor
     app.kubernetes.io/component: metrics
     app.kubernetes.io/created-by: nagare-media-engine
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/managed-by: kustomize
+  name: controller-manager-metrics-monitor
+  namespace: system
 spec:
   endpoints:
     - path: /metrics

@@ -1,6 +1,7 @@
+replicas: 1
+
 tempo:
   multitenancyEnabled: false
-  searchEnabled: true
   reportingEnabled: false
   retention: 72h
   storage:

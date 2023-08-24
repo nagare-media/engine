@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (ctt *ClusterTaskTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -45,24 +46,24 @@ func (ctt *ClusterTaskTemplate) Default() {
 var _ webhook.Validator = &ClusterTaskTemplate{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (ctt *ClusterTaskTemplate) ValidateCreate() error {
+func (ctt *ClusterTaskTemplate) ValidateCreate() (admission.Warnings, error) {
 	return ctt.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (ctt *ClusterTaskTemplate) ValidateUpdate(old runtime.Object) error {
+func (ctt *ClusterTaskTemplate) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldCTT, ok := old.(*ClusterTaskTemplate)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterTaskTemplate but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterTaskTemplate but got a %T", old))
 	}
 	return ctt.validate(oldCTT)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (ctt *ClusterTaskTemplate) ValidateDelete() error {
-	return nil
+func (ctt *ClusterTaskTemplate) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (ctt *ClusterTaskTemplate) validate(old *ClusterTaskTemplate) error {
+func (ctt *ClusterTaskTemplate) validate(old *ClusterTaskTemplate) (admission.Warnings, error) {
 	return (*TaskTemplate)(ctt).validate((*TaskTemplate)(old))
 }

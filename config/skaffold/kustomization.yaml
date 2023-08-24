@@ -6,9 +6,9 @@ bases:
 resources:
 - gateway-nbmp_ingress.yaml
 
-patchesStrategicMerge:
-- patches/manager.yaml
-- patches/gateway-nbmp.yaml
+patches:
+- path: patches/manager.yaml
+- path: patches/gateway-nbmp.yaml
 
 generatorOptions:
   disableNameSuffixHash: true

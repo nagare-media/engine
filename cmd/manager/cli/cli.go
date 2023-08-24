@@ -82,6 +82,7 @@ func Execute() error {
 	ctrlConfig := enginev1.ControllerManagerConfiguration{}
 	options := ctrl.Options{Scheme: scheme}
 	if configFile != "" {
+		// TODO: migrate to custom configuration logic
 		options, err = options.AndFrom(ctrl.ConfigFile().AtPath(configFile).OfKind(&ctrlConfig))
 		if err != nil {
 			setupLog.Error(err, "unable to load the config file")

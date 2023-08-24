@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 func (t *Task) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -44,24 +45,24 @@ func (t *Task) Default() {
 var _ webhook.Validator = &Task{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (t *Task) ValidateCreate() error {
+func (t *Task) ValidateCreate() (admission.Warnings, error) {
 	return t.validate(nil)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (t *Task) ValidateUpdate(old runtime.Object) error {
+func (t *Task) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	oldT, ok := old.(*Task)
 	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a Task but got a %T", old))
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Task but got a %T", old))
 	}
 	return t.validate(oldT)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (t *Task) ValidateDelete() error {
-	return nil
+func (t *Task) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
-func (t *Task) validate(old *Task) error {
-	return nil
+func (t *Task) validate(old *Task) (admission.Warnings, error) {
+	return nil, nil
 }
