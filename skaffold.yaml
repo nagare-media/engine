@@ -1,10 +1,11 @@
-apiVersion: skaffold/v4beta1
+apiVersion: skaffold/v4beta6
 kind: Config
 metadata:
   name: nagare-media-engine
 build:
   artifacts:
     - image: ghcr.io/nagare-media/engine/controller
+      runtimeType: go
       context: .
       docker:
         dockerfile: build/package/image/controller/Dockerfile.generic.generic
@@ -20,6 +21,7 @@ build:
           GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
           VERSION: "{{ .VERSION }}"
     - image: ghcr.io/nagare-media/engine/gateway-nbmp
+      runtimeType: go
       context: .
       docker:
         dockerfile: build/package/image/gateway-nbmp/Dockerfile.generic.generic
