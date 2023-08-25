@@ -1,7 +1,7 @@
 namespace: nagare-media-engine-system
 
 bases:
-- ../default
+- ../output-default
 
 resources:
 - gateway-nbmp_ingress.yaml

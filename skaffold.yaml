@@ -43,7 +43,7 @@ build:
 manifests:
   kustomize:
     paths:
-      - config/skaffold
+      - config/output-skaffold
 deploy:
   kubeContext: kind-nagare-media-mgmt
   kubectl:

@@ -22,4 +22,4 @@
 
 mkdir -p out
 
-"${KUSTOMIZE}" build config/default > out/deploy.yaml
+"${KUSTOMIZE}" build config/output-default > out/deploy.yaml
