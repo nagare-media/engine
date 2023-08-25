@@ -33,8 +33,9 @@ TESTENV_TEMPO_VERSION                 ?= 1.5.1  # Helm chart versions
 TESTENV_MINIO_VERSION                 ?= 5.0.13 # Helm chart versions
 TESTENV_NATS_VERSION                  ?= 1.0.2  # Helm chart versions
 
-KUSTOMIZE_VERSION        ?= v5.1.1
 CONTROLLER_TOOLS_VERSION ?= v0.13.0
+KUSTOMIZE_VERSION        ?= v5.1.1
+YQ_VERSION               ?= v4.35.1
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 
 # Do not change
@@ -87,8 +88,9 @@ info: ## Print options
 	@printf "  \033[36m%-40s\033[0m %s\n"   "TESTENV_NATS_VERSION"                  "$(TESTENV_NATS_VERSION)"
 	@printf "\n"
 	@printf "\033[1m%s\033[0m\n"          "Build Dependencies"
-	@printf "  \033[36m%-25s\033[0m %s\n"   "KUSTOMIZE_VERSION"             "$(KUSTOMIZE_VERSION)"
 	@printf "  \033[36m%-25s\033[0m %s\n"   "CONTROLLER_TOOLS_VERSION"      "$(CONTROLLER_TOOLS_VERSION)"
+	@printf "  \033[36m%-25s\033[0m %s\n"   "KUSTOMIZE_VERSION"             "$(KUSTOMIZE_VERSION)"
+	@printf "  \033[36m%-25s\033[0m %s\n"   "YQ_VERSION"                    "$(YQ_VERSION)"
 
 ##@ Development
 
@@ -167,16 +169,21 @@ build-%: generate-modules generate-go-deepcopy fmt vet
 	scripts/exec-local build
 
 .PHONY: output
-output: output-crds output-deployment ## Output all
+output: output-all output-crds output-deployment ## Generate all outputs
+
+.PHONY: output-all
+output-all: kustomize generate-manifests ## Output all manifests
+	@	KUSTOMIZE=$(KUSTOMIZE) \
+	scripts/exec-local output-all
 
 .PHONY: output-crds
-output-crds: kustomize generate-manifests ## Output CRDs
-	@	KUSTOMIZE=$(KUSTOMIZE) \
+output-crds: yq output-all ## Output CRD manifests
+	@	YQ=$(YQ) \
 	scripts/exec-local output-crds
 
 .PHONY: output-deployment
-output-deployment: kustomize generate-manifests ## Output deployment manifests
-	@	KUSTOMIZE=$(KUSTOMIZE) \
+output-deployment: yq output-all ## Output deployment manifests
+	@	YQ=$(YQ) \
 	scripts/exec-local output-deployment
 
 .PHONY: clean
@@ -224,22 +231,13 @@ undeploy: output-deployment ## Undeploy application
 ##@ Build Dependencies
 
 LOCALBIN       ?= $(shell pwd)/tmp
-KUSTOMIZE      ?= $(LOCALBIN)/kustomize
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST        ?= $(LOCALBIN)/setup-envtest
+KUSTOMIZE      ?= $(LOCALBIN)/kustomize
+YQ             ?= $(LOCALBIN)/yq
 
 $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
-
-.PHONY: kustomize
-kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary
-$(KUSTOMIZE): $(LOCALBIN)
-	@if test -x $(LOCALBIN)/kustomize && ! $(LOCALBIN)/kustomize version | grep -q $(KUSTOMIZE_VERSION); then \
-		echo "$(LOCALBIN)/kustomize version is not expected $(KUSTOMIZE_VERSION). Removing it before installing."; \
-		rm -rf $(LOCALBIN)/kustomize; \
-	fi
-	@  test -s $(LOCALBIN)/kustomize \
-	|| { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) $(LOCALBIN); }
 
 .PHONY: controller-gen
 controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary
@@ -253,3 +251,20 @@ envtest: $(ENVTEST) ## Download envtest-setup locally if necessary
 $(ENVTEST): $(LOCALBIN)
 	@  test -s $(LOCALBIN)/setup-envtest \
 	|| GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+
+.PHONY: kustomize
+kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary
+$(KUSTOMIZE): $(LOCALBIN)
+	@if test -x $(LOCALBIN)/kustomize && ! $(LOCALBIN)/kustomize version | grep -q $(KUSTOMIZE_VERSION); then \
+		echo "$(LOCALBIN)/kustomize version is not expected $(KUSTOMIZE_VERSION). Removing it before installing."; \
+		rm -rf $(LOCALBIN)/kustomize; \
+	fi
+	@  test -s $(LOCALBIN)/kustomize \
+	|| { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) $(LOCALBIN); }
+
+.PHONY: yq
+yq: $(YQ) ## Download yq locally if necessary
+$(YQ): $(LOCALBIN)
+	@  test -s $(LOCALBIN)/yq \
+	&& $(LOCALBIN)/yq --version | grep -q $(YQ_VERSION) \
+	|| GOBIN=$(LOCALBIN) go install github.com/mikefarah/yq/v4@$(YQ_VERSION)

@@ -16,8 +16,10 @@
 
 # Validation
 
-[ -n "${YQ}" ] || fatal "mandatory variable \$YQ is empty"
+[ -n "${KUSTOMIZE}" ] || fatal "mandatory variable \$KUSTOMIZE is empty"
 
 # Main
 
-"${YQ}" -M '. | select(.kind == "CustomResourceDefinition")' < out/all.yaml > out/crds.yaml
+mkdir -p out
+
+"${KUSTOMIZE}" build config/output-all > out/all.yaml
