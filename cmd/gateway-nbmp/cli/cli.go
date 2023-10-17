@@ -112,7 +112,10 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return nil
 	}
 
-	l := zap.New(zap.UseFlagOptions(&logOpts)).WithName("engine")
+	l := zap.New(zap.UseFlagOptions(&logOpts)).
+		WithName("nagare-media").
+		WithName("engine").
+		WithName("gateway-nbmp")
 	ctx = log.IntoContext(ctx, l)
 	log.SetLogger(l)
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420

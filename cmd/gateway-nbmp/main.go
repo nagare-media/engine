@@ -27,7 +27,10 @@ import (
 
 func main() {
 	ctx := signals.SetupSignalHandler()
-	log.IntoContext(ctx, log.Log.WithName("engine"))
+	log.IntoContext(ctx, log.Log.
+		WithName("nagare-media").
+		WithName("engine").
+		WithName("gateway-nbmp"))
 
 	c := cli.New()
 	if err := c.Execute(ctx, os.Args[1:]); err != nil {

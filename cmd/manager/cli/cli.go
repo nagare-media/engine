@@ -74,7 +74,10 @@ func Execute() error {
 
 	flag.Parse()
 
-	l := zap.New(zap.UseFlagOptions(&logOpts))
+	l := zap.New(zap.UseFlagOptions(&logOpts)).
+		WithName("nagare-media").
+		WithName("engine").
+		WithName("manager")
 	ctrl.SetLogger(l)
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
