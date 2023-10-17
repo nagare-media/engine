@@ -21,7 +21,7 @@ ARG OS \
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/app/tmp \
-    make build-gateway-nbmp \
+    make build-workflow-opentelemetry-adapter \
       "OS=${OS}" \
       "ARCH=${ARCH}" \
       "VERSION=${VERSION}" \
@@ -42,7 +42,7 @@ ARG OS \
 LABEL maintainer="Matthias Neugebauer <mtneug@mailbox.org>" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.authors="Matthias Neugebauer <mtneug@mailbox.org>" \
-      org.opencontainers.image.url="ghcr.io/nagare-media/engine/gateway-nbmp" \
+      org.opencontainers.image.url="ghcr.io/nagare-media/engine/workflow-opentelemetry-adapter" \
       org.opencontainers.image.documentation="https://nagare.media" \
       org.opencontainers.image.source="https://github.com/nagare-media/engine" \
       org.opencontainers.image.version="${VERSION}" \
@@ -54,10 +54,7 @@ LABEL maintainer="Matthias Neugebauer <mtneug@mailbox.org>" \
       org.opencontainers.image.base.name="gcr.io/distroless/static:latest"
 
 WORKDIR /
-COPY --from=build "/app/bin/gateway-nbmp-${VERSION}-${OS}-${ARCH}" /gateway-nbmp
+COPY --from=build "/app/bin/workflow-opentelemetry-adapter-${VERSION}-${OS}-${ARCH}" /workflow-opentelemetry-adapter
 USER 65532:65532
 
-# NBMP Workflow API
-EXPOSE 8080
-
-ENTRYPOINT [ "/gateway-nbmp" ]
+ENTRYPOINT [ "/workflow-opentelemetry-adapter" ]

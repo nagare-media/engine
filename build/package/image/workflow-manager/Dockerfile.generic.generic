@@ -64,4 +64,4 @@ EXPOSE 8081
 # webhooks
 EXPOSE 9443
 
-CMD [ "/workflow-manager" ]
+ENTRYPOINT [ "/workflow-manager" ]

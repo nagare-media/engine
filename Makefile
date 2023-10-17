@@ -155,8 +155,13 @@ skaffold-debug: ## Execute skaffold debug pipeline against kind test cluster
 .PHONY: build
 build: $(addprefix build-, $(CMDS)) ## Build all binaries
 
-## build-manager:      ## Build controller manager binary
-## build-gateway-nbmp: ## Build NBMP gateway binary
+## build-functions:                      ## Build functinos binary
+## build-gateway-nbmp:                   ## Build NBMP gateway binary 
+## build-task-shim:                      ## Build task shim binary
+## build-workflow-manager:               ## Build workflow manager binary
+## build-workflow-manager-helper:        ## Build workflow manager helper binary
+## build-workflow-opentelemetry-adapter: ## Build workflow OpenTelemetry adapter binary
+## build-workflow-vacuum:                ## Build workflow vacuum binary
 build-%: generate-modules generate-go-deepcopy fmt vet
 	@	CMD="$*" \
 		PKG="$(PKG)" \
@@ -195,8 +200,12 @@ clean: ## Cleanup build output
 .PHONY: image
 image: $(addprefix image-, $(IMAGES)) ## Build all container images
 
-## image-controller:   ## Build controller manager container image
-## image-gateway-nbmp: ## Build NBMP gateway container image
+## image-function-noop:                  ## Build noop function container image
+## image-gateway-nbmp:                   ## Build NBMP gateway container image
+## image-workflow-manager:               ## Build workflow manager container image
+## image-workflow-manager-helper:        ## Build workflow manager helper container image
+## image-workflow-opentelemetry-adapter: ## Build workflow OpenTelemetry adapter container image
+## image-workflow-vacuum:                ## Build workflow vacuum container image
 image-%:
 	@	IMAGE="$*" \
 		IMAGE_REGISTRY="$(IMAGE_REGISTRY)" \
