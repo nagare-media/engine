@@ -28,8 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
       "GIT_COMMIT=${GIT_COMMIT}" \
       "GIT_TREE_STATE=${GIT_TREE_STATE}" \
       "BUILD_DATE=${BUILD_DATE}" \
-    \
-    make build-functions \
+ && make build-functions \
       "OS=${OS}" \
       "ARCH=${ARCH}" \
       "VERSION=${VERSION}" \
