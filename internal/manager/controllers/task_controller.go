@@ -444,7 +444,7 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 
 	// 4. default MediaProcessingEntity
 	mpeObj, err := utils.GetAnnotatedObject(ctx, r.Client, &enginev1.MediaProcessingEntity{},
-		enginev1.BetaIsDefaultStepMediaLocationAnnotation, "true", client.InNamespace(task.Namespace))
+		enginev1.BetaIsDefaultMediaProcessingEntityAnnotation, "true", client.InNamespace(task.Namespace))
 	if !apierrors.IsNotFound(err) {
 		if err != nil {
 			return ctrl.Result{}, err
@@ -458,7 +458,7 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 
 	// 5. default ClusterMediaProcessingEntity
 	cmpeObj, err := utils.GetAnnotatedObject(ctx, r.Client, &enginev1.ClusterMediaProcessingEntity{},
-		enginev1.BetaIsDefaultStepMediaLocationAnnotation, "true")
+		enginev1.BetaIsDefaultMediaProcessingEntityAnnotation, "true")
 	if !apierrors.IsNotFound(err) {
 		if err != nil {
 			return ctrl.Result{}, err
