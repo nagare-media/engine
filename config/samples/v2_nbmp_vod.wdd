@@ -92,7 +92,7 @@
     "image": [],
     "connection-map": [
       {
-        "connection-id": "transcode-1080p -\u003e package-cmaf-hls",
+        "connection-id": "transcode-1080p -> package-cmaf-hls",
         "from": {
           "id": "transcode-function",
           "instance": "transcode-1080p",
@@ -107,7 +107,7 @@
         "breakable": true
       },
       {
-        "connection-id": "transcode-720p -\u003e package-cmaf-hls",
+        "connection-id": "transcode-720p -> package-cmaf-hls",
         "from": {
           "id": "transcode-function",
           "instance": "transcode-720p",
@@ -122,7 +122,7 @@
         "breakable": true
       },
       {
-        "connection-id": "transcode-audio -\u003e package-cmaf-hls",
+        "connection-id": "transcode-audio -> package-cmaf-hls",
         "from": {
           "id": "transcode-function",
           "instance": "transcode-audio",
