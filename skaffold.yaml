@@ -4,11 +4,11 @@ metadata:
   name: nagare-media-engine
 build:
   artifacts:
-    - image: ghcr.io/nagare-media/engine/controller
+    - image: ghcr.io/nagare-media/engine/workflow-manager
       runtimeType: go
       context: .
       docker:
-        dockerfile: build/package/image/controller/Dockerfile.generic.generic
+        dockerfile: build/package/image/workflow-manager/Dockerfile.generic.generic
         pullParent: false
         noCache: false
         squash: false

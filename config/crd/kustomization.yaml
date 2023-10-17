@@ -2,45 +2,45 @@
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/output-*
 resources:
-- bases/engine.nagare.media_clusterfunctions.yaml
-- bases/engine.nagare.media_clustermedialocations.yaml
-- bases/engine.nagare.media_clustermediaprocessingentities.yaml
-- bases/engine.nagare.media_clustertasktemplates.yaml
-- bases/engine.nagare.media_functions.yaml
-- bases/engine.nagare.media_medialocations.yaml
-- bases/engine.nagare.media_mediaprocessingentities.yaml
-- bases/engine.nagare.media_tasks.yaml
-- bases/engine.nagare.media_tasktemplates.yaml
-- bases/engine.nagare.media_workflows.yaml
-#+kubebuilder:scaffold:crdkustomizeresource
+  - bases/engine.nagare.media_clusterfunctions.yaml
+  - bases/engine.nagare.media_clustermedialocations.yaml
+  - bases/engine.nagare.media_clustermediaprocessingentities.yaml
+  - bases/engine.nagare.media_clustertasktemplates.yaml
+  - bases/engine.nagare.media_functions.yaml
+  - bases/engine.nagare.media_medialocations.yaml
+  - bases/engine.nagare.media_mediaprocessingentities.yaml
+  - bases/engine.nagare.media_tasks.yaml
+  - bases/engine.nagare.media_tasktemplates.yaml
+  - bases/engine.nagare.media_workflows.yaml
+  #+kubebuilder:scaffold:crdkustomizeresource
 
 patches:
-# patches here are for enabling the conversion webhook for each CRD
-- path: patches/webhook_in_clusterfunctions.yaml
-- path: patches/webhook_in_clustermedialocations.yaml
-- path: patches/webhook_in_clustermediaprocessingentities.yaml
-- path: patches/webhook_in_clustertasktemplates.yaml
-- path: patches/webhook_in_functions.yaml
-- path: patches/webhook_in_medialocations.yaml
-- path: patches/webhook_in_mediaprocessingentities.yaml
-- path: patches/webhook_in_tasks.yaml
-- path: patches/webhook_in_tasktemplates.yaml
-- path: patches/webhook_in_workflows.yaml
-#+kubebuilder:scaffold:crdkustomizewebhookpatch
+  # patches here are for enabling the conversion webhook for each CRD
+  - path: patches/webhook_in_clusterfunctions.yaml
+  - path: patches/webhook_in_clustermedialocations.yaml
+  - path: patches/webhook_in_clustermediaprocessingentities.yaml
+  - path: patches/webhook_in_clustertasktemplates.yaml
+  - path: patches/webhook_in_functions.yaml
+  - path: patches/webhook_in_medialocations.yaml
+  - path: patches/webhook_in_mediaprocessingentities.yaml
+  - path: patches/webhook_in_tasks.yaml
+  - path: patches/webhook_in_tasktemplates.yaml
+  - path: patches/webhook_in_workflows.yaml
+  #+kubebuilder:scaffold:crdkustomizewebhookpatch
 
-# patches here are for enabling the CA injection for each CRD
-- path: patches/cainjection_in_clusterfunctions.yaml
-- path: patches/cainjection_in_clustermedialocations.yaml
-- path: patches/cainjection_in_clustermediaprocessingentities.yaml
-- path: patches/cainjection_in_clustertasktemplates.yaml
-- path: patches/cainjection_in_functions.yaml
-- path: patches/cainjection_in_medialocations.yaml
-- path: patches/cainjection_in_mediaprocessingentities.yaml
-- path: patches/cainjection_in_tasks.yaml
-- path: patches/cainjection_in_tasktemplates.yaml
-- path: patches/cainjection_in_workflows.yaml
-#+kubebuilder:scaffold:crdkustomizecainjectionpatch
+  # patches here are for enabling the CA injection for each CRD
+  - path: patches/cainjection_in_clusterfunctions.yaml
+  - path: patches/cainjection_in_clustermedialocations.yaml
+  - path: patches/cainjection_in_clustermediaprocessingentities.yaml
+  - path: patches/cainjection_in_clustertasktemplates.yaml
+  - path: patches/cainjection_in_functions.yaml
+  - path: patches/cainjection_in_medialocations.yaml
+  - path: patches/cainjection_in_mediaprocessingentities.yaml
+  - path: patches/cainjection_in_tasks.yaml
+  - path: patches/cainjection_in_tasktemplates.yaml
+  - path: patches/cainjection_in_workflows.yaml
+  #+kubebuilder:scaffold:crdkustomizecainjectionpatch
 
 # the following config is for teaching kustomize how to do kustomization for CRDs.
 configurations:
-- kustomizeconfig.yaml
+  - kustomizeconfig.yaml

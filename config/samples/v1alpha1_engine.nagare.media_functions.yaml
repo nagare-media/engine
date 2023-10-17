@@ -1,13 +1,13 @@
 apiVersion: engine.nagare.media/v1alpha1
 kind: Function
 metadata:
-  name: sleep-0.1.0
   labels:
     app.kubernetes.io/name: function
     app.kubernetes.io/instance: sleep
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/created-by: nagare-media-engine
     beta.engine.nagare.media/function-type: example
+  name: sleep-0.1.0
 spec:
   version: 0.1.0+example
   template:

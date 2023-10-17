@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway-nbmp
+  name: workflow-manager
   namespace: system
 spec:
   template:
@@ -9,9 +9,9 @@ spec:
       securityContext:
         runAsNonRoot: false
       containers:
-        - name: gateway-nbmp
+        - name: workflow-manager
           args:
-            - "--config=/config/gateway-nbmp.yaml"
+            - "--config=/config/workflow-manager.yaml"
             - "--zap-devel"
             - "--zap-stacktrace-level=panic"
             - "--zap-log-level=info"

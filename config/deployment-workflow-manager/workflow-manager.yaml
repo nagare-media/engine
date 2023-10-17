@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: deployment
+    app.kubernetes.io/instance: workflow-manager
+    app.kubernetes.io/component: workflow-manager
+    app.kubernetes.io/created-by: nagare-media-engine
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/managed-by: kustomize
+  name: workflow-manager
+  namespace: system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: workflow-manager
+      app.kubernetes.io/component: workflow-manager
+      app.kubernetes.io/part-of: nagare-media-engine
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: workflow-manager
+      labels:
+        app.kubernetes.io/instance: workflow-manager
+        app.kubernetes.io/component: workflow-manager
+        app.kubernetes.io/part-of: nagare-media-engine
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - arm
+                      - arm64
+                      - ppc64le
+                      - s390x
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: workflow-manager
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: workflow-manager
+          image: ghcr.io/nagare-media/engine/workflow-manager:dev
+          command:
+            - /workflow-manager
+          args:
+            - "--config=/config/workflow-manager.yaml"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - "ALL"
+          ports:
+            - name: http-metrics
+              containerPort: 8080
+            - name: http-healthz
+              containerPort: 8081
+            - name: http-webhooks
+              containerPort: 9443
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http-healthz
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http-healthz
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          # TODO: define default resource allocations
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          volumeMounts:
+            - name: workflow-manager-config
+              mountPath: /config
+              readOnly: true
+            - name: cert-workflow-manager-webhook
+              mountPath: /tmp/k8s-webhook-server/serving-certs
+              readOnly: true
+      volumes:
+        - name: workflow-manager-config
+          secret:
+            name: workflow-manager-config
+            defaultMode: 420
+        - name: cert-workflow-manager-webhook
+          secret:
+            secretName: cert-workflow-manager-webhook
+            defaultMode: 420

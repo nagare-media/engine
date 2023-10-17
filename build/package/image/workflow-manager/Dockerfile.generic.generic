@@ -1,0 +1,67 @@
+ARG GOVERSION
+FROM --platform=${BUILDPLATFORM} docker.io/golang:${GOVERSION} AS build
+
+ARG SKAFFOLD_GO_GCFLAGS=""
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    go mod download
+COPY . .
+
+# BUILD_DATE changes ofter so move this section down to allow for caching
+ARG OS \
+    ARCH \
+    VERSION \
+    GIT_COMMIT \
+    GIT_TREE_STATE \
+    BUILD_DATE
+
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/app/tmp \
+    make build-workflow-manager \
+      "OS=${OS}" \
+      "ARCH=${ARCH}" \
+      "VERSION=${VERSION}" \
+      "GIT_COMMIT=${GIT_COMMIT}" \
+      "GIT_TREE_STATE=${GIT_TREE_STATE}" \
+      "BUILD_DATE=${BUILD_DATE}"
+
+FROM gcr.io/distroless/static:latest
+
+ENV GOTRACEBACK=all
+
+ARG OS \
+    ARCH \
+    VERSION \
+    GIT_COMMIT \
+    BUILD_DATE
+
+LABEL maintainer="Matthias Neugebauer <mtneug@mailbox.org>" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.authors="Matthias Neugebauer <mtneug@mailbox.org>" \
+      org.opencontainers.image.url="ghcr.io/nagare-media/engine/workflow-manager" \
+      org.opencontainers.image.documentation="https://nagare.media" \
+      org.opencontainers.image.source="https://github.com/nagare-media/engine" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      org.opencontainers.image.vendor="nagare media" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.title="nagare media engine" \
+      org.opencontainers.image.description="nagare media engine — an open source modern cloud- and edge-native media workflow system running on Kubernetes" \
+      org.opencontainers.image.base.name="gcr.io/distroless/static:latest"
+
+WORKDIR /
+COPY --from=build "/app/bin/workflow-manager-${VERSION}-${OS}-${ARCH}" /workflow-manager
+USER 65532:65532
+
+# metrics
+EXPOSE 8080
+# health probe
+EXPOSE 8081
+# webhooks
+EXPOSE 9443
+
+CMD [ "/workflow-manager" ]

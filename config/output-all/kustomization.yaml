@@ -1,128 +1,112 @@
-# Adds namespace to all resources.
 namespace: nagare-media-engine-system
 
-# Value of this field is prepended to the
-# names of all resources, e.g. a deployment named
-# "wordpress" becomes "alices-wordpress".
-# Note that it should also match with the prefix (text before '-') of the namespace
-# field above.
-namePrefix: nagare-media-engine-
-
-# Labels to add to all resources and selectors.
-#labels:
-#- includeSelectors: true
-#  pairs:
-#    someName: someValue
-
 resources:
-- namespace.yaml
-- ../crd
-- ../rbac
-- ../manager
-- ../gateway-nbmp
-- ../webhook
-- ../certmanager
-- ../prometheus
-
-patches:
-- path: patches/manager_webhook.yaml
-- path: patches/webhookcainjection_mutating.yaml
-- path: patches/webhookcainjection_validating.yaml
+  - namespace.yaml
+  - ../crd
+  - ../rbac
+  - ../certmanager
+  - ../deployment-gateway-nbmp
+  - ../deployment-workflow-manager
 
 replacements:
- - source: # Add cert-manager annotation to ValidatingWebhookConfiguration, MutatingWebhookConfiguration and CRDs
-     kind: Certificate
-     group: cert-manager.io
-     version: v1
-     name: serving-cert # this name should match the one in certificate.yaml
-     fieldPath: .metadata.namespace # namespace of the certificate CR
-   targets:
-     - select:
-         kind: ValidatingWebhookConfiguration
-       fieldPaths:
-         - .metadata.annotations.[cert-manager.io/inject-ca-from]
-       options:
-         delimiter: '/'
-         index: 0
-         create: true
-     - select:
-         kind: MutatingWebhookConfiguration
-       fieldPaths:
-         - .metadata.annotations.[cert-manager.io/inject-ca-from]
-       options:
-         delimiter: '/'
-         index: 0
-         create: true
-     - select:
-         kind: CustomResourceDefinition
-       fieldPaths:
-         - .metadata.annotations.[cert-manager.io/inject-ca-from]
-       options:
-         delimiter: '/'
-         index: 0
-         create: true
- - source:
-     kind: Certificate
-     group: cert-manager.io
-     version: v1
-     name: serving-cert # this name should match the one in certificate.yaml
-     fieldPath: .metadata.name
-   targets:
-     - select:
-         kind: ValidatingWebhookConfiguration
-       fieldPaths:
-         - .metadata.annotations.[cert-manager.io/inject-ca-from]
-       options:
-         delimiter: '/'
-         index: 1
-         create: true
-     - select:
-         kind: MutatingWebhookConfiguration
-       fieldPaths:
-         - .metadata.annotations.[cert-manager.io/inject-ca-from]
-       options:
-         delimiter: '/'
-         index: 1
-         create: true
-     - select:
-         kind: CustomResourceDefinition
-       fieldPaths:
-         - .metadata.annotations.[cert-manager.io/inject-ca-from]
-       options:
-         delimiter: '/'
-         index: 1
-         create: true
- - source: # Add cert-manager annotation to the webhook Service
-     kind: Service
-     version: v1
-     name: webhook-service
-     fieldPath: .metadata.name # namespace of the service
-   targets:
-     - select:
-         kind: Certificate
-         group: cert-manager.io
-         version: v1
-       fieldPaths:
-         - .spec.dnsNames.0
-         - .spec.dnsNames.1
-       options:
-         delimiter: '.'
-         index: 0
-         create: true
- - source:
-     kind: Service
-     version: v1
-     name: webhook-service
-     fieldPath: .metadata.namespace # namespace of the service
-   targets:
-     - select:
-         kind: Certificate
-         group: cert-manager.io
-         version: v1
-       fieldPaths:
-         - .spec.dnsNames.0
-         - .spec.dnsNames.1
-       options:
-         delimiter: '.'
-         index: 1
-         create: true
+  # Add cert-manager annotation to ValidatingWebhookConfiguration, MutatingWebhookConfiguration and CRDs
+  - source:
+      kind: Certificate
+      group: cert-manager.io
+      version: v1
+      name: workflow-manager-webhook
+      fieldPath: .metadata.namespace
+    targets:
+      - select:
+          kind: ValidatingWebhookConfiguration
+        fieldPaths:
+          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+        options:
+          delimiter: "/"
+          index: 0
+          create: true
+      - select:
+          kind: MutatingWebhookConfiguration
+        fieldPaths:
+          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+        options:
+          delimiter: "/"
+          index: 0
+          create: true
+      - select:
+          kind: CustomResourceDefinition
+        fieldPaths:
+          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+        options:
+          delimiter: "/"
+          index: 0
+          create: true
+  - source:
+      kind: Certificate
+      group: cert-manager.io
+      version: v1
+      name: workflow-manager-webhook
+      fieldPath: .metadata.name
+    targets:
+      - select:
+          kind: ValidatingWebhookConfiguration
+        fieldPaths:
+          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+        options:
+          delimiter: "/"
+          index: 1
+          create: true
+      - select:
+          kind: MutatingWebhookConfiguration
+        fieldPaths:
+          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+        options:
+          delimiter: "/"
+          index: 1
+          create: true
+      - select:
+          kind: CustomResourceDefinition
+        fieldPaths:
+          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+        options:
+          delimiter: "/"
+          index: 1
+          create: true
+
+  # Add DNS names to webhook certificate
+  - source:
+      kind: Service
+      version: v1
+      name: workflow-manager
+      fieldPath: .metadata.name
+    targets:
+      - select:
+          group: cert-manager.io
+          version: v1
+          kind: Certificate
+          name: workflow-manager-webhook
+        fieldPaths:
+          - .spec.dnsNames.0
+          - .spec.dnsNames.1
+        options:
+          delimiter: "."
+          index: 0
+          create: true
+  - source:
+      kind: Service
+      version: v1
+      name: workflow-manager
+      fieldPath: .metadata.namespace
+    targets:
+      - select:
+          group: cert-manager.io
+          version: v1
+          kind: Certificate
+          name: workflow-manager-webhook
+        fieldPaths:
+          - .spec.dnsNames.0
+          - .spec.dnsNames.1
+        options:
+          delimiter: "."
+          index: 1
+          create: true

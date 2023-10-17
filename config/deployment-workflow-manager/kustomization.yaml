@@ -1,0 +1,21 @@
+resources:
+  - workflow-manager.yaml
+  - workflow-manager_admission-webhooks-cert.yaml
+  - workflow-manager_admission-webhooks.yaml
+  - workflow-manager_service-monitor.yaml
+  - workflow-manager_service.yaml
+
+patches:
+- path: patches/webhookcainjection_mutating.yaml
+- path: patches/webhookcainjection_validating.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: workflow-manager-config
+    files:
+      - workflow-manager.yaml=workflow-manager_configuration.yaml
+
+configurations:
+  - kustomizeconfig.yaml

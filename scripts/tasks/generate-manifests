@@ -20,15 +20,21 @@
 
 # Main
 
+# CRDs
 "${CONTROLLER_GEN}" \
   paths="./..." \
   crd \
-  webhook \
   output:crd:artifacts:config=config/crd/bases
 
-# Create RBAC roles for each component
+# webhooks
 "${CONTROLLER_GEN}" \
-  paths="./internal/manager/..." \
+  paths="./..." \
+  webhook \
+  output:stdout > config/deployment-workflow-manager/workflow-manager_admission-webhooks.yaml
+
+# RBAC
+"${CONTROLLER_GEN}" \
+  paths="./internal/workflow-manager/..." \
   rbac:roleName=manager \
   output:stdout > config/rbac/role-manager.yaml
 

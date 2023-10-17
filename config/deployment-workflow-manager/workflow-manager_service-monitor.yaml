@@ -1,0 +1,23 @@
+# Prometheus Monitor Service (Metrics)
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: servicemonitor
+    app.kubernetes.io/instance: workflow-manager
+    app.kubernetes.io/component: workflow-manager
+    app.kubernetes.io/created-by: nagare-media-engine
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/managed-by: kustomize
+  name: workflow-manager
+  namespace: system
+spec:
+  endpoints:
+    - path: /metrics
+      port: http-metrics
+      scheme: http
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: workflow-manager
+      app.kubernetes.io/component: workflow-manager
+      app.kubernetes.io/part-of: nagare-media-engine

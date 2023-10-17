@@ -1,0 +1,19 @@
+apiVersion: engine.nagare.media/v1alpha1
+kind: WorkflowManagerConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/name: workflowmanagerconfiguration
+    app.kubernetes.io/instance: workflow-manager-configuration
+    app.kubernetes.io/component: workflow-manager
+    app.kubernetes.io/created-by: nagare-media-engine
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/managed-by: kustomize
+health:
+  healthProbeBindAddress: :8081
+metrics:
+  bindAddress: :8080
+webhook:
+  port: 9443
+leaderElection:
+  leaderElect: true
+  resourceName: a3df9e9e.engine.nagare.media

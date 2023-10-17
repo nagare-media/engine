@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: gateway-nbmp
-  namespace: system
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "999999"
   labels:
     app.kubernetes.io/name: ingress
     app.kubernetes.io/instance: gateway-nbmp
@@ -10,17 +10,17 @@ metadata:
     app.kubernetes.io/created-by: nagare-media-engine
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/managed-by: kustomize
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "999999"
+  name: gateway-nbmp
+  namespace: system
 spec:
   rules:
-  - host: engine.nagare.local.gd
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: gateway-nbmp
-            port:
-              name: http
+    - host: engine.nagare.local.gd
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: gateway-nbmp
+                port:
+                  name: http

@@ -2,14 +2,14 @@
 apiVersion: engine.nagare.media/v1alpha1
 kind: MediaProcessingEntity
 metadata:
-  name: local-cluster
+  annotations:
+    beta.engine.nagare.media/is-default-media-processing-entity: "true"
   labels:
     app.kubernetes.io/name: mediaprocessingentity
     app.kubernetes.io/instance: local-cluster
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/created-by: nagare-media-engine
-  annotations:
-    beta.engine.nagare.media/is-default-media-processing-entity: "true"
+  name: local-cluster
 spec:
   local:
     namespace: default
@@ -17,12 +17,12 @@ spec:
 apiVersion: engine.nagare.media/v1alpha1
 kind: MediaProcessingEntity
 metadata:
-  name: edge-cluster
   labels:
     app.kubernetes.io/name: mediaprocessingentity
     app.kubernetes.io/instance: edge-cluster
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/created-by: nagare-media-engine
+  name: edge-cluster
 spec:
   remote:
     kubeconfig:

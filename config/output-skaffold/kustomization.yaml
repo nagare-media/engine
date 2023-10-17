@@ -1,24 +1,24 @@
 namespace: nagare-media-engine-system
 
 bases:
-- ../output-all
+  - ../output-all
 
 resources:
-- gateway-nbmp_ingress.yaml
+  - gateway-nbmp_ingress.yaml
 
 patches:
-- path: patches/manager.yaml
-- path: patches/gateway-nbmp.yaml
+  - path: patches/gateway-nbmp.yaml
+  - path: patches/workflow-manager.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
 
-configMapGenerator:
-- name: manager-config
-  behavior: replace
-  files:
-  - controller_manager_configuration.yaml
-- name: gateway-nbmp-config
-  behavior: replace
-  files:
-  - gateway-nbmp_configuration.yaml
+secretGenerator:
+  - name: gateway-nbmp-config
+    behavior: replace
+    files:
+      - gateway-nbmp.yaml=gateway-nbmp_configuration.yaml
+  - name: workflow-manager-config
+    behavior: replace
+    files:
+      - workflow-manager.yaml=workflow-manager_configuration.yaml
