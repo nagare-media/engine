@@ -50,7 +50,7 @@ func (wfapi *workflowapi) App() *fiber.App {
 	app.
 		Post("/", wfapi.handleRequest(wfapi.wfsvc.Create)).
 		Patch("/:id", wfapi.handleRequest(wfapi.wfsvc.Update)).
-		Put("/:id", wfapi.handleRequest(wfapi.wfsvc.Update)).
+		Put("/:id", wfapi.handleRequest(wfapi.wfsvc.Update)). // the NBMP standard does not define PUT
 		Delete("/:id", wfapi.handleRequest(wfapi.wfsvc.Delete)).
 		Get("/:id", wfapi.handleRequest(wfapi.wfsvc.Retrieve))
 	return app
