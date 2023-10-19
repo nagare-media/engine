@@ -14,29 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package functions
 
 import (
-	"os"
-	"path/filepath"
-
-	"sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
-
-	"github.com/nagare-media/engine/cmd/functions/cli"
+	"github.com/nagare-media/engine/pkg/nbmp"
+	"github.com/nagare-media/engine/pkg/registry"
 )
 
-func main() {
-	fn := filepath.Base(os.Args[0])
-
-	ctx := signals.SetupSignalHandler()
-	log.IntoContext(ctx, log.Log.
-		WithName("nagare-media").
-		WithName("engine").
-		WithName("functions"))
-
-	c := cli.New()
-	if err := c.Execute(ctx, fn, os.Args[1:]); err != nil {
-		os.Exit(1)
-	}
-}
+// TaskBuilders registry.
+var TaskBuilders = registry.New[nbmp.TaskBuilder]()

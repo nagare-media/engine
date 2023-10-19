@@ -14,4 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package fn
+package registry
+
+// Generic registry.
+type registry[T any] struct {
+	m map[string]T
+}
+
+// New returns a registry.
+func New[T any]() *registry[T] {
+	return &registry[T]{
+		m: make(map[string]T),
+	}
+}
+
+// Register obj.
+func (r *registry[T]) Register(name string, t T) {
+	r.m[name] = t
+}
+
+// Contains checks if obj by that name is registered.
+func (r *registry[T]) Contains(name string) bool {
+	_, ok := r.m[name]
+	return ok
+}
+
+// Get obj with given name.
+func (r *registry[T]) Get(name string) (T, bool) {
+	t, ok := r.m[name]
+	return t, ok
+}

@@ -18,8 +18,11 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
@@ -27,7 +30,21 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	"github.com/nagare-media/engine/internal/functions"
 	"github.com/nagare-media/engine/internal/pkg/version"
+	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
+
+	// Import nagare media functions to be included in this multi-binary.
+	_ "github.com/nagare-media/engine/internal/functions/noop"
+	_ "github.com/nagare-media/engine/internal/functions/sleep"
+)
+
+const BaseBinaryName = "functions"
+
+var (
+	requiredNArgs = 1
+	fnArg         = -1
+	tddArg        = 0
 )
 
 type cli struct{}
@@ -37,14 +54,27 @@ func New() *cli {
 }
 
 func (c *cli) Execute(ctx context.Context, fn string, args []string) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
 	setupLog := log.FromContext(ctx).WithName("setup")
 
 	// setup CLI flags
 
-	fs := flag.NewFlagSet("workflow-vacuum", flag.ContinueOnError)
+	baseBinary := strings.HasPrefix(fn, BaseBinaryName)
+	if baseBinary {
+		requiredNArgs = 2
+		fnArg++
+		tddArg++
+	}
+
+	fs := flag.NewFlagSet("functions", flag.ContinueOnError)
 	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		if baseBinary {
+			fmt.Fprintf(fs.Output(), "Usage: %s [options] <function> <task description document>\n", fn)
+		} else {
+			fmt.Fprintf(fs.Output(), "Usage: %s [options] <task description document>\n", fn)
+		}
+		fs.PrintDefaults()
+	}
 
 	var showUsage bool
 	fs.BoolVar(&showUsage, "help", false, "Show help and exit")
@@ -70,7 +100,7 @@ func (c *cli) Execute(ctx context.Context, fn string, args []string) error {
 		return err
 	}
 
-	// configure workflow-vacuum
+	// configure functions
 
 	if showUsage {
 		fs.Usage()
@@ -85,27 +115,57 @@ func (c *cli) Execute(ctx context.Context, fn string, args []string) error {
 	l := zap.New(zap.UseFlagOptions(&logOpts)).
 		WithName("nagare-media").
 		WithName("engine").
-		WithName("workflow-vacuum")
+		WithName("functions")
 	ctx = log.IntoContext(ctx, l)
 	log.SetLogger(l)
 
-	// TODO: configure
-
-	// create components
-
-	// start components
-
-	setupLog.Info("TODO: implement")
-	// TODO: execute fn
-
-	// termination handling
-
-	select {
-	// TODO: check for terminated components
-	case <-ctx.Done():
+	if fs.NArg() != requiredNArgs {
+		err = fmt.Errorf("invalid number or positional arguments: %d", fs.NArg())
+		setupLog.Error(err, "setup failed")
+		fs.Usage()
+		return err
 	}
-	// TODO: wait for components
-	// TODO: check for components errors
+
+	if baseBinary {
+		fn = fs.Arg(fnArg)
+	}
+
+	tddPath := fs.Arg(tddArg)
+	tdd, err := decodeTddFile(tddPath)
+	if err != nil {
+		setupLog.Error(err, "unable to parse the task description document")
+		return err
+	}
+
+	// create and start task controller
+
+	tskCtrl := &functions.TaskController{
+		FunctionName:    fn,
+		TaskDescription: tdd,
+	}
+
+	if err = tskCtrl.Start(ctx); err != nil {
+		setupLog.Error(err, "problem running task controller")
+		return err
+	}
 
 	return nil
+}
+
+func decodeTddFile(path string) (*nbmpv2.Task, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	tdd := &nbmpv2.Task{}
+
+	dec := json.NewDecoder(f)
+	err = dec.Decode(tdd)
+	if err != nil {
+		return nil, err
+	}
+
+	return tdd, nil
 }

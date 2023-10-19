@@ -14,29 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package nbmp
 
 import (
-	"os"
-	"path/filepath"
+	"context"
 
-	"sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
-
-	"github.com/nagare-media/engine/cmd/functions/cli"
+	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-func main() {
-	fn := filepath.Base(os.Args[0])
-
-	ctx := signals.SetupSignalHandler()
-	log.IntoContext(ctx, log.Log.
-		WithName("nagare-media").
-		WithName("engine").
-		WithName("functions"))
-
-	c := cli.New()
-	if err := c.Execute(ctx, fn, os.Args[1:]); err != nil {
-		os.Exit(1)
-	}
+// Function interface.
+type Function interface {
+	// Execute this function.
+	Exec(context.Context) error
 }
+
+// FunctionFunc adapts Go functions to NBMP functions.
+type FunctionFunc func(context.Context) error
+
+// Exec adapts FunctionFunc to the Function's Exec method.
+func (f FunctionFunc) Exec(ctx context.Context) error {
+	return f(ctx)
+}
+
+// TaskBuilder configures a function based on the given NBMP task description.
+type TaskBuilder func(context.Context, *nbmpv2.Task) (Function, error)

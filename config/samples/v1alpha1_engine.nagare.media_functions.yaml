@@ -1,27 +1,56 @@
+---
+apiVersion: engine.nagare.media/v1alpha1
+kind: Function
+metadata:
+  labels:
+    app.kubernetes.io/name: function
+    app.kubernetes.io/instance: noop
+    app.kubernetes.io/version: 0.0.0+dev
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+    beta.engine.nagare.media/function-type: generic
+  name: noop
+spec:
+  version: 0.0.0+dev
+  template:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: function
+              image: ghcr.io/nagare-media/engine/function-noop:latest
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+---
 apiVersion: engine.nagare.media/v1alpha1
 kind: Function
 metadata:
   labels:
     app.kubernetes.io/name: function
     app.kubernetes.io/instance: sleep
+    app.kubernetes.io/version: 0.0.0+dev
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/created-by: nagare-media-engine
-    beta.engine.nagare.media/function-type: example
-  name: sleep-0.1.0
+    beta.engine.nagare.media/function-type: generic
+  name: sleep
 spec:
-  version: 0.1.0+example
+  version: 0.0.0+dev
+  defaultConfig:
+    sleep.engine.nagare.media/duration: 30s
   template:
     spec:
       template:
         spec:
-          restartPolicy: Never
           containers:
-            - name: sleep
-              image: alpine
-              command:
-                - sh
-                - -c
-                - t=$(shuf -i 50-120 -n 1); echo "sleeping for $t second(s)"; sleep $t
+            - name: function
+              image: ghcr.io/nagare-media/engine/function-sleep:latest
+              imagePullPolicy: IfNotPresent
               resources:
                 requests:
                   cpu: 10m

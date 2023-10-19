@@ -201,6 +201,7 @@ clean: ## Cleanup build output
 image: $(addprefix image-, $(IMAGES)) ## Build all container images
 
 ## image-function-noop:                  ## Build noop function container image
+## image-function-sleep:                 ## Build sleep function container image
 ## image-gateway-nbmp:                   ## Build NBMP gateway container image
 ## image-workflow-manager:               ## Build workflow manager container image
 ## image-workflow-manager-helper:        ## Build workflow manager helper container image
