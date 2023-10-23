@@ -259,7 +259,7 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 
 		// workflow inputs
 		for j, port := range fr.General.InputPorts {
-			if port.Bind.StreamID == nil {
+			if port.Bind.StreamID == "" {
 				continue
 			}
 
@@ -272,9 +272,9 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 
 			// media or metadata?
 			var streamType string
-			if containsStreamID(*port.Bind.StreamID, nbmpWf.Input.MediaParameters) {
+			if containsStreamID(port.Bind.StreamID, nbmpWf.Input.MediaParameters) {
 				streamType = "media"
-			} else if containsStreamID(*port.Bind.StreamID, nbmpWf.Input.MetadataParameters) {
+			} else if containsStreamID(port.Bind.StreamID, nbmpWf.Input.MetadataParameters) {
 				streamType = "metadata"
 			} else {
 				nbmpWf.Acknowledge.Failed = append(nbmpWf.Acknowledge.Failed,
@@ -283,7 +283,7 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 			}
 
 			ioCfg.Inputs[port.PortName] = functions.MediaRef{
-				URL: fmt.Sprintf("{{ wf.cfg.inputs.%s['%s'].url }}", streamType, *port.Bind.StreamID),
+				URL: fmt.Sprintf("{{ wf.cfg.inputs.%s['%s'].url }}", streamType, port.Bind.StreamID),
 			}
 		}
 
@@ -300,15 +300,15 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 
 		// workflow output
 		for j, port := range fr.General.OutputPorts {
-			if port.Bind.StreamID == nil {
+			if port.Bind.StreamID == "" {
 				continue
 			}
 
 			// media or metadata?
 			var streamType string
-			if containsStreamID(*port.Bind.StreamID, nbmpWf.Output.MediaParameters) {
+			if containsStreamID(port.Bind.StreamID, nbmpWf.Output.MediaParameters) {
 				streamType = "media"
-			} else if containsStreamID(*port.Bind.StreamID, nbmpWf.Output.MetadataParameters) {
+			} else if containsStreamID(port.Bind.StreamID, nbmpWf.Output.MetadataParameters) {
 				streamType = "metadata"
 			} else {
 				nbmpWf.Acknowledge.Failed = append(nbmpWf.Acknowledge.Failed,
@@ -317,7 +317,7 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 			}
 
 			ioCfg.Outputs[port.PortName] = functions.MediaRef{
-				URL: fmt.Sprintf("{{ wf.cfg.outputs.%s['%s'].url }}", streamType, *port.Bind.StreamID),
+				URL: fmt.Sprintf("{{ wf.cfg.outputs.%s['%s'].url }}", streamType, port.Bind.StreamID),
 			}
 		}
 
