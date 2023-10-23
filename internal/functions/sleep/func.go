@@ -54,8 +54,12 @@ func (f *function) Exec(ctx context.Context) error {
 		WithValues("duration", f.duration)
 
 	l.Info("going to sleep")
-	time.Sleep(f.duration)
-	l.Info("woke up")
+	select {
+	case <-ctx.Done():
+		l.Error(ctx.Err(), "sleep disrupted")
+	case <-time.After(f.duration):
+		l.Info("woke up")
+	}
 
 	return nil
 }
