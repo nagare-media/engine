@@ -129,6 +129,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	content, err := os.ReadFile(configFile)
 	if err != nil {
+		setupLog.Error(err, "unable to read the config file")
 		return err
 	}
 
@@ -136,7 +137,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	codecs := serializer.NewCodecFactory(scheme)
 	err = runtime.DecodeInto(codecs.UniversalDecoder(), content, &cfg)
 	if err != nil {
-		setupLog.Error(err, "unable to load the config file")
+		setupLog.Error(err, "unable to parse the config file")
 		return err
 	}
 
@@ -226,7 +227,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	<-httpServerDone
 
 	if httpServerErr != nil {
-		setupLog.Error(err, "problem running webserver")
+		setupLog.Error(httpServerErr, "problem running webserver")
 	}
 	return httpServerErr
 }
