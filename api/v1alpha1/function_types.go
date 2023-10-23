@@ -58,12 +58,6 @@ type FunctionSpec struct {
 	// Default configuration values.
 	// +optional
 	DefaultConfig *apiextensionsv1.JSON `json:"defaultConfig,omitempty"`
-
-	// TODO:
-	// Indicates that the function is not nagare media engine native and a shim should be used.
-	// +kubebuilder:default=false
-	// +optional
-	// UseShim bool `json:"useShim"`
 }
 
 // +kubebuilder:object:root=true
