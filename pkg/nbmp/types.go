@@ -19,7 +19,13 @@ package nbmp
 import (
 	"context"
 
+	"github.com/nagare-media/models.go/base"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
+)
+
+var (
+	// NBMP brand v1 for nagare media engine.
+	BrandNagareMediaEngineV1 = base.URI("urn:nagare-media:engine:schema:nbmp:v1")
 )
 
 // Function interface.

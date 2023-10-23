@@ -19,11 +19,9 @@ package svc
 import (
 	"fmt"
 
-	"github.com/nagare-media/models.go/base"
+	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
-
-var NBMPBrandNagareEnginev1alpha1 = base.URI("urn:nagare-media:engine:schema:nbmp:v1apha1")
 
 func ValidateWorkflowCommon(wf *nbmpv2.Workflow) error {
 	//// Scheme
@@ -53,7 +51,7 @@ func ValidateWorkflowCommon(wf *nbmpv2.Workflow) error {
 	// NBMP brand
 	if wf.General.NBMPBrand != nil &&
 		*wf.General.NBMPBrand != "" &&
-		*wf.General.NBMPBrand != NBMPBrandNagareEnginev1alpha1 {
+		*wf.General.NBMPBrand != nbmp.BrandNagareMediaEngineV1 {
 		wf.Acknowledge.Unsupported = append(wf.Acknowledge.Unsupported, "$.general.nbmp-brand")
 	}
 
@@ -151,7 +149,7 @@ func ValidateWorkflowCommon(wf *nbmpv2.Workflow) error {
 			// NBMP brand
 			if fr.General.NBMPBrand != nil &&
 				*fr.General.NBMPBrand != "" &&
-				*fr.General.NBMPBrand != NBMPBrandNagareEnginev1alpha1 {
+				*fr.General.NBMPBrand != nbmp.BrandNagareMediaEngineV1 {
 				wf.Acknowledge.Unsupported = append(wf.Acknowledge.Unsupported,
 					fmt.Sprintf("$.processing.function-restrictions[%d].general.nbmp-brand", i))
 			}
