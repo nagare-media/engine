@@ -18,17 +18,30 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"os"
 
 	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
 
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/version"
 )
+
+var (
+	scheme = runtime.NewScheme()
+)
+
+func init() {
+	utilruntime.Must(enginev1.AddToScheme(scheme))
+}
 
 type cli struct{}
 
@@ -45,6 +58,9 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	fs := flag.NewFlagSet("task-shim", flag.ContinueOnError)
 	fs.SetOutput(os.Stdout)
+
+	var cfgFile string
+	fs.StringVar(&cfgFile, "config", "", "Location of the task-shim configuration file")
 
 	var showUsage bool
 	fs.BoolVar(&showUsage, "help", false, "Show help and exit")
@@ -90,7 +106,34 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	ctx = log.IntoContext(ctx, l)
 	log.SetLogger(l)
 
-	// TODO: configure
+	if cfgFile == "" {
+		err := errors.New("--config option missing")
+		setupLog.Error(err, "setup failed")
+		fs.Usage()
+		return err
+	}
+
+	cfgStr, err := os.ReadFile(cfgFile)
+	if err != nil {
+		setupLog.Error(err, "unable to read config file")
+		return err
+	}
+
+	var cfg enginev1.TaskShimConfiguration
+	codecs := serializer.NewCodecFactory(scheme)
+	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, &cfg)
+	if err != nil {
+		setupLog.Error(err, "unable to parse config file")
+		return err
+	}
+
+	cfg.Default()
+
+	err = cfg.Validate()
+	if err != nil {
+		setupLog.Error(err, "invalid configuration")
+		return err
+	}
 
 	// create components
 
