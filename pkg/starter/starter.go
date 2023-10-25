@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package api
+package starter
 
-import "github.com/gofiber/fiber/v2"
+import "context"
 
-type API interface {
-	App() *fiber.App
+type Starter interface {
+	Start(context.Context) error
 }

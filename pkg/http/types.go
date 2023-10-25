@@ -18,14 +18,6 @@ package http
 
 import "github.com/gofiber/fiber/v2"
 
-func IsReadRequest(c *fiber.Ctx) bool {
-	m := c.Method()
-	return m == fiber.MethodGet ||
-		m == fiber.MethodHead ||
-		m == fiber.MethodOptions ||
-		m == fiber.MethodTrace
-}
-
-func IsWriteRequest(c *fiber.Ctx) bool {
-	return !IsReadRequest(c)
+type API interface {
+	App() *fiber.App
 }

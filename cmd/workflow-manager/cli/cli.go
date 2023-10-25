@@ -88,7 +88,7 @@ func Execute() error {
 		// TODO: migrate to custom configuration logic
 		options, err = options.AndFrom(ctrl.ConfigFile().AtPath(configFile).OfKind(&cfg))
 		if err != nil {
-			setupLog.Error(err, "unable to load the config file")
+			setupLog.Error(err, "unable to load config file")
 			return err
 		}
 	}

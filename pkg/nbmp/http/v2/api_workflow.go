@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package workflowapi
+package v2
 
 import (
 	"bytes"
@@ -24,80 +24,81 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
-	"github.com/nagare-media/engine/internal/gateway-nbmp/http/api"
-	nbmpapiv2 "github.com/nagare-media/engine/internal/gateway-nbmp/http/v2"
-	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
 	"github.com/nagare-media/engine/pkg/http"
+	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-type workflowapi struct {
-	cfg   *enginev1.GatewayNBMPConfiguration
-	wfsvc svc.WorkflowService
+type workflowAPI struct {
+	cfg *enginev1.WebserverConfiguration
+	svc nbmpsvcv2.WorkflowService
 }
 
-var _ api.API = &workflowapi{}
+var _ http.API = &workflowAPI{}
 
-func New(cfg *enginev1.GatewayNBMPConfiguration, wfsvc svc.WorkflowService) *workflowapi {
-	return &workflowapi{
-		cfg:   cfg,
-		wfsvc: wfsvc,
+func WorkflowAPI(cfg *enginev1.WebserverConfiguration, svc nbmpsvcv2.WorkflowService) *workflowAPI {
+	return &workflowAPI{
+		cfg: cfg,
+		svc: svc,
 	}
 }
 
-func (wfapi *workflowapi) App() *fiber.App {
+func (api *workflowAPI) App() *fiber.App {
 	app := fiber.New()
 	app.
-		Post("/", wfapi.handleRequest(wfapi.wfsvc.Create)).
-		Patch("/:id", wfapi.handleRequest(wfapi.wfsvc.Update)).
-		Put("/:id", wfapi.handleRequest(wfapi.wfsvc.Update)). // the NBMP standard does not define PUT
-		Delete("/:id", wfapi.handleRequest(wfapi.wfsvc.Delete)).
-		Get("/:id", wfapi.handleRequest(wfapi.wfsvc.Retrieve))
+		// middlewares
+		Use(ValidateHeadersMiddleware(nbmpv2.WorkflowDescriptionDocumentMIMEType)).
+		// API
+		Post("/", api.handleRequest(api.svc.Create)).
+		Patch("/:id", api.handleRequest(api.svc.Update)).
+		Put("/:id", api.handleRequest(api.svc.Update)).
+		Delete("/:id", api.handleRequest(api.svc.Delete)).
+		Get("/:id", api.handleRequest(api.svc.Retrieve))
 	return app
 }
 
-func (wfapi *workflowapi) handleRequest(svcCall func(ctx context.Context, wf *nbmpv2.Workflow) error) fiber.Handler {
+func (api *workflowAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Workflow) error) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := http.ContextFromFiberCtx(c)
 
 		// parse request
-		wf := &nbmpv2.Workflow{}
-		if http.ReadRequest(c) {
+		w := &nbmpv2.Workflow{}
+		if http.IsReadRequest(c) {
 			// construct initial description
-			wf.General = nbmpv2.General{
+			w.General = nbmpv2.General{
 				ID: c.Params("id"),
 			}
 		} else {
 			// decode body
 			dec := json.NewDecoder(bytes.NewReader(c.Body()))
 			dec.DisallowUnknownFields()
-			err := dec.Decode(wf)
+			err := dec.Decode(w)
 			if err != nil {
 				return fiber.ErrBadRequest
 			}
 		}
 
 		// service call
-		err := svcCall(ctx, wf)
+		err := svcCall(ctx, w)
 		if err != nil {
-			return nbmpapiv2.SvcErrorHandler(c, wf, err)
+			return handleErr(c, w, err, nbmpv2.WorkflowDescriptionDocumentMIMEType)
 		}
 
 		// create response
-		respBody, err := json.Marshal(wf)
+		respBody, err := json.Marshal(w)
 		if err != nil {
 			return fiber.ErrInternalServerError
 		}
 
-		var selfURL string
-		if wfapi.cfg.Webserver.PublicBaseURL == nil {
-			selfURL = c.BaseURL()
-		} else {
-			selfURL = *wfapi.cfg.Webserver.PublicBaseURL
-		}
-		selfURL += "/" + c.Path() + "/" + wf.General.ID
 		// TODO: the NBMP standard requires (SHOULD) a link object in the WDD response. The JSON schema definition does not
 		//       specify a link object.
+		var selfURL string
+		if api.cfg.PublicBaseURL == nil {
+			selfURL = c.BaseURL()
+		} else {
+			selfURL = *api.cfg.PublicBaseURL
+		}
+		selfURL += "/" + c.Path() + "/" + w.General.ID
 
 		// set status and headers
 		c.Set(fiber.HeaderContentType, nbmpv2.WorkflowDescriptionDocumentMIMEType)

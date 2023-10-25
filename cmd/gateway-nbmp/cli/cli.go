@@ -43,8 +43,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
-	"github.com/nagare-media/engine/internal/gateway-nbmp/http"
-	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
+	gatewaynbmp "github.com/nagare-media/engine/internal/gateway-nbmp"
 	"github.com/nagare-media/engine/internal/pkg/version"
 )
 
@@ -73,8 +72,8 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	fs := flag.NewFlagSet("gateway-nbmp", flag.ContinueOnError)
 	fs.SetOutput(os.Stdout)
 
-	var configFile string
-	fs.StringVar(&configFile, "config", "", "Location of the gateway-nbmp configuration file")
+	var cfgFile string
+	fs.StringVar(&cfgFile, "config", "", "Location of the gateway-nbmp configuration file")
 
 	var showUsage bool
 	fs.BoolVar(&showUsage, "help", false, "Show help and exit")
@@ -97,6 +96,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	err := fs.Parse(args)
 	if err != nil {
+		setupLog.Error(err, "setup failed")
 		return err
 	}
 
@@ -120,24 +120,24 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	log.SetLogger(l)
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
-	if configFile == "" {
+	if cfgFile == "" {
 		err := errors.New("--config option missing")
 		setupLog.Error(err, "setup failed")
 		fs.Usage()
 		return err
 	}
 
-	content, err := os.ReadFile(configFile)
+	cfgStr, err := os.ReadFile(cfgFile)
 	if err != nil {
-		setupLog.Error(err, "unable to read the config file")
+		setupLog.Error(err, "unable to read config file")
 		return err
 	}
 
 	var cfg enginev1.GatewayNBMPConfiguration
 	codecs := serializer.NewCodecFactory(scheme)
-	err = runtime.DecodeInto(codecs.UniversalDecoder(), content, &cfg)
+	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, &cfg)
 	if err != nil {
-		setupLog.Error(err, "unable to parse the config file")
+		setupLog.Error(err, "unable to parse config file")
 		return err
 	}
 
@@ -145,6 +145,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	err = cfg.Validate()
 	if err != nil {
+		setupLog.Error(err, "invalid config file")
 		return err
 	}
 
@@ -154,11 +155,13 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	restClient, err := rest.HTTPClientFor(k8sCfg)
 	if err != nil {
+		setupLog.Error(err, "unable to create Kubernetes REST client")
 		return err
 	}
 
 	mapper, err := apiutil.NewDynamicRESTMapper(k8sCfg, restClient)
 	if err != nil {
+		setupLog.Error(err, "unable to create Kubernetes REST mapper")
 		return err
 	}
 
@@ -166,10 +169,11 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		Scheme: scheme,
 		Mapper: mapper,
 		DefaultNamespaces: map[string]cache.Config{
-			cfg.Services.KubernetesNamespace: {},
+			cfg.WorkflowService.KubernetesNamespace: {},
 		},
 	})
 	if err != nil {
+		setupLog.Error(err, "unable to create Kubernetes API cache")
 		return err
 	}
 
@@ -181,14 +185,14 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		},
 	})
 	if err != nil {
+		setupLog.Error(err, "unable to create Kubernetes API client")
 		return err
 	}
-	k8sClient = client.NewNamespacedClient(k8sClient, cfg.Services.KubernetesNamespace)
+	k8sClient = client.NewNamespacedClient(k8sClient, cfg.WorkflowService.KubernetesNamespace)
 
 	// create components
 
-	wfsvc := svc.NewWorkflowService(&cfg, k8sClient)
-	httpServer := http.NewServer(&cfg, wfsvc)
+	httpServer := gatewaynbmp.New(&cfg, k8sClient)
 
 	// start components
 
@@ -201,9 +205,9 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	if ok := k8sCache.WaitForCacheSync(ctx); !ok {
 		if k8sCacheErr == nil {
-			k8sCacheErr = errors.New("problem starting Kubernetes API client cache")
+			k8sCacheErr = errors.New("unable to sync Kubernetes API cache")
 		}
-		setupLog.Error(k8sCacheErr, "problem starting Kubernetes API client cache")
+		setupLog.Error(k8sCacheErr, "unable to sync Kubernetes API cache")
 		return k8sCacheErr
 	}
 

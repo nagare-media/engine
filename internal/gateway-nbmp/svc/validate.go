@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/nagare-media/engine/pkg/nbmp"
+	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
@@ -233,9 +234,9 @@ func ValidateWorkflowRetrieve(wf *nbmpv2.Workflow) error {
 func acknowledgeStatusToErr(s nbmpv2.AcknowledgeStatus) error {
 	switch s {
 	case nbmpv2.NotSupportedAcknowledgeStatus:
-		return ErrUnsupported
+		return nbmpsvcv2.ErrUnsupported
 	case nbmpv2.FailedAcknowledgeStatus:
-		return ErrInvalid
+		return nbmpsvcv2.ErrInvalid
 	}
 	return nil
 }

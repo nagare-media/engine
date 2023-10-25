@@ -25,27 +25,21 @@ import (
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/uuid"
+	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch;create;update;patch;delete
 
-type WorkflowService interface {
-	Create(ctx context.Context, wf *nbmpv2.Workflow) error
-	Update(ctx context.Context, wf *nbmpv2.Workflow) error
-	Delete(ctx context.Context, wf *nbmpv2.Workflow) error
-	Retrieve(ctx context.Context, wf *nbmpv2.Workflow) error
-}
-
 type workflowService struct {
-	cfg *enginev1.GatewayNBMPConfiguration
+	cfg *enginev1.WorkflowServiceConfiguration
 	k8s client.Client
 }
 
-var _ WorkflowService = &workflowService{}
+var _ nbmpsvcv2.WorkflowService = &workflowService{}
 
-func NewWorkflowService(cfg *enginev1.GatewayNBMPConfiguration, k8sClient client.Client) *workflowService {
+func NewWorkflowService(cfg *enginev1.WorkflowServiceConfiguration, k8sClient client.Client) *workflowService {
 	return &workflowService{
 		cfg: cfg,
 		k8s: k8sClient,
@@ -180,7 +174,7 @@ func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) err
 		return apiErrorHandler(err)
 	}
 	if w.Labels[IsNBMPLabel] != "true" {
-		return ErrNotFound
+		return nbmpsvcv2.ErrNotFound
 	}
 
 	tasks := &enginev1.TaskList{}

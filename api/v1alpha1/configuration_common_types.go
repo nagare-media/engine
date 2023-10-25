@@ -14,10 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package http
+package v1alpha1
 
-import "github.com/gofiber/fiber/v2"
+import "time"
 
-func HealthRequestHandler() fiber.Handler {
-	return func(c *fiber.Ctx) error { return nil }
+type WebserverConfiguration struct {
+	// +optional
+	BindAddress *string `json:"bindAddress,omitempty"`
+
+	// +optional
+	ReadTimeout *time.Duration `json:"readTimeout,omitempty"`
+
+	// +optional
+	WriteTimeout *time.Duration `json:"writeTimeout,omitempty"`
+
+	// +optional
+	IdleTimeout *time.Duration `json:"idleTimeout,omitempty"`
+
+	// +kubebuilder:validation:Enum=tcp;tcp4;tcp6
+	// +optional
+	Network *string `json:"network,omitempty"`
+
+	// +optional
+	PublicBaseURL *string `json:"publicBaseURL,omitempty"`
 }

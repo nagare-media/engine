@@ -11,5 +11,5 @@ metadata:
 webserver:
   bindAddress: :8080
   publicBaseURL: http://engine.nagare.local.gd
-services:
+workflows:
   kubernetesNamespace: default

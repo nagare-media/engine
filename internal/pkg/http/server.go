@@ -24,34 +24,32 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
-	nbmpv2 "github.com/nagare-media/engine/internal/gateway-nbmp/http/v2"
-	"github.com/nagare-media/engine/internal/gateway-nbmp/http/v2/workflowapi"
-	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
 	"github.com/nagare-media/engine/pkg/http"
 )
 
 type server struct {
-	cfg *enginev1.GatewayNBMPConfiguration
-	app *fiber.App
+	App *fiber.App
+
+	cfg *enginev1.WebserverConfiguration
 	ctx context.Context
 }
 
-func NewServer(cfg *enginev1.GatewayNBMPConfiguration, wfsvc svc.WorkflowService) *server {
+func NewServer(cfg *enginev1.WebserverConfiguration) *server {
 	s := &server{
 		cfg: cfg,
-		app: fiber.New(fiber.Config{
+		App: fiber.New(fiber.Config{
 			ServerHeader:          "nagare media engine",
-			AppName:               "nagare media engine gateway-nbmp",
+			AppName:               "nagare media engine",
 			DisableStartupMessage: true,
 
 			CaseSensitive:                true,
 			DisableDefaultContentType:    true, // we set Content-Type ourselves
 			DisablePreParseMultipartForm: true, // we don't expect multipart/form-data requests
 
-			ReadTimeout:  *cfg.Webserver.ReadTimeout,
-			WriteTimeout: *cfg.Webserver.WriteTimeout,
-			IdleTimeout:  *cfg.Webserver.IdleTimeout,
-			Network:      *cfg.Webserver.Network,
+			ReadTimeout:  *cfg.ReadTimeout,
+			WriteTimeout: *cfg.WriteTimeout,
+			IdleTimeout:  *cfg.IdleTimeout,
+			Network:      *cfg.Network,
 
 			RequestMethods: []string{
 				fiber.MethodGet,
@@ -67,22 +65,9 @@ func NewServer(cfg *enginev1.GatewayNBMPConfiguration, wfsvc svc.WorkflowService
 	}
 
 	// global middlewares
-	s.app.
+	s.App.
 		Use(http.ContextMiddleware(func() context.Context { return s.ctx })).
 		Use(http.RequestIDMiddleware())
-
-	// Health API
-	s.app.
-		Get("/healthz", http.HealthRequestHandler()).
-		Get("/readyz", http.HealthRequestHandler())
-
-	// NBMP 2nd edition APIs
-	s.app.Group("/v2").
-		// middlewares
-		Use(http.TelemetryMiddleware()).
-		Use(nbmpv2.HandleRequest).
-		// APIs
-		Mount("/workflows", workflowapi.New(cfg, wfsvc).App())
 
 	return s
 }
@@ -96,9 +81,9 @@ func (s *server) Start(ctx context.Context) error {
 	var err error
 	listenDone := make(chan struct{})
 	go func() {
-		err = s.app.Listen(*s.cfg.Webserver.BindAddress)
+		err = s.App.Listen(*s.cfg.BindAddress)
 		if err != nil {
-			l.Error(err, "problem starting listener")
+			l.Error(err, "unable to start webserver")
 		}
 		close(listenDone)
 	}()
@@ -106,9 +91,9 @@ func (s *server) Start(ctx context.Context) error {
 	select {
 	case <-s.ctx.Done():
 		l.Info("stop webserver")
-		err = s.app.Shutdown()
+		err = s.App.Shutdown()
 		if err != nil {
-			l.Error(err, "problem stopping webserver")
+			l.Error(err, "unable to stop webserver gracefully")
 		}
 	case <-listenDone:
 	}

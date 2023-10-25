@@ -403,7 +403,7 @@ func (s *workflowService) functionRestrictionToJobTemplateSpec(fr *nbmpv2.Functi
 		if fr.Requirements.Hardware.VGPU != nil {
 			n := *fr.Requirements.Hardware.VGPU
 			// TODO: make this configurable per Task.
-			rl[s.cfg.Services.DefaultKubernetesGPUResource] = *resource.NewQuantity(int64(n), resource.DecimalSI)
+			rl[s.cfg.DefaultKubernetesGPUResource] = *resource.NewQuantity(int64(n), resource.DecimalSI)
 		}
 
 		// RAM in megabytes

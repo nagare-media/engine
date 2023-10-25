@@ -18,14 +18,31 @@ package http
 
 import "github.com/gofiber/fiber/v2"
 
-func IsReadRequest(c *fiber.Ctx) bool {
-	m := c.Method()
-	return m == fiber.MethodGet ||
-		m == fiber.MethodHead ||
-		m == fiber.MethodOptions ||
-		m == fiber.MethodTrace
+var DefaultHealthFunc = func() error { return nil }
+
+type HealthFunc func() error
+
+type healthAPI struct {
+	HealthFunc HealthFunc
 }
 
-func IsWriteRequest(c *fiber.Ctx) bool {
-	return !IsReadRequest(c)
+var _ API = &healthAPI{}
+
+func HealthAPI(h HealthFunc) *healthAPI {
+	return &healthAPI{
+		HealthFunc: h,
+	}
+}
+
+func (api *healthAPI) App() *fiber.App {
+	app := fiber.New()
+	app.
+		Get("/healthz", api.handleRequest).
+		Get("/readyz", api.handleRequest)
+	return app
+}
+
+func (api *healthAPI) handleRequest(c *fiber.Ctx) error {
+	// TODO: implement something like https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check
+	return api.HealthFunc()
 }

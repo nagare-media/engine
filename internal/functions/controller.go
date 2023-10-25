@@ -22,6 +22,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/nagare-media/engine/pkg/starter"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
@@ -30,6 +31,8 @@ type TaskController struct {
 	FunctionName    string
 	TaskDescription *nbmpv2.Task
 }
+
+var _ starter.Starter = &TaskController{}
 
 // Start task controller.
 func (c *TaskController) Start(ctx context.Context) error {

@@ -14,18 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package http
+package v2
 
-import "github.com/gofiber/fiber/v2"
+import "errors"
 
-func IsReadRequest(c *fiber.Ctx) bool {
-	m := c.Method()
-	return m == fiber.MethodGet ||
-		m == fiber.MethodHead ||
-		m == fiber.MethodOptions ||
-		m == fiber.MethodTrace
-}
-
-func IsWriteRequest(c *fiber.Ctx) bool {
-	return !IsReadRequest(c)
-}
+var (
+	ErrNotFound      = errors.New("nbmp: resource not found")
+	ErrAlreadyExists = errors.New("nbmp: resource already exists")
+	ErrUnsupported   = errors.New("nbmp: resource has unsupported descriptions")
+	ErrInvalid       = errors.New("nbmp: resource is invalid")
+)

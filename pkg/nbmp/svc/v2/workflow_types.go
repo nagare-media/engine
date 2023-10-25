@@ -14,18 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package http
+package v2
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"context"
 
-func IsReadRequest(c *fiber.Ctx) bool {
-	m := c.Method()
-	return m == fiber.MethodGet ||
-		m == fiber.MethodHead ||
-		m == fiber.MethodOptions ||
-		m == fiber.MethodTrace
+	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
+)
+
+// WorkflowService handles NBMP Workflow API requests.
+type WorkflowService interface {
+	Create(context.Context, *nbmpv2.Workflow) error
+	Update(context.Context, *nbmpv2.Workflow) error
+	Delete(context.Context, *nbmpv2.Workflow) error
+	Retrieve(context.Context, *nbmpv2.Workflow) error
 }
 
-func IsWriteRequest(c *fiber.Ctx) bool {
-	return !IsReadRequest(c)
-}
+// WorkflowServiceMiddleware is a function that implements a WorkflowService middleware.
+type WorkflowServiceMiddleware func(next WorkflowService) WorkflowService

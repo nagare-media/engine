@@ -23,24 +23,23 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/nagare-media/engine/internal/gateway-nbmp/svc"
-	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
+	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 )
 
-func SvcErrorHandler(c *fiber.Ctx, obj any, svcErr error) error {
+func handleErr(c *fiber.Ctx, obj any, svcErr error, contentType string) error {
 	var s int
 	switch svcErr {
-	case svc.ErrInvalid:
+	case nbmpsvcv2.ErrInvalid:
 		s = fiber.StatusBadRequest // 400
 
-	case svc.ErrNotFound:
+	case nbmpsvcv2.ErrNotFound:
 		// respond without a body
 		return fiber.ErrNotFound // 404
 
-	case svc.ErrAlreadyExists:
+	case nbmpsvcv2.ErrAlreadyExists:
 		s = fiber.StatusConflict // 409
 
-	case svc.ErrUnsupported:
+	case nbmpsvcv2.ErrUnsupported:
 		s = fiber.StatusUnprocessableEntity // 422
 
 	default:
@@ -62,7 +61,7 @@ func SvcErrorHandler(c *fiber.Ctx, obj any, svcErr error) error {
 	}
 
 	c.Status(s)
-	c.Set(fiber.HeaderContentType, nbmpv2.WorkflowDescriptionDocumentMIMEType)
+	c.Set(fiber.HeaderContentType, contentType)
 	respBody, err := json.Marshal(obj)
 	if err != nil {
 		return fiber.ErrInternalServerError

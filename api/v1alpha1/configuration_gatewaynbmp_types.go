@@ -29,32 +29,11 @@ import (
 )
 
 type GatewayNBMPConfigurationSpec struct {
-	Webserver WebserverConfiguration `json:"webserver"`
-	Services  ServicesConfiguration  `json:"services"`
+	Webserver       WebserverConfiguration       `json:"webserver"`
+	WorkflowService WorkflowServiceConfiguration `json:"workflows"`
 }
 
-type WebserverConfiguration struct {
-	// +optional
-	BindAddress *string `json:"bindAddress,omitempty"`
-
-	// +optional
-	ReadTimeout *time.Duration `json:"readTimeout"`
-
-	// +optional
-	WriteTimeout *time.Duration `json:"writeTimeout"`
-
-	// +optional
-	IdleTimeout *time.Duration `json:"idleTimeout"`
-
-	// +kubebuilder:validation:Enum=tcp;tcp4;tcp6
-	// +optional
-	Network *string `json:"network"`
-
-	// +optional
-	PublicBaseURL *string `json:"publicBaseURL"`
-}
-
-type ServicesConfiguration struct {
+type WorkflowServiceConfiguration struct {
 	// Limit gateway-nbmp to a specific Kubernetes namespace.
 	// +optional
 	KubernetesNamespace string `json:"kubernetesNamespace,omitempty"`
@@ -98,9 +77,9 @@ func (c *GatewayNBMPConfiguration) Default() {
 		c.Webserver.Network = ptr.To[string]("tcp")
 	}
 
-	if c.Services.DefaultKubernetesGPUResource == "" {
+	if c.WorkflowService.DefaultKubernetesGPUResource == "" {
 		// TODO: what should the default be?
-		c.Services.DefaultKubernetesGPUResource = resources.NVIDIA_GPU
+		c.WorkflowService.DefaultKubernetesGPUResource = resources.NVIDIA_GPU
 	}
 }
 
@@ -123,10 +102,10 @@ func (c *GatewayNBMPConfiguration) Validate() error {
 	if c.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.Webserver.PublicBaseURL, "/") {
 		return errors.New("trailing slash in webserver.publicBaseURL")
 	}
-	if c.Services.KubernetesNamespace == "" {
+	if c.WorkflowService.KubernetesNamespace == "" {
 		return errors.New("missing services.kubernetesNamespace")
 	}
-	if c.Services.DefaultKubernetesGPUResource == "" {
+	if c.WorkflowService.DefaultKubernetesGPUResource == "" {
 		return errors.New("missing services.defaultKubernetesGPUResource")
 	}
 	return nil

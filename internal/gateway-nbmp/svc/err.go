@@ -17,25 +17,18 @@ limitations under the License.
 package svc
 
 import (
-	"errors"
-
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-)
 
-var (
-	ErrNotFound      = errors.New("nbmp: resource not found")
-	ErrAlreadyExists = errors.New("nbmp: resource already exists")
-	ErrUnsupported   = errors.New("nbmp: resource has unsupported descriptions")
-	ErrInvalid       = errors.New("nbmp: resource is invalid")
+	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 )
 
 func apiErrorHandler(err error) error {
 	switch {
 	case apierrors.IsNotFound(err),
 		apierrors.IsGone(err):
-		return ErrNotFound
+		return nbmpsvcv2.ErrNotFound
 	case apierrors.IsAlreadyExists(err):
-		return ErrAlreadyExists
+		return nbmpsvcv2.ErrAlreadyExists
 	}
 	return err
 }
