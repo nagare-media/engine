@@ -67,6 +67,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	err := fs.Parse(args)
 	if err != nil {
+		setupLog.Error(err, "setup failed")
 		return err
 	}
 

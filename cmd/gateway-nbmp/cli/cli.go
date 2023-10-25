@@ -22,11 +22,6 @@ import (
 	"flag"
 	"os"
 
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/rest"
-
 	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
 
@@ -34,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -41,6 +37,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	gatewaynbmp "github.com/nagare-media/engine/internal/gateway-nbmp"
@@ -145,7 +145,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	err = cfg.Validate()
 	if err != nil {
-		setupLog.Error(err, "invalid config file")
+		setupLog.Error(err, "invalid configuration")
 		return err
 	}
 

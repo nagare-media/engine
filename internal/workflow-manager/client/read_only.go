@@ -27,8 +27,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
 
-var _ client.Client = &readOnlyClient{}
-
 type readOnlyClient struct {
 	client.Reader
 
@@ -36,7 +34,9 @@ type readOnlyClient struct {
 	restMapper meta.RESTMapper
 }
 
-func NewReadOnlyClient(reader client.Reader, scheme *runtime.Scheme, restMapper meta.RESTMapper) client.Client {
+var _ client.Client = &readOnlyClient{}
+
+func NewReadOnlyClient(reader client.Reader, scheme *runtime.Scheme, restMapper meta.RESTMapper) *readOnlyClient {
 	return &readOnlyClient{
 		Reader:     reader,
 		scheme:     scheme,

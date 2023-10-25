@@ -19,12 +19,21 @@ package main
 import (
 	"os"
 
+	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
+
 	"github.com/nagare-media/engine/cmd/workflow-manager/cli"
 )
 
 func main() {
-	err := cli.Execute()
-	if err != nil {
+	ctx := signals.SetupSignalHandler()
+	log.IntoContext(ctx, log.Log.
+		WithName("nagare-media").
+		WithName("engine").
+		WithName("workflow-manager"))
+
+	c := cli.New()
+	if err := c.Execute(ctx, os.Args[1:]); err != nil {
 		os.Exit(1)
 	}
 }

@@ -17,12 +17,9 @@ limitations under the License.
 package cli
 
 import (
+	"context"
 	"flag"
 	"os"
-
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
@@ -34,16 +31,21 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/pkg/version"
 	"github.com/nagare-media/engine/internal/workflow-manager/controllers"
 	// +kubebuilder:scaffold:imports
 )
 
 var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
+	scheme = runtime.NewScheme()
 )
 
 func init() {
@@ -52,12 +54,30 @@ func init() {
 	// +kubebuilder:scaffold:scheme
 }
 
-func Execute() error {
-	var configFile string
-	flag.StringVar(&configFile, "config", "",
+type cli struct{}
+
+func New() *cli {
+	return &cli{}
+}
+
+func (c *cli) Execute(ctx context.Context, args []string) error {
+	setupLog := log.FromContext(ctx).WithName("setup")
+
+	// setup CLI flags
+
+	fs := flag.NewFlagSet("workflow-manager", flag.ContinueOnError)
+	fs.SetOutput(os.Stdout)
+
+	var cfgFile string
+	fs.StringVar(&cfgFile, "config", "",
 		"The controller will load its initial configuration from this file. "+
-			"Omit this flag to use the default configuration values. "+
-			"Command-line flags override configuration from this file.")
+			"Omit this flag to use the default configuration values.")
+
+	var showUsage bool
+	fs.BoolVar(&showUsage, "help", false, "Show help and exit")
+
+	var showVersion bool
+	fs.BoolVar(&showVersion, "version", false, "Show version and exit")
 
 	logOpts := zap.Options{
 		TimeEncoder: zapcore.ISO8601TimeEncoder,
@@ -70,23 +90,39 @@ func Execute() error {
 			}
 		},
 	}
-	logOpts.BindFlags(flag.CommandLine)
+	logOpts.BindFlags(fs)
 
-	flag.Parse()
+	err := fs.Parse(args)
+	if err != nil {
+		setupLog.Error(err, "setup failed")
+		return err
+	}
+
+	// configure workflow-manager
+
+	if showUsage {
+		fs.Usage()
+		return nil
+	}
+
+	if showVersion {
+		_ = version.Engine.Write(os.Stdout)
+		return nil
+	}
 
 	l := zap.New(zap.UseFlagOptions(&logOpts)).
 		WithName("nagare-media").
 		WithName("engine").
-		WithName("manager")
+		WithName("workflow-manager")
+	ctx = log.IntoContext(ctx, l)
 	ctrl.SetLogger(l)
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
-	var err error
 	cfg := enginev1.WorkflowManagerConfiguration{}
 	options := ctrl.Options{Scheme: scheme}
-	if configFile != "" {
+	if cfgFile != "" {
 		// TODO: migrate to custom configuration logic
-		options, err = options.AndFrom(ctrl.ConfigFile().AtPath(configFile).OfKind(&cfg))
+		options, err = options.AndFrom(ctrl.ConfigFile().AtPath(cfgFile).OfKind(&cfg))
 		if err != nil {
 			setupLog.Error(err, "unable to load config file")
 			return err
@@ -94,15 +130,18 @@ func Execute() error {
 	}
 
 	cfg.Default()
+
 	if err = cfg.Validate(); err != nil {
 		setupLog.Error(err, "invalid configuration")
 		return err
 	}
 
+	// create components
+
 	restCfg := ctrl.GetConfigOrDie()
 	mgr, err := ctrl.NewManager(restCfg, options)
 	if err != nil {
-		setupLog.Error(err, "unable to start manager")
+		setupLog.Error(err, "unable to start workflow-manager")
 		return err
 	}
 
@@ -124,11 +163,11 @@ func Execute() error {
 	}
 	if err = (&enginev1.MediaProcessingEntity{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "MediaProcessingEntity")
-		os.Exit(1)
+		return err
 	}
 	if err = (&enginev1.ClusterMediaProcessingEntity{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ClusterMediaProcessingEntity")
-		os.Exit(1)
+		return err
 	}
 	if err = (&enginev1.TaskTemplate{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "TaskTemplate")
@@ -191,9 +230,11 @@ func Execute() error {
 		return err
 	}
 
-	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-		setupLog.Error(err, "problem running manager")
+	// start components
+
+	setupLog.Info("starting workflow-manager")
+	if err := mgr.Start(ctx); err != nil {
+		setupLog.Error(err, "problem running workflow-manager")
 		return err
 	}
 
