@@ -226,5 +226,5 @@ func (m *workflowValidatorSpecLaxMiddleware) common(ctx context.Context, w *nbmp
 
 	//// Schedule
 
-	// TODO: implement full validation
+	// TODO: implement workflow validation
 }

@@ -120,5 +120,5 @@ func (m *workflowValidatorMiddleware) common(ctx context.Context, w *nbmpv2.Work
 		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.Schedule")
 	}
 
-	// TODO: implement full validation
+	// TODO: implement workflow validation
 }

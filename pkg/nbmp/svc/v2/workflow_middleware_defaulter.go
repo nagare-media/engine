@@ -43,7 +43,7 @@ func (m *workflowDefaulterMiddleware) Create(ctx context.Context, w *nbmpv2.Work
 		return err
 	}
 
-	// General
+	//// General
 
 	if w.General.ID == "" {
 		w.General.ID = uuid.UUIDv4()
@@ -76,7 +76,7 @@ func (m *workflowDefaulterMiddleware) Retrieve(ctx context.Context, w *nbmpv2.Wo
 }
 
 func (m *workflowDefaulterMiddleware) common(ctx context.Context, w *nbmpv2.Workflow) error {
-	// Scheme
+	//// Scheme
 
 	if w.Scheme == nil {
 		w.Scheme = &nbmpv2.Scheme{
@@ -84,7 +84,7 @@ func (m *workflowDefaulterMiddleware) common(ctx context.Context, w *nbmpv2.Work
 		}
 	}
 
-	// Acknowledge
+	//// Acknowledge
 
 	// reset Acknowledge for response
 	w.Acknowledge = &nbmpv2.Acknowledge{}
@@ -97,6 +97,8 @@ func (m *workflowDefaulterMiddleware) common(ctx context.Context, w *nbmpv2.Work
 	if w.Acknowledge.Partial == nil {
 		w.Acknowledge.Partial = make([]string, 0)
 	}
+
+	// TODO: implement workflow defaulter
 
 	return nil
 }

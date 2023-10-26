@@ -33,6 +33,7 @@ import (
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/version"
+	taskshim "github.com/nagare-media/engine/internal/task-shim"
 )
 
 var (
@@ -135,20 +136,13 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// create components
+	// create and start components
 
-	// start components
-
-	setupLog.Info("TODO: implement")
-
-	// termination handling
-
-	select {
-	// TODO: check for terminated components
-	case <-ctx.Done():
+	httpServer := taskshim.New(&cfg)
+	if err = httpServer.Start(ctx); err != nil {
+		setupLog.Error(err, "problem running webserver")
+		return err
 	}
-	// TODO: wait for components
-	// TODO: check for components errors
 
 	return nil
 }
