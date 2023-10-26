@@ -43,18 +43,16 @@ func TaskAPI(cfg *enginev1.WebserverConfiguration, svc nbmpsvcv2.TaskService) *t
 	}
 }
 
-func (api *taskAPI) App() *fiber.App {
-	app := fiber.New()
-	app.
+func (api *taskAPI) MountTo(r fiber.Router) {
+	r.
 		// middlewares
 		Use(ValidateHeadersMiddleware(nbmpv2.TaskDescriptionDocumentMIMEType)).
 		// API
-		Post("/", api.handleRequest(api.svc.Create)).
+		Post("", api.handleRequest(api.svc.Create)).
 		Patch("/:id", api.handleRequest(api.svc.Update)).
 		Put("/:id", api.handleRequest(api.svc.Update)).
 		Delete("/:id", api.handleRequest(api.svc.Delete)).
 		Get("/:id", api.handleRequest(api.svc.Retrieve))
-	return app
 }
 
 func (api *taskAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Task) error) fiber.Handler {

@@ -34,12 +34,9 @@ func HealthAPI(h HealthFunc) *healthAPI {
 	}
 }
 
-func (api *healthAPI) App() *fiber.App {
-	app := fiber.New()
-	app.
-		Get("/healthz", api.handleRequest).
+func (api *healthAPI) MountTo(r fiber.Router) {
+	r.Get("/healthz", api.handleRequest).
 		Get("/readyz", api.handleRequest)
-	return app
 }
 
 func (api *healthAPI) handleRequest(c *fiber.Ctx) error {

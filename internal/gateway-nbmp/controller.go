@@ -33,7 +33,7 @@ func New(cfg *enginev1.GatewayNBMPConfiguration, k8sClient client.Client) starte
 
 	// Health API
 
-	s.App.Mount("/", http.HealthAPI(http.DefaultHealthFunc).App())
+	http.HealthAPI(http.DefaultHealthFunc).MountTo(s.App)
 
 	// NBMP 2nd edition APIs
 
@@ -46,11 +46,11 @@ func New(cfg *enginev1.GatewayNBMPConfiguration, k8sClient client.Client) starte
 			),
 		)
 
-	s.App.Group("/v2").
-		// middlewares
-		Use(http.TelemetryMiddleware()).
-		// APIs
-		Mount("/workflows", nbmphttpv2.WorkflowAPI(&cfg.Webserver, svc).App())
+	r := s.App.Group("/v2")
+	// middlewares
+	r.Use(http.TelemetryMiddleware())
+	// APIs
+	nbmphttpv2.WorkflowAPI(&cfg.Webserver, svc).MountTo(r.Group("/workflows"))
 
 	return s
 }

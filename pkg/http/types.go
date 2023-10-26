@@ -19,5 +19,5 @@ package http
 import "github.com/gofiber/fiber/v2"
 
 type API interface {
-	App() *fiber.App
+	MountTo(fiber.Router)
 }

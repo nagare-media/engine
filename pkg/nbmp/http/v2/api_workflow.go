@@ -43,18 +43,16 @@ func WorkflowAPI(cfg *enginev1.WebserverConfiguration, svc nbmpsvcv2.WorkflowSer
 	}
 }
 
-func (api *workflowAPI) App() *fiber.App {
-	app := fiber.New()
-	app.
+func (api *workflowAPI) MountTo(r fiber.Router) {
+	r.
 		// middlewares
 		Use(ValidateHeadersMiddleware(nbmpv2.WorkflowDescriptionDocumentMIMEType)).
 		// API
-		Post("/", api.handleRequest(api.svc.Create)).
+		Post("", api.handleRequest(api.svc.Create)).
 		Patch("/:id", api.handleRequest(api.svc.Update)).
 		Put("/:id", api.handleRequest(api.svc.Update)).
 		Delete("/:id", api.handleRequest(api.svc.Delete)).
 		Get("/:id", api.handleRequest(api.svc.Retrieve))
-	return app
 }
 
 func (api *workflowAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Workflow) error) fiber.Handler {

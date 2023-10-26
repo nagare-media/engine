@@ -31,7 +31,7 @@ func New(cfg *enginev1.TaskShimConfiguration) starter.Starter {
 
 	// Health API
 
-	s.App.Mount("/", http.HealthAPI(http.DefaultHealthFunc).App())
+	http.HealthAPI(http.DefaultHealthFunc).MountTo(s.App)
 
 	// NBMP 2nd edition APIs
 
@@ -44,11 +44,11 @@ func New(cfg *enginev1.TaskShimConfiguration) starter.Starter {
 			),
 		)
 
-	s.App.Group("/v2").
-		// middlewares
-		Use(http.TelemetryMiddleware()).
-		// APIs
-		Mount("/tasks", nbmphttpv2.TaskAPI(&cfg.Webserver, svc).App())
+	r := s.App.Group("/v2")
+	// middlewares
+	r.Use(http.TelemetryMiddleware())
+	// APIs
+	nbmphttpv2.TaskAPI(&cfg.Webserver, svc).MountTo(r.Group("/tasks"))
 
 	return s
 }
