@@ -76,7 +76,7 @@ func (s *server) Start(ctx context.Context) error {
 	l := log.FromContext(ctx).WithName("http")
 	s.ctx = log.IntoContext(ctx, l)
 
-	l.Info("start webserver")
+	l.Info("start webserver", "bind-address", *s.cfg.BindAddress)
 
 	var err error
 	listenDone := make(chan struct{})
