@@ -35,6 +35,7 @@ import (
 	"github.com/nagare-media/engine/pkg/apis/functions"
 	"github.com/nagare-media/engine/pkg/apis/meta"
 	"github.com/nagare-media/engine/pkg/maps"
+	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
@@ -364,7 +365,7 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 		})
 	}
 
-	err := acknowledgeStatusToErr(updateAcknowledgeStatus(nbmpWf.Acknowledge))
+	err := nbmputils.AcknowledgeStatusToErr(nbmputils.UpdateAcknowledgeStatus(nbmpWf.Acknowledge))
 	if err != nil {
 		return nil, err
 	}

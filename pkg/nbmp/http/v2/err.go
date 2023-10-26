@@ -23,23 +23,23 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
-	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
+	"github.com/nagare-media/engine/pkg/nbmp"
 )
 
 func handleErr(c *fiber.Ctx, obj any, svcErr error, contentType string) error {
 	var s int
 	switch svcErr {
-	case nbmpsvcv2.ErrInvalid:
+	case nbmp.ErrInvalid:
 		s = fiber.StatusBadRequest // 400
 
-	case nbmpsvcv2.ErrNotFound:
+	case nbmp.ErrNotFound:
 		// respond without a body
 		return fiber.ErrNotFound // 404
 
-	case nbmpsvcv2.ErrAlreadyExists:
+	case nbmp.ErrAlreadyExists:
 		s = fiber.StatusConflict // 409
 
-	case nbmpsvcv2.ErrUnsupported:
+	case nbmp.ErrUnsupported:
 		s = fiber.StatusUnprocessableEntity // 422
 
 	default:

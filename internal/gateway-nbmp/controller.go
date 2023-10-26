@@ -24,6 +24,7 @@ import (
 	enginehttp "github.com/nagare-media/engine/internal/pkg/http"
 	"github.com/nagare-media/engine/pkg/http"
 	nbmphttpv2 "github.com/nagare-media/engine/pkg/nbmp/http/v2"
+	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	"github.com/nagare-media/engine/pkg/starter"
 )
 
@@ -36,8 +37,14 @@ func New(cfg *enginev1.GatewayNBMPConfiguration, k8sClient client.Client) starte
 
 	// NBMP 2nd edition APIs
 
-	// TODO: setup service middlewares
-	svc := svc.NewWorkflowService(&cfg.WorkflowService, k8sClient)
+	svc :=
+		nbmpsvcv2.WorkflowDefaulterMiddleware(
+			nbmpsvcv2.WorkflowValidatorSpecLaxMiddleware(
+				svc.WorkflowValidatorMiddleware(
+					svc.NewWorkflowService(&cfg.WorkflowService, k8sClient),
+				),
+			),
+		)
 
 	s.App.Group("/v2").
 		// middlewares

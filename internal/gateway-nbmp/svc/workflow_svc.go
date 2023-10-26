@@ -19,12 +19,13 @@ package svc
 import (
 	"context"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
-	"github.com/nagare-media/engine/internal/pkg/uuid"
+	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
@@ -47,20 +48,8 @@ func NewWorkflowService(cfg *enginev1.WorkflowServiceConfiguration, k8sClient cl
 }
 
 func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error {
-	l := log.FromContext(ctx)
-	PopulateWorkflowDefaults(wf)
-
-	// validate
-	err := ValidateWorkflowCreate(wf)
-	if err != nil {
-		return err
-	}
-
-	// initialize
-	wf.General.ID = uuid.UUIDv4()
-	l = l.WithValues("workflowID", wf.General.ID)
+	l := log.FromContext(ctx, "workflowID", wf.General.ID)
 	l.V(2).Info("creating workflow")
-	wf.General.State = &nbmpv2.InstantiatedState
 
 	// convert to Kubernetes resources
 	w, err := s.wddToWorkflow(wf)
@@ -92,13 +81,6 @@ func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error
 func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
 	l.V(2).Info("updating workflow")
-	PopulateWorkflowDefaults(wf)
-
-	// validate
-	err := ValidateWorkflowCommon(wf)
-	if err != nil {
-		return err
-	}
 
 	// convert to Kubernetes resources
 	w, err := s.wddToWorkflow(wf)
@@ -131,13 +113,6 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
 	l.V(2).Info("deleting workflow")
-	PopulateWorkflowDefaults(wf)
-
-	// validate
-	err := ValidateWorkflowDelete(wf)
-	if err != nil {
-		return err
-	}
 
 	// convert to Kubernetes resources
 	w := &enginev1.Workflow{
@@ -148,7 +123,7 @@ func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error
 
 	// delete Kubernetes resources
 	// Tasks have a owner reference and will be deleted automatically
-	err = s.k8s.Delete(ctx, w)
+	err := s.k8s.Delete(ctx, w)
 	if err != nil {
 		return apiErrorHandler(err)
 	}
@@ -159,22 +134,15 @@ func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error
 func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
 	l.V(2).Info("retrieving workflow")
-	PopulateWorkflowDefaults(wf)
-
-	// validate
-	err := ValidateWorkflowRetrieve(wf)
-	if err != nil {
-		return err
-	}
 
 	// retrieve Kubernetes resources
 	w := &enginev1.Workflow{}
-	err = s.k8s.Get(ctx, client.ObjectKey{Name: wf.General.ID}, w)
+	err := s.k8s.Get(ctx, client.ObjectKey{Name: wf.General.ID}, w)
 	if err != nil {
 		return apiErrorHandler(err)
 	}
 	if w.Labels[IsNBMPLabel] != "true" {
-		return nbmpsvcv2.ErrNotFound
+		return nbmp.ErrNotFound
 	}
 
 	tasks := &enginev1.TaskList{}
@@ -191,4 +159,15 @@ func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) err
 	// TODO: implement
 
 	return nil
+}
+
+func apiErrorHandler(err error) error {
+	switch {
+	case apierrors.IsNotFound(err),
+		apierrors.IsGone(err):
+		return nbmp.ErrNotFound
+	case apierrors.IsAlreadyExists(err):
+		return nbmp.ErrAlreadyExists
+	}
+	return err
 }

@@ -24,7 +24,7 @@ import (
 
 	"github.com/nagare-media/engine/internal/functions"
 	"github.com/nagare-media/engine/pkg/nbmp"
-	"github.com/nagare-media/engine/pkg/nbmp/utils"
+	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
@@ -68,7 +68,7 @@ func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
 		duration: DefaultDuration,
 	}
 
-	if d, ok := utils.GetStringParameterValue(t.Configuration.Parameters, DurationParameterKey); ok {
+	if d, ok := nbmputils.GetStringParameterValue(t.Configuration.Parameters, DurationParameterKey); ok {
 		var err error
 		f.duration, err = time.ParseDuration(d)
 		if err != nil {
