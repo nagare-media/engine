@@ -16,20 +16,20 @@ limitations under the License.
 
 package v1alpha1
 
-import "time"
+import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 type WebserverConfiguration struct {
 	// +optional
 	BindAddress *string `json:"bindAddress,omitempty"`
 
 	// +optional
-	ReadTimeout *time.Duration `json:"readTimeout,omitempty"`
+	ReadTimeout *metav1.Duration `json:"readTimeout,omitempty"`
 
 	// +optional
-	WriteTimeout *time.Duration `json:"writeTimeout,omitempty"`
+	WriteTimeout *metav1.Duration `json:"writeTimeout,omitempty"`
 
 	// +optional
-	IdleTimeout *time.Duration `json:"idleTimeout,omitempty"`
+	IdleTimeout *metav1.Duration `json:"idleTimeout,omitempty"`
 
 	// +kubebuilder:validation:Enum=tcp;tcp4;tcp6
 	// +optional

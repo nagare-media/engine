@@ -62,15 +62,15 @@ func (c *GatewayNBMPConfiguration) Default() {
 	}
 
 	if c.Webserver.ReadTimeout == nil {
-		c.Webserver.ReadTimeout = ptr.To[time.Duration](time.Minute)
+		c.Webserver.ReadTimeout = &metav1.Duration{Duration: time.Minute}
 	}
 
 	if c.Webserver.WriteTimeout == nil {
-		c.Webserver.WriteTimeout = ptr.To[time.Duration](time.Minute)
+		c.Webserver.WriteTimeout = &metav1.Duration{Duration: time.Minute}
 	}
 
 	if c.Webserver.IdleTimeout == nil {
-		c.Webserver.IdleTimeout = ptr.To[time.Duration](time.Minute)
+		c.Webserver.IdleTimeout = &metav1.Duration{Duration: time.Minute}
 	}
 
 	if c.Webserver.Network == nil {
@@ -87,24 +87,31 @@ func (c *GatewayNBMPConfiguration) Validate() error {
 	if c.Webserver.BindAddress == nil {
 		return errors.New("missing webserver.bindAddress")
 	}
+
 	if c.Webserver.ReadTimeout == nil {
 		return errors.New("missing webserver.readTimeout")
 	}
+
 	if c.Webserver.WriteTimeout == nil {
 		return errors.New("missing webserver.writeTimeout")
 	}
+
 	if c.Webserver.IdleTimeout == nil {
 		return errors.New("missing webserver.idleTimeout")
 	}
+
 	if c.Webserver.Network == nil {
 		return errors.New("missing webserver.network")
 	}
+
 	if c.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.Webserver.PublicBaseURL, "/") {
 		return errors.New("trailing slash in webserver.publicBaseURL")
 	}
+
 	if c.WorkflowService.KubernetesNamespace == "" {
 		return errors.New("missing services.kubernetesNamespace")
 	}
+
 	if c.WorkflowService.DefaultKubernetesGPUResource == "" {
 		return errors.New("missing services.defaultKubernetesGPUResource")
 	}

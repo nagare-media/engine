@@ -46,9 +46,9 @@ func NewServer(cfg *enginev1.WebserverConfiguration) *server {
 			DisableDefaultContentType:    true, // we set Content-Type ourselves
 			DisablePreParseMultipartForm: true, // we don't expect multipart/form-data requests
 
-			ReadTimeout:  *cfg.ReadTimeout,
-			WriteTimeout: *cfg.WriteTimeout,
-			IdleTimeout:  *cfg.IdleTimeout,
+			ReadTimeout:  cfg.ReadTimeout.Duration,
+			WriteTimeout: cfg.WriteTimeout.Duration,
+			IdleTimeout:  cfg.IdleTimeout.Duration,
 			Network:      *cfg.Network,
 
 			RequestMethods: []string{

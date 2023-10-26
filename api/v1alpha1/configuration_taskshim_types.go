@@ -50,9 +50,19 @@ func (c *TaskShimConfiguration) Default() {
 	if c.Webserver.BindAddress == nil {
 		c.Webserver.BindAddress = ptr.To[string]("127.0.0.1:8888")
 	}
+
 	if c.Webserver.ReadTimeout == nil {
-		c.Webserver.ReadTimeout = ptr.To[time.Duration](time.Minute)
+		c.Webserver.ReadTimeout = &metav1.Duration{Duration: time.Minute}
 	}
+
+	if c.Webserver.WriteTimeout == nil {
+		c.Webserver.WriteTimeout = &metav1.Duration{} // = unlimited
+	}
+
+	if c.Webserver.IdleTimeout == nil {
+		c.Webserver.IdleTimeout = &metav1.Duration{} // = unlimited
+	}
+
 	if c.Webserver.Network == nil {
 		c.Webserver.Network = ptr.To[string]("tcp")
 	}
@@ -62,12 +72,15 @@ func (c *TaskShimConfiguration) Validate() error {
 	if c.Webserver.BindAddress == nil {
 		return errors.New("missing webserver.bindAddress")
 	}
+
 	if c.Webserver.ReadTimeout == nil {
 		return errors.New("missing webserver.readTimeout")
 	}
+
 	if c.Webserver.Network == nil {
 		return errors.New("missing webserver.network")
 	}
+
 	if c.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.Webserver.PublicBaseURL, "/") {
 		return errors.New("trailing slash in webserver.publicBaseURL")
 	}
