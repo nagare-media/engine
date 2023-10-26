@@ -49,9 +49,7 @@ var _ nbmp.Function = &function{}
 
 // Exec sleep function.
 func (f *function) Exec(ctx context.Context) error {
-	l := log.FromContext(ctx).
-		WithName(Name).
-		WithValues("duration", f.duration)
+	l := log.FromContext(ctx, "duration", f.duration).WithName(Name)
 
 	l.Info("going to sleep")
 	select {
