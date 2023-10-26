@@ -38,7 +38,7 @@ func NewServer(cfg *enginev1.WebserverConfiguration) *server {
 	s := &server{
 		cfg: cfg,
 		App: fiber.New(fiber.Config{
-			ServerHeader:          "nagare media engine",
+			ServerHeader:          "nme",
 			AppName:               "nagare media engine",
 			DisableStartupMessage: true,
 
