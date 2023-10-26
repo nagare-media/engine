@@ -26,7 +26,11 @@ import (
 )
 
 type TaskShimConfigurationSpec struct {
-	Webserver WebserverConfiguration `json:"webserver"`
+	Webserver   WebserverConfiguration   `json:"webserver"`
+	TaskService TaskServiceConfiguration `json:"tasks"`
+}
+
+type TaskServiceConfiguration struct {
 }
 
 // +kubebuilder:object:root=true
