@@ -133,6 +133,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
+	// TODO: decoding seems to be lax; disallow unknown fields
 	var cfg enginev1.GatewayNBMPConfiguration
 	codecs := serializer.NewCodecFactory(scheme)
 	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, &cfg)

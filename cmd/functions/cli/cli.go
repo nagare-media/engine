@@ -160,9 +160,10 @@ func decodeTddFile(path string) (*nbmpv2.Task, error) {
 	}
 	defer f.Close()
 
-	tdd := &nbmpv2.Task{}
-
 	dec := json.NewDecoder(f)
+	dec.DisallowUnknownFields()
+
+	tdd := &nbmpv2.Task{}
 	err = dec.Decode(tdd)
 	if err != nil {
 		return nil, err
