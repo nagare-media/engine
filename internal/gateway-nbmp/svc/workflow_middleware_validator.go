@@ -34,6 +34,9 @@ type workflowValidatorMiddleware struct {
 // WorkflowValidatorMiddleware validates given workflow according the nagare media engine.
 func WorkflowValidatorMiddleware(next nbmpsvcv2.WorkflowService) nbmpsvcv2.WorkflowService {
 	return &workflowValidatorMiddleware{
+		WorkflowDummyMiddleware: nbmpsvcv2.WorkflowDummyMiddleware{
+			Next: next,
+		},
 		next: next,
 	}
 }

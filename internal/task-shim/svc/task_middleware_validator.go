@@ -29,6 +29,9 @@ type taskValidatorMiddleware struct {
 // TaskValidatorMiddleware validates given task according the nagare media engine.
 func TaskValidatorMiddleware(next nbmpsvcv2.TaskService) nbmpsvcv2.TaskService {
 	return &taskValidatorMiddleware{
+		TaskDummyMiddleware: nbmpsvcv2.TaskDummyMiddleware{
+			Next: next,
+		},
 		next: next,
 	}
 }

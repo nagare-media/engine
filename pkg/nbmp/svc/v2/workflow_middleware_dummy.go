@@ -23,23 +23,23 @@ import (
 )
 
 type WorkflowDummyMiddleware struct {
-	next WorkflowService
+	Next WorkflowService
 }
 
 var _ WorkflowService = &WorkflowDummyMiddleware{}
 
 func (m *WorkflowDummyMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
-	return m.next.Create(ctx, w)
+	return m.Next.Create(ctx, w)
 }
 
 func (m *WorkflowDummyMiddleware) Update(ctx context.Context, w *nbmpv2.Workflow) error {
-	return m.next.Update(ctx, w)
+	return m.Next.Update(ctx, w)
 }
 
 func (m *WorkflowDummyMiddleware) Delete(ctx context.Context, w *nbmpv2.Workflow) error {
-	return m.next.Delete(ctx, w)
+	return m.Next.Delete(ctx, w)
 }
 
 func (m *WorkflowDummyMiddleware) Retrieve(ctx context.Context, w *nbmpv2.Workflow) error {
-	return m.next.Retrieve(ctx, w)
+	return m.Next.Retrieve(ctx, w)
 }

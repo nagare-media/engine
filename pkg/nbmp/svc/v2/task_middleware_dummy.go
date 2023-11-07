@@ -23,23 +23,23 @@ import (
 )
 
 type TaskDummyMiddleware struct {
-	next TaskService
+	Next TaskService
 }
 
 var _ TaskService = &TaskDummyMiddleware{}
 
 func (m *TaskDummyMiddleware) Create(ctx context.Context, w *nbmpv2.Task) error {
-	return m.next.Create(ctx, w)
+	return m.Next.Create(ctx, w)
 }
 
 func (m *TaskDummyMiddleware) Update(ctx context.Context, w *nbmpv2.Task) error {
-	return m.next.Update(ctx, w)
+	return m.Next.Update(ctx, w)
 }
 
 func (m *TaskDummyMiddleware) Delete(ctx context.Context, w *nbmpv2.Task) error {
-	return m.next.Delete(ctx, w)
+	return m.Next.Delete(ctx, w)
 }
 
 func (m *TaskDummyMiddleware) Retrieve(ctx context.Context, w *nbmpv2.Task) error {
-	return m.next.Retrieve(ctx, w)
+	return m.Next.Retrieve(ctx, w)
 }
