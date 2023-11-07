@@ -26,9 +26,17 @@ import (
 	"github.com/nagare-media/engine/pkg/nbmp"
 )
 
+const DefaultRetryAfterSeconds = "10"
+
 func handleErr(c *fiber.Ctx, obj any, svcErr error, contentType string) error {
 	var s int
 	switch svcErr {
+	case nbmp.ErrRetryLater:
+		c.Status(fiber.StatusAccepted) // 202
+		c.Set(fiber.HeaderRetryAfter, DefaultRetryAfterSeconds)
+		// respond without a body
+		return nil
+
 	case nbmp.ErrInvalid:
 		s = fiber.StatusBadRequest // 400
 

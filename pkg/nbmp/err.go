@@ -23,4 +23,5 @@ var (
 	ErrAlreadyExists = errors.New("nbmp: resource already exists")
 	ErrUnsupported   = errors.New("nbmp: resource has unsupported descriptions")
 	ErrInvalid       = errors.New("nbmp: resource is invalid")
+	ErrRetryLater    = errors.New("nbmp: resource accept but retry later")
 )
