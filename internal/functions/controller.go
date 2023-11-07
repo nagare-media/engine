@@ -60,7 +60,6 @@ func (c *TaskController) Start(ctx context.Context) error {
 	err = tsk.Exec(ctx)
 	if err != nil {
 		l.Error(err, "task failed")
-		return err
 	}
 	l.Info("task finished")
 	return err
