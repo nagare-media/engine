@@ -21,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nagare-media/engine/pkg/strobj"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 )
@@ -31,6 +32,15 @@ type TaskShimConfigurationSpec struct {
 }
 
 type TaskServiceConfiguration struct {
+	OnCreateActions []TaskServiceAction `json:"onCreate"`
+	OnUpdateActions []TaskServiceAction `json:"onUpdate"`
+	OnDeleteActions []TaskServiceAction `json:"onDelete"`
+}
+
+type TaskServiceAction struct {
+	Name   string                 `json:"name"`
+	Action string                 `json:"action"`
+	Config *strobj.StringOrObject `json:"config"`
 }
 
 // +kubebuilder:object:root=true
