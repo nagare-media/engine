@@ -28,7 +28,7 @@ import (
 
 type TaskShimConfigurationSpec struct {
 	Webserver   WebserverConfiguration   `json:"webserver"`
-	TaskService TaskServiceConfiguration `json:"tasks"`
+	TaskService TaskServiceConfiguration `json:"task"`
 }
 
 type TaskServiceConfiguration struct {
