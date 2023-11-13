@@ -35,6 +35,7 @@ import (
 	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	"github.com/nagare-media/engine/pkg/nbmp/utils"
 	"github.com/nagare-media/engine/pkg/strobj"
+	"github.com/nagare-media/engine/pkg/tplfuncs"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
@@ -428,7 +429,10 @@ func evaluateConfigToRawJSON(a enginev1.TaskServiceAction, oldTask, currentTask 
 
 	case a.Config.Type == strobj.String:
 		// evaluate string as a Go template...
-		tpl, err := template.New("config").Parse(a.Config.StrVal)
+		tpl, err := template.
+			New("config").
+			Funcs(tplfuncs.DefaultFuncMap()).
+			Parse(a.Config.StrVal)
 		if err != nil {
 			return nil, err
 		}
