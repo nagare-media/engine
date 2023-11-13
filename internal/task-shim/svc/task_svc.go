@@ -87,9 +87,6 @@ func (s *taskService) init() {
 }
 
 func (s *taskService) Create(ctx context.Context, t *nbmpv2.Task) error {
-	l := log.FromContext(s.rootCtx)
-	l.Info("create task")
-
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 
@@ -98,15 +95,15 @@ func (s *taskService) Create(ctx context.Context, t *nbmpv2.Task) error {
 		return nbmp.ErrAlreadyExists
 	}
 
+	l := log.FromContext(s.rootCtx)
+	l.Info("create task")
+
 	// run onCreate actions
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "create"))
 	return s.execEventActions(ctx, s.cfg.OnCreateActions, t)
 }
 
 func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
-	l := log.FromContext(s.rootCtx)
-	l.Info("update task")
-
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 
@@ -118,6 +115,9 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 	if s.hasTerminated() {
 		return nbmp.ErrInvalid
 	}
+
+	l := log.FromContext(s.rootCtx)
+	l.Info("update task")
 
 	// run onUpdate actions
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "update"))
