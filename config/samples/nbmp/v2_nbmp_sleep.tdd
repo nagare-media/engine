@@ -1,0 +1,55 @@
+{
+  "scheme": {
+    "uri": "urn:mpeg:mpegi:nbmp:2023"
+  },
+  "general": {
+    "id": "047d405f-44c4-4373-b651-f16c2cd24d0f",
+    "name": "encoding",
+    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1",
+    "input-ports": [
+      {
+        "port-name": "input-main",
+        "bind": {
+          "stream-id": "input"
+        }
+      }
+    ],
+    "output-ports": [
+      {
+        "port-name": "output-main",
+        "bind": {
+          "stream-id": "output"
+        }
+      }
+    ]
+  },
+  "input": {
+    "media-parameters": [
+      {
+        "stream-id": "input"
+      }
+    ]
+  },
+  "output": {
+    "media-parameters": [
+      {
+        "stream-id": "output"
+      }
+    ]
+  },
+  "configuration": {
+    "parameters": [
+      {
+        "name": "sleep.engine.nagare.media/duration",
+        "datatype": "string",
+        "values": [
+          {
+            "restrictions": [
+              "10s"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
