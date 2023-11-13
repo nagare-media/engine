@@ -140,6 +140,7 @@ func (s *taskService) Delete(ctx context.Context, t *nbmpv2.Task) error {
 		l.Info("no task running")
 		return nil
 	}
+	*t = *s.tsk
 
 	// Task is running or has terminated => run onDelete actions
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "delete"))
