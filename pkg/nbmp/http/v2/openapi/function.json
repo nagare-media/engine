@@ -1,0 +1,313 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "This is a NBMP Function Description Management API",
+    "version": "1.0.0",
+    "title": "NBMP Function Description Management API",
+    "license": {
+      "name": "ISO/IEC Directives",
+      "url": "https://www.iso.org/directives-and-policies.html"
+    }
+  },
+  "externalDocs": {
+    "description": "ISO/IEC FDIS 23090-8: Network based media processing",
+    "url": "http://isohttps://www.iso.org/standard/77839.html"
+  },
+  "paths": {
+    "/discover-functions": {
+      "get": {
+        "tags": [
+          "Function discovery API"
+        ],
+        "description": "Discover a set of Functions ",
+        "operationId": "DiscoverFunctions",
+        "parameters": [
+          {
+            "name": "parameter",
+            "description": "Query string shall include the key-value pairs describing the desired properties of the target Function. Note: Query string shall be empty, i.e. only '?' added to the end of Function Repository's URL when it is required to discover all Functions of Repository",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response’s body with discovered FDD",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "minItems": 0,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/FDD"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Function description not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/discover-functions-in-group": {
+      "get": {
+        "tags": [
+          "Function discovery API"
+        ],
+        "description": "Discover all Functions in the Function Repository that belong to the given Function Group",
+        "operationId": "DiscoverFunctionsInGroup",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "description": "Group’s id of the group for which the Function list is sought",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response’s body with discovered FDD",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "minItems": 0,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/FDD"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Matched FDD not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/discover-groups-of-function": {
+      "get": {
+        "tags": [
+          "Function discovery API"
+        ],
+        "description": "Discover all Function Groups that a given Function belongs to",
+        "operationId": "DiscoverGroupsOfFunction",
+        "parameters": [
+          {
+            "name": "functionId",
+            "in": "query",
+            "description": "Function’s id of the Function for which Function Group information is sought",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response’s body with discovered group IDs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "minItems": 0,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Matched group ID not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/functions": {
+      "post": {
+        "tags": [
+          "Function management API"
+        ],
+        "description": "Insert an FDD into the function repository",
+        "operationId": "CreateFunctionDescription",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FDD"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Function description is created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FDD"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/functions/{functionId}": {
+      "patch": {
+        "tags": [
+          "Function management API"
+        ],
+        "description": "Update an existing FDD in the function repository",
+        "operationId": "UpdateFunctionDescription",
+        "parameters": [
+          {
+            "name": "functionId",
+            "in": "path",
+            "description": "ID of function description that needs to be updated",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FDD"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response’s body with updated FDD",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FDD"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Function ID not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Function management API"
+        ],
+        "description": "Remove a FDD from the function repository ",
+        "operationId": "DeleteFunctionDescription",
+        "parameters": [
+          {
+            "name": "functionId",
+            "in": "path",
+            "description": "ID of function description that needs to be deleted",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response’s body with updated WDD"
+          },
+          "204": {
+            "description": "Response’s body with updated WDD"
+          },
+          "404": {
+            "description": "Function ID not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FDD": {
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "$ref": "nbmp-schema-definitions.json#/scheme"
+          },
+          "general": {
+            "$ref": "nbmp-schema-definitions.json#/general"
+          },
+          "repository": {
+            "$ref": "nbmp-schema-definitions.json#/repository"
+          },
+          "input": {
+            "$ref": "nbmp-schema-definitions.json#/input"
+          },
+          "output": {
+            "$ref": "nbmp-schema-definitions.json#/output"
+          },
+          "processing": {
+            "$ref": "nbmp-schema-definitions.json#/processing"
+          },
+          "requirement": {
+            "$ref": "nbmp-schema-definitions.json#/requirement"
+          },
+          "step": {
+            "$ref": "nbmp-schema-definitions.json#/step"
+          },
+          "client-assistant": {
+            "$ref": "nbmp-schema-definitions.json#/client-assistant"
+          },
+          "failover": {
+            "$ref": "nbmp-schema-definitions.json#/failover"
+          },
+          "monitoring": {
+            "$ref": "nbmp-schema-definitions.json#/monitoring"
+          },
+          "assertion": {
+            "$ref": "nbmp-schema-definitions.json#/assertion"
+          },
+          "reporting": {
+            "$ref": "nbmp-schema-definitions.json#/reporting"
+          },
+          "notification": {
+            "$ref": "nbmp-schema-definitions.json#/notification"
+          },
+          "security": {
+            "$ref": "nbmp-schema-definitions.json#/security"
+          },
+          "acknowledge": {
+            "$ref": "nbmp-schema-definitions.json#/acknowledge"
+          }
+        }
+      }
+    }
+  }
+}

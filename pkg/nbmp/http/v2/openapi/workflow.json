@@ -1,0 +1,277 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "This is a NBMP Workflow OpenAPI specification",
+    "version": "1.0.0",
+    "title": "NBMP Workflow API",
+    "license": {
+      "name": "ISO/IEC Directives",
+      "url": "https://www.iso.org/directives-and-policies.html"
+    }
+  },
+  "externalDocs": {
+    "description": "ISO/IEC FDIS 23090-8: Network based media processing",
+    "url": "http://isohttps://www.iso.org/standard/77839.html"
+  },
+  "paths": {
+    "/workflows": {
+      "post": {
+        "tags": [
+          "workflows"
+        ],
+        "summary": "Create a workflow",
+        "description": "Create a workflow",
+        "operationId": "CreateWorkflow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WDD"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "search results matching criteria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WDD"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Workflow creation request accepted, but the workflow is not created immediately",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "$ref": "#/components/schemas/Retry-After"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/workflows/{workflowId}": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "summary": "Retrieve an existing workflow",
+        "description": "Retrieve an existing workflow",
+        "operationId": "RetrieveWorkflow",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "in": "path",
+            "description": "ID of workflow previously received in CreateWorkflow’s response",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response’s body with updated WDD",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WDD"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Workflow creation request accepted, but the workflow is not created immediately",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "$ref": "#/components/schemas/Retry-After"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow ID not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "workflows"
+        ],
+        "summary": "Update an existing workflow",
+        "description": "Update an existing workflow",
+        "operationId": "UpdateWorkflow",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "in": "path",
+            "description": "ID of workflow that needs to be updated",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WDD"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response’s body with updated WDD",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WDD"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Workflow creation request accepted, but the workflow is not created immediately",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "$ref": "#/components/schemas/Retry-After"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow ID not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workflows"
+        ],
+        "summary": "Terminate an existing workflow",
+        "description": "Terminate an existing workflow",
+        "operationId": "DeleteWorkflow",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "in": "path",
+            "description": "ID of workflow that needs to be updated",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response’s body with updated WDD",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WDD"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Workflow creation request accepted, but the workflow is not created immediately",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "$ref": "#/components/schemas/Retry-After"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow ID not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WDD": {
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "$ref": "nbmp-schema-definitions.json#/scheme"
+          },
+          "general": {
+            "$ref": "nbmp-schema-definitions.json#/general"
+          },
+          "repository": {
+            "$ref": "nbmp-schema-definitions.json#/repository"
+          },
+          "input": {
+            "$ref": "nbmp-schema-definitions.json#/input"
+          },
+          "output": {
+            "$ref": "nbmp-schema-definitions.json#/output"
+          },
+          "processing": {
+            "$ref": "nbmp-schema-definitions.json#/processing"
+          },
+          "requirement": {
+            "$ref": "nbmp-schema-definitions.json#/requirement"
+          },
+          "step": {
+            "$ref": "nbmp-schema-definitions.json#/step"
+          },
+          "client-assistant": {
+            "$ref": "nbmp-schema-definitions.json#/client-assistant"
+          },
+          "failover": {
+            "$ref": "nbmp-schema-definitions.json#/failover"
+          },
+          "monitoring": {
+            "$ref": "nbmp-schema-definitions.json#/monitoring"
+          },
+          "assertion": {
+            "$ref": "nbmp-schema-definitions.json#/assertion"
+          },
+          "reporting": {
+            "$ref": "nbmp-schema-definitions.json#/reporting"
+          },
+          "notification": {
+            "$ref": "nbmp-schema-definitions.json#/notification"
+          },
+          "security": {
+            "$ref": "nbmp-schema-definitions.json#/security"
+          },
+          "acknowledge": {
+            "$ref": "nbmp-schema-definitions.json#/acknowledge"
+          }
+        }
+      },
+      "Retry-After": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "A date after which to retry specified using the HTTP date format (as defined by RFC7231) to get WR using operation RetrieveWorkflow"
+          },
+          {
+            "type": "integer",
+            "minimum": 1,
+            "exclusiveMinimum": false,
+            "description": "The number of seconds to delay in seconds (as defined by RFC7231) to get WR using operation RetrieveWorkflow"
+          }
+        ]
+      }
+    }
+  }
+}
