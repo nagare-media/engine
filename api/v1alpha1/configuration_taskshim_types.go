@@ -21,9 +21,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nagare-media/engine/pkg/strobj"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
+
+	metaaction "github.com/nagare-media/engine/internal/task-shim/actions/meta"
+	"github.com/nagare-media/engine/pkg/strobj"
 )
 
 type TaskShimConfigurationSpec struct {
@@ -32,6 +34,7 @@ type TaskShimConfigurationSpec struct {
 }
 
 type TaskServiceConfiguration struct {
+	Actions         []TaskServiceAction `json:"actions"`
 	OnCreateActions []TaskServiceAction `json:"onCreate"`
 	OnUpdateActions []TaskServiceAction `json:"onUpdate"`
 	OnDeleteActions []TaskServiceAction `json:"onDelete"`
@@ -76,6 +79,36 @@ func (c *TaskShimConfiguration) Default() {
 	if c.Webserver.Network == nil {
 		c.Webserver.Network = ptr.To[string]("tcp")
 	}
+
+	if len(c.TaskService.OnCreateActions) == 0 {
+		c.TaskService.OnCreateActions = append(c.TaskService.OnCreateActions, TaskServiceAction{
+			Action: metaaction.Name,
+			Config: &strobj.StringOrObject{
+				Type:   strobj.String,
+				StrVal: string(metaaction.ConfigTypeStartTask),
+			},
+		})
+	}
+
+	if len(c.TaskService.OnUpdateActions) == 0 {
+		c.TaskService.OnUpdateActions = append(c.TaskService.OnUpdateActions, TaskServiceAction{
+			Action: metaaction.Name,
+			Config: &strobj.StringOrObject{
+				Type:   strobj.String,
+				StrVal: string(metaaction.ConfigTypeRestartTask),
+			},
+		})
+	}
+
+	if len(c.TaskService.OnDeleteActions) == 0 {
+		c.TaskService.OnDeleteActions = append(c.TaskService.OnDeleteActions, TaskServiceAction{
+			Action: metaaction.Name,
+			Config: &strobj.StringOrObject{
+				Type:   strobj.String,
+				StrVal: string(metaaction.ConfigTypeStopTask),
+			},
+		})
+	}
 }
 
 func (c *TaskShimConfiguration) Validate() error {
@@ -94,5 +127,10 @@ func (c *TaskShimConfiguration) Validate() error {
 	if c.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.Webserver.PublicBaseURL, "/") {
 		return errors.New("trailing slash in webserver.publicBaseURL")
 	}
+
+	if len(c.TaskService.Actions) == 0 {
+		return errors.New("missing task actions")
+	}
+
 	return nil
 }
