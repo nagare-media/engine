@@ -22,6 +22,7 @@ import (
 )
 
 func UpdateAcknowledgeStatus(ack *nbmpv2.Acknowledge) nbmpv2.AcknowledgeStatus {
+	ack.Status = nbmpv2.FulfilledAcknowledgeStatus
 	if len(ack.Partial) > 0 {
 		ack.Status = nbmpv2.PartiallyFulfilledAcknowledgeStatus
 	}
