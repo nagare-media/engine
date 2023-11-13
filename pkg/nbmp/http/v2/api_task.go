@@ -61,7 +61,7 @@ func (api *taskAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Task) er
 
 		// parse request
 		t := &nbmpv2.Task{}
-		if http.IsReadRequest(c) {
+		if http.IsReadRequest(c) || c.Method() == fiber.MethodDelete {
 			// construct initial description
 			t.General = nbmpv2.General{
 				ID: c.Params("id"),

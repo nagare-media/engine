@@ -61,7 +61,7 @@ func (api *workflowAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Work
 
 		// parse request
 		w := &nbmpv2.Workflow{}
-		if http.IsReadRequest(c) {
+		if http.IsReadRequest(c) || c.Method() == fiber.MethodDelete {
 			// construct initial description
 			w.General = nbmpv2.General{
 				ID: c.Params("id"),
