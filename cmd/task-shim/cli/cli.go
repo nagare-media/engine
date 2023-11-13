@@ -37,6 +37,7 @@ import (
 
 	// Import task-shim actions to be included.
 	_ "github.com/nagare-media/engine/internal/task-shim/actions/exec"
+	_ "github.com/nagare-media/engine/internal/task-shim/actions/file"
 )
 
 var (
