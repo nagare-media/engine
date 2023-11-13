@@ -34,6 +34,8 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/version"
 	taskshim "github.com/nagare-media/engine/internal/task-shim"
+
+	// Import task-shim actions to be included.
 )
 
 var (
@@ -139,8 +141,13 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	// create and start components
 
-	httpServer := taskshim.New(&cfg)
-	if err = httpServer.Start(ctx); err != nil {
+	// We work with two separate contexts:
+	//   ctx     : was given to CLI and should normally only cancel if a termination signal was send by the OS
+	//   httpCtx : is used for the HTTP server
+	httpCtx, terminateCliFunc := context.WithCancel(context.Background())
+	httpCtx = log.IntoContext(httpCtx, l)
+	httpServer := taskshim.New(ctx, terminateCliFunc, &cfg)
+	if err = httpServer.Start(httpCtx); err != nil {
 		setupLog.Error(err, "problem running webserver")
 		return err
 	}

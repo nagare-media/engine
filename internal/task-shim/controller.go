@@ -17,6 +17,8 @@ limitations under the License.
 package taskshim
 
 import (
+	"context"
+
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	enginehttp "github.com/nagare-media/engine/internal/pkg/http"
 	"github.com/nagare-media/engine/internal/task-shim/svc"
@@ -26,7 +28,7 @@ import (
 	"github.com/nagare-media/engine/pkg/starter"
 )
 
-func New(cfg *enginev1.TaskShimConfiguration) starter.Starter {
+func New(ctx context.Context, terminateFunc func(), cfg *enginev1.TaskShimConfiguration) starter.Starter {
 	s := enginehttp.NewServer(&cfg.Webserver)
 
 	// Health API
@@ -39,7 +41,7 @@ func New(cfg *enginev1.TaskShimConfiguration) starter.Starter {
 		nbmpsvcv2.TaskDefaulterMiddleware(
 			nbmpsvcv2.TaskValidatorSpecLaxMiddleware(
 				svc.TaskValidatorMiddleware(
-					svc.NewTaskService(&cfg.TaskService),
+					svc.NewTaskService(ctx, terminateFunc, &cfg.TaskService),
 				),
 			),
 		)
