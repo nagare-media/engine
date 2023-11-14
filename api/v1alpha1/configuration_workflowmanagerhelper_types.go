@@ -70,6 +70,10 @@ func (c *WorkflowManagerHelperConfiguration) Default() {
 	if c.ReportsController.Webserver.Network == nil {
 		c.ReportsController.Webserver.Network = ptr.To[string]("tcp")
 	}
+
+	if c.ReportsController.Webserver.PublicBaseURL == nil {
+		c.ReportsController.Webserver.PublicBaseURL = ptr.To[string]("http://127.0.0.1:8181")
+	}
 }
 
 func (c *WorkflowManagerHelperConfiguration) Validate() error {

@@ -80,6 +80,10 @@ func (c *TaskShimConfiguration) Default() {
 		c.Webserver.Network = ptr.To[string]("tcp")
 	}
 
+	if c.Webserver.PublicBaseURL == nil {
+		c.Webserver.PublicBaseURL = ptr.To[string]("http://127.0.0.1:8888")
+	}
+
 	if len(c.TaskService.OnCreateActions) == 0 {
 		c.TaskService.OnCreateActions = append(c.TaskService.OnCreateActions, TaskServiceAction{
 			Action: metaaction.Name,
