@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 ARG GOVERSION
 FROM --platform=${BUILDPLATFORM} docker.io/golang:${GOVERSION} AS build
 
@@ -65,8 +67,32 @@ COPY --from=build "/app/bin/task-shim-${VERSION}-${OS}-${ARCH}" /task-shim
 COPY --from=build "/app/bin/functions-${VERSION}-${OS}-${ARCH}" /noop
 USER 65532:65532
 
+COPY <<EOF /config/workflow-manager-helper.yaml
+apiVersion: engine.nagare.media/v1alpha1
+kind: TaskShimConfiguration
+webserver:
+  bindAddress: 127.0.0.1:8888
+  publicBaseURL: http://127.0.0.1:8888
+task:
+  actions:
+    - name: execute function
+      action: task-shim.engine.nagare.media/exec
+      config:
+        command: /noop
+        args: ["/tmp/nbmp.tdd"]
+  onCreate:
+    - name: write task description document
+      action: task-shim.engine.nagare.media/file
+      config: |
+        path: /tmp/nbmp.tdd
+        content: |
+          {{ toJson .Task }}
+    - action: task-shim.engine.nagare.media/meta
+      config: start-task
+EOF
+
 # NBMP Task API
-EXPOSE 8080
+EXPOSE 8888
 
 ENTRYPOINT [ "/task-shim" ]
-CMD [ "/noop" ]
+CMD [ "--config", "/config/task-shim.yaml" ]
