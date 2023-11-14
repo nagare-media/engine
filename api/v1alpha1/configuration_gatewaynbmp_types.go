@@ -24,8 +24,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
-
-	"github.com/nagare-media/engine/pkg/apis/resources"
 )
 
 type GatewayNBMPConfigurationSpec struct {
@@ -43,6 +41,20 @@ type GatewayNBMPWorkflowServiceConfiguration struct {
 	// +optional
 	DefaultKubernetesGPUResource corev1.ResourceName `json:"defaultKubernetesGPUResource,omitempty"`
 }
+
+const (
+	// AMD GPU resource name.
+	AMD_GPU corev1.ResourceName = "amd.com/gpu"
+
+	// Intel GPU prefix resource name.
+	IntelGPUPrefix string = "gpu.intel.com/"
+
+	// NVIDIA GPU resource name.
+	NVIDIA_GPU corev1.ResourceName = "nvidia.com/gpu"
+
+	// Shared NVIDIA GPU resource name.
+	NVIDIA_GPUShared corev1.ResourceName = "nvidia.com/gpu.shared"
+)
 
 // +kubebuilder:object:root=true
 
@@ -80,7 +92,7 @@ func (c *GatewayNBMPConfiguration) Default() {
 
 	if c.WorkflowService.DefaultKubernetesGPUResource == "" {
 		// TODO: what should the default be?
-		c.WorkflowService.DefaultKubernetesGPUResource = resources.NVIDIA_GPU
+		c.WorkflowService.DefaultKubernetesGPUResource = NVIDIA_GPU
 	}
 }
 
