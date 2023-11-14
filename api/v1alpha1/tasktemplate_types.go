@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	batchv1 "k8s.io/api/batch/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
@@ -66,7 +65,7 @@ type TaskTemplateSpec struct {
 
 	// Configuration values.
 	// +optional
-	Config *apiextensionsv1.JSON `json:"config,omitempty"`
+	Config map[string]string `json:"config,omitempty"`
 }
 
 // +kubebuilder:object:root=true

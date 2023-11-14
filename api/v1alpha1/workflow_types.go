@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
@@ -53,7 +52,7 @@ type WorkflowSpec struct {
 
 	// Workflow configuration values.
 	// +optional
-	Config *apiextensionsv1.JSON `json:"config,omitempty"`
+	Config map[string]string `json:"config,omitempty"`
 }
 
 type HumanReadableWorkflowDescription struct {

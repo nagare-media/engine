@@ -121,7 +121,9 @@ func (s *workflowService) wddToWorkflow(nbmpWf *nbmpv2.Workflow) (*enginev1.Work
 	if err != nil {
 		return nil, err
 	}
-	wf.Spec.Config = &apiextensionsv1.JSON{Raw: cfgRaw}
+	_ = &apiextensionsv1.JSON{Raw: cfgRaw}
+	// wf.Spec.Config = &apiextensionsv1.JSON{Raw: cfgRaw}
+	// TODO: fix configuration
 
 	// TODO: add media locations
 
@@ -341,6 +343,8 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 		if err != nil {
 			return nil, err
 		}
+		_ = rawCfg
+		// TODO: fix config
 
 		// create task
 		tasks = append(tasks, &enginev1.Task{
@@ -358,9 +362,9 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 				MediaProcessingEntitySelector: mpeSel,
 				WorkflowRef:                   meta.LocalObjectReference{Name: wf.Name},
 				FunctionRef:                   &meta.LocalObjectReference{Name: fid},
-				Config:                        &apiextensionsv1.JSON{Raw: rawCfg},
-				TemplatePatches:               tplPatches,
-				JobFailurePolicy:              &enginev1.JobFailurePolicy{DefaultAction: &enginev1.JobFailurePolicyActionFailWorkflow},
+				// Config:                        &apiextensionsv1.JSON{Raw: rawCfg},
+				TemplatePatches:  tplPatches,
+				JobFailurePolicy: &enginev1.JobFailurePolicy{DefaultAction: &enginev1.JobFailurePolicyActionFailWorkflow},
 			},
 		})
 	}

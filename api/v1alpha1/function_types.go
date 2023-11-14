@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	batchv1 "k8s.io/api/batch/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -57,7 +56,7 @@ type FunctionSpec struct {
 
 	// Default configuration values.
 	// +optional
-	DefaultConfig *apiextensionsv1.JSON `json:"defaultConfig,omitempty"`
+	DefaultConfig map[string]string `json:"defaultConfig,omitempty"`
 }
 
 // +kubebuilder:object:root=true

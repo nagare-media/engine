@@ -430,7 +430,7 @@ type QueryArg struct {
 	// allowed. A MediaLocation can only reference Objects from its own Namespace. This field is required if value is not
 	// specified. If both are specified, value has precedence.
 	// +optional
-	// // ValueFrom *meta.ConfigMapOrSecretReference `json:"valueFrom,omitempty"`
+	// ValueFrom *meta.ConfigMapOrSecretReference `json:"valueFrom,omitempty"`
 }
 
 // +kubebuilder:object:root=true
