@@ -40,7 +40,7 @@ import (
 )
 
 type taskService struct {
-	cfg *enginev1.TaskServiceConfiguration
+	cfg *enginev1.TaskShimTaskServiceConfiguration
 
 	rootCtx       context.Context
 	terminateFunc func()
@@ -55,7 +55,7 @@ type taskService struct {
 
 var _ nbmpsvcv2.TaskService = &taskService{}
 
-func NewTaskService(ctx context.Context, terminateFunc func(), cfg *enginev1.TaskServiceConfiguration) *taskService {
+func NewTaskService(ctx context.Context, terminateFunc func(), cfg *enginev1.TaskShimTaskServiceConfiguration) *taskService {
 	s := &taskService{
 		cfg:           cfg,
 		rootCtx:       ctx,

@@ -29,11 +29,11 @@ import (
 )
 
 type TaskShimConfigurationSpec struct {
-	Webserver   WebserverConfiguration   `json:"webserver"`
-	TaskService TaskServiceConfiguration `json:"task"`
+	Webserver   WebserverConfiguration           `json:"webserver"`
+	TaskService TaskShimTaskServiceConfiguration `json:"task"`
 }
 
-type TaskServiceConfiguration struct {
+type TaskShimTaskServiceConfiguration struct {
 	Actions         []TaskServiceAction `json:"actions"`
 	OnCreateActions []TaskServiceAction `json:"onCreate"`
 	OnUpdateActions []TaskServiceAction `json:"onUpdate"`

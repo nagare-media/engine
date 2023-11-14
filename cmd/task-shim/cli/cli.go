@@ -112,6 +112,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	log.SetLogger(l)
 
 	if cfgFile == "" {
+		// TODO: make this optional
 		err := errors.New("--config option missing")
 		setupLog.Error(err, "setup failed")
 		fs.Usage()
@@ -125,9 +126,9 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	}
 
 	// TODO: decoding seems to be lax; disallow unknown fields
-	var cfg enginev1.TaskShimConfiguration
+	cfg := &enginev1.TaskShimConfiguration{}
 	codecs := serializer.NewCodecFactory(scheme)
-	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, &cfg)
+	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, cfg)
 	if err != nil {
 		setupLog.Error(err, "unable to parse config file")
 		return err
@@ -148,9 +149,9 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	//   httpCtx : is used for the HTTP server
 	httpCtx, terminateCliFunc := context.WithCancel(context.Background())
 	httpCtx = log.IntoContext(httpCtx, l)
-	httpServer := taskshim.New(ctx, terminateCliFunc, &cfg)
+	httpServer := taskshim.New(ctx, terminateCliFunc, cfg)
 	if err = httpServer.Start(httpCtx); err != nil {
-		setupLog.Error(err, "problem running webserver")
+		setupLog.Error(err, "problem running task-shim")
 		return err
 	}
 

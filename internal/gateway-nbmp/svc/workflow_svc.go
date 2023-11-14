@@ -34,13 +34,13 @@ import (
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch;create;update;patch;delete
 
 type workflowService struct {
-	cfg *enginev1.WorkflowServiceConfiguration
+	cfg *enginev1.GatewayNBMPWorkflowServiceConfiguration
 	k8s client.Client
 }
 
 var _ nbmpsvcv2.WorkflowService = &workflowService{}
 
-func NewWorkflowService(cfg *enginev1.WorkflowServiceConfiguration, k8sClient client.Client) *workflowService {
+func NewWorkflowService(cfg *enginev1.GatewayNBMPWorkflowServiceConfiguration, k8sClient client.Client) *workflowService {
 	return &workflowService{
 		cfg: cfg,
 		k8s: k8sClient,

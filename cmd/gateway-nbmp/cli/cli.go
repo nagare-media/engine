@@ -121,6 +121,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	if cfgFile == "" {
+		// TODO: make this optional
 		err := errors.New("--config option missing")
 		setupLog.Error(err, "setup failed")
 		fs.Usage()
@@ -134,9 +135,9 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	}
 
 	// TODO: decoding seems to be lax; disallow unknown fields
-	var cfg enginev1.GatewayNBMPConfiguration
+	cfg := &enginev1.GatewayNBMPConfiguration{}
 	codecs := serializer.NewCodecFactory(scheme)
-	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, &cfg)
+	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, cfg)
 	if err != nil {
 		setupLog.Error(err, "unable to parse config file")
 		return err
@@ -193,7 +194,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	// create components
 
-	httpServer := gatewaynbmp.New(&cfg, k8sClient)
+	httpServer := gatewaynbmp.New(cfg, k8sClient)
 
 	// start components
 

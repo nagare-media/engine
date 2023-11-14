@@ -29,13 +29,14 @@ import (
 )
 
 type GatewayNBMPConfigurationSpec struct {
-	Webserver       WebserverConfiguration       `json:"webserver"`
-	WorkflowService WorkflowServiceConfiguration `json:"workflows"`
+	Webserver       WebserverConfiguration                  `json:"webserver"`
+	WorkflowService GatewayNBMPWorkflowServiceConfiguration `json:"workflows"`
 }
 
-type WorkflowServiceConfiguration struct {
+type GatewayNBMPWorkflowServiceConfiguration struct {
 	// Limit gateway-nbmp to a specific Kubernetes namespace.
 	// +optional
+	// TODO: make really optional
 	KubernetesNamespace string `json:"kubernetesNamespace,omitempty"`
 
 	// Name of the GPU resource used in the Kubernetes cluster (e.g. "nvidia.com/gpu").
@@ -115,5 +116,6 @@ func (c *GatewayNBMPConfiguration) Validate() error {
 	if c.WorkflowService.DefaultKubernetesGPUResource == "" {
 		return errors.New("missing services.defaultKubernetesGPUResource")
 	}
+
 	return nil
 }
