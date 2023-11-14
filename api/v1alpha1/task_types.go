@@ -96,6 +96,14 @@ type TaskSpec struct {
 	// +optional
 	JobFailurePolicy *JobFailurePolicy `json:"jobFailurePolicy,omitempty"`
 
+	// Inputs of this task.
+	// +optional
+	Inputs []Media `json:"inputs"`
+
+	// Outputs of this task.
+	// +optional
+	Outputs []Media `json:"outputs"`
+
 	// Configuration values.
 	// +optional
 	Config map[string]string `json:"config,omitempty"`

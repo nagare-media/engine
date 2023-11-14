@@ -50,6 +50,14 @@ type WorkflowSpec struct {
 	// +optional
 	MediaLocations []NamedMediaLocationReference `json:"mediaLocations,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
+	// Inputs of this workflow.
+	// +optional
+	Inputs []Media `json:"inputs"`
+
+	// Outputs of this workflow.
+	// +optional
+	Outputs []Media `json:"outputs"`
+
 	// Workflow configuration values.
 	// +optional
 	Config map[string]string `json:"config,omitempty"`
