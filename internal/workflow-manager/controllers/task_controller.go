@@ -23,9 +23,10 @@ import (
 	"fmt"
 	"time"
 
+	"dario.cat/mergo"
+
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -43,7 +44,6 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/apis/utils"
 	apiclient "github.com/nagare-media/engine/internal/workflow-manager/client"
-	"github.com/nagare-media/engine/pkg/apis/functions"
 	"github.com/nagare-media/engine/pkg/apis/meta"
 )
 
@@ -645,131 +645,125 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 	}
 
 	// construct Secret
-	data := &functions.SecretData{
-		Workflow: functions.Workflow{
-			Info: functions.WorkflowInfo{
-				Name: wf.Name,
+	data := &enginev1.WorkflowManagerHelperData{
+		WorkflowManagerHelperDataSpec: enginev1.WorkflowManagerHelperDataSpec{
+			Workflow: enginev1.WorkflowManagerHelperDataWorkflow{
+				ID:            wf.Name,
+				HumanReadable: wf.Spec.HumanReadable,
+				Config:        wf.Spec.Config,
 			},
-		},
-		Task: functions.Task{
-			Info: functions.TaskInfo{
-				Name: task.Name,
+			Task: enginev1.WorkflowManagerHelperDataTask{
+				ID:            task.Name,
+				HumanReadable: task.Spec.HumanReadable,
+				Inputs:        task.Spec.Inputs,
+				Outputs:       task.Spec.Outputs,
 			},
-		},
-		System: functions.System{
-			NATS: r.Config.NATS,
+			System: enginev1.WorkflowManagerHelperDataSystem{
+				NATS: r.Config.NATS,
+			},
 		},
 	}
 
-	// add Workflow configuration
-	wfCfgMap := make(map[string]any)
-	if wf.Spec.Config != nil {
-		if err = json.Unmarshal(wf.Spec.Config.Raw, &wfCfgMap); err != nil {
+	// add Task configuration (merge of Function, TaskTemplate and Task configuration)
+	taskCfg := funcSpec.DefaultConfig
+	if taskCfg == nil {
+		taskCfg = make(map[string]string)
+	}
+	if ttSpec != nil && ttSpec.Config != nil {
+		err = mergo.Map(&taskCfg, ttSpec.Config)
+		if err != nil {
 			return ctrl.Result{}, err
 		}
 	}
-	data.Workflow.Config = wfCfgMap
-
-	// add Task configuration (merge of Function, TaskTemplate and Task configuration)
-	taskCfgMap := make(map[string]any)
-	taskCfgPatches := make([]*apiextensionsv1.JSON, 0, 3)
-	taskCfgPatches = append(taskCfgPatches, funcSpec.DefaultConfig)
-	if ttSpec != nil {
-		taskCfgPatches = append(taskCfgPatches, ttSpec.Config)
-	}
-	taskCfgPatches = append(taskCfgPatches, task.Spec.Config)
-	for _, patch := range taskCfgPatches {
-		if patch != nil {
-			newTaskCfgMap := make(map[string]any)
-			if err = utils.StrategicMerge(taskCfgMap, patch, &newTaskCfgMap); err != nil {
-				return ctrl.Result{}, err
-			}
-			taskCfgMap = newTaskCfgMap
+	if task.Spec.Config != nil {
+		err = mergo.Map(&taskCfg, task.Spec.Config)
+		if err != nil {
+			return ctrl.Result{}, err
 		}
 	}
-	data.Task.Config = taskCfgMap
+	data.Task.Config = taskCfg
 
 	// add MediaLocations
 	// TODO: add default MLs
-	data.MediaLocations = make(map[string]enginev1.MediaLocationConfig, len(wf.Spec.MediaLocations))
+	data.MediaLocations = make(map[string]enginev1.MediaLocationSpec, len(wf.Spec.MediaLocations))
 	for _, mlRef := range wf.Spec.MediaLocations {
 		mlObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, &mlRef.Ref)
 		if err != nil {
 			return ctrl.Result{}, err
 		}
 
-		var mlCfg *enginev1.MediaLocationConfig
+		var mlSpec *enginev1.MediaLocationSpec
 		switch ml := mlObj.(type) {
 		case *enginev1.ClusterMediaLocation:
-			mlCfg = &ml.Spec.MediaLocationConfig
+			mlSpec = &ml.Spec
 		case *enginev1.MediaLocation:
-			mlCfg = &ml.Spec.MediaLocationConfig
+			mlSpec = &ml.Spec
 		default:
 			return ctrl.Result{}, errors.New("mediaProcessingEntityRef does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
 		}
 
 		// resolve MediaLocation secrets
 		switch {
-		case mlCfg.HTTP != nil:
-			if mlCfg.HTTP.Auth != nil {
-				if mlCfg.HTTP.Auth.Basic != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.HTTP.Auth.Basic.SecretRef, task); err != nil {
+		case mlSpec.HTTP != nil:
+			if mlSpec.HTTP.Auth != nil {
+				if mlSpec.HTTP.Auth.Basic != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Basic.SecretRef, task); err != nil {
 						return ctrl.Result{}, err
 					}
 				}
-				if mlCfg.HTTP.Auth.Digest != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.HTTP.Auth.Digest.SecretRef, task); err != nil {
+				if mlSpec.HTTP.Auth.Digest != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Digest.SecretRef, task); err != nil {
 						return ctrl.Result{}, err
 					}
 				}
-				if mlCfg.HTTP.Auth.Token != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.HTTP.Auth.Token.SecretRef, task); err != nil {
+				if mlSpec.HTTP.Auth.Token != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Token.SecretRef, task); err != nil {
 						return ctrl.Result{}, err
 					}
 				}
 			}
-		case mlCfg.S3 != nil:
-			if mlCfg.S3.Auth.AWS != nil {
-				if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.S3.Auth.AWS.SecretRef, task); err != nil {
+		case mlSpec.S3 != nil:
+			if mlSpec.S3.Auth.AWS != nil {
+				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.S3.Auth.AWS.SecretRef, task); err != nil {
 					return ctrl.Result{}, err
 				}
 			}
-		case mlCfg.Opencast != nil:
-			if mlCfg.Opencast.Auth.Basic != nil {
-				if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.Opencast.Auth.Basic.SecretRef, task); err != nil {
+		case mlSpec.Opencast != nil:
+			if mlSpec.Opencast.Auth.Basic != nil {
+				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.Opencast.Auth.Basic.SecretRef, task); err != nil {
 					return ctrl.Result{}, err
 				}
 			}
-		case mlCfg.RTMP != nil:
-			if mlCfg.RTMP.Auth != nil {
-				if mlCfg.RTMP.Auth.Basic != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.RTMP.Auth.Basic.SecretRef, task); err != nil {
+		case mlSpec.RTMP != nil:
+			if mlSpec.RTMP.Auth != nil {
+				if mlSpec.RTMP.Auth.Basic != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTMP.Auth.Basic.SecretRef, task); err != nil {
 						return ctrl.Result{}, err
 					}
 				}
-				if mlCfg.RTMP.Auth.StreamingKey != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.RTMP.Auth.StreamingKey.SecretRef, task); err != nil {
-						return ctrl.Result{}, err
-					}
-				}
-			}
-		case mlCfg.RTSP != nil:
-			if mlCfg.RTSP.Auth != nil {
-				if mlCfg.RTSP.Auth.Basic != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.RTSP.Auth.Basic.SecretRef, task); err != nil {
+				if mlSpec.RTMP.Auth.StreamingKey != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTMP.Auth.StreamingKey.SecretRef, task); err != nil {
 						return ctrl.Result{}, err
 					}
 				}
 			}
-		case mlCfg.RIST != nil:
-			if mlCfg.RIST.Encryption != nil {
-				if err = r.prepareSecretRefForSecretData(ctx, &mlCfg.RIST.Encryption.SecretRef, task); err != nil {
+		case mlSpec.RTSP != nil:
+			if mlSpec.RTSP.Auth != nil {
+				if mlSpec.RTSP.Auth.Basic != nil {
+					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTSP.Auth.Basic.SecretRef, task); err != nil {
+						return ctrl.Result{}, err
+					}
+				}
+			}
+		case mlSpec.RIST != nil:
+			if mlSpec.RIST.Encryption != nil {
+				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RIST.Encryption.SecretRef, task); err != nil {
 					return ctrl.Result{}, err
 				}
 			}
 		}
 
-		data.MediaLocations[mlRef.Name] = *mlCfg
+		data.MediaLocations[mlRef.Name] = *mlSpec
 	}
 
 	// create Secret

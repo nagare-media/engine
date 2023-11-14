@@ -16,36 +16,7 @@ limitations under the License.
 
 package functions
 
-import enginev1 "github.com/nagare-media/engine/api/v1alpha1"
-
-type SecretData struct {
-	Workflow       Workflow                                `json:"workflow,omitempty"`
-	Task           Task                                    `json:"task,omitempty"`
-	MediaLocations map[string]enginev1.MediaLocationConfig `json:"mediaLocations,omitempty"`
-	System         System                                  `json:"system,omitempty"`
-}
-
-type Workflow struct {
-	Info   WorkflowInfo   `json:"info,omitempty"`
-	Config map[string]any `json:"config,omitempty"`
-}
-
-type WorkflowInfo struct {
-	Name string `json:"name,omitempty"`
-}
-
-type Task struct {
-	Info   TaskInfo       `json:"info,omitempty"`
-	Config map[string]any `json:"config,omitempty"`
-}
-
-type TaskInfo struct {
-	Name string `json:"name,omitempty"`
-}
-
-type System struct {
-	NATS enginev1.NATSConfig `json:"nats,omitempty"`
-}
+// TODO: migrate away from these types and remove them
 
 type GenericFunctionConfig struct {
 	Inputs  map[string]any `json:"inputs,omitempty"`
