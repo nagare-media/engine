@@ -28,7 +28,7 @@ import (
 	"github.com/nagare-media/engine/pkg/starter"
 )
 
-func New(ctx context.Context, terminateFunc func(), cfg *enginev1.TaskShimConfiguration) starter.Starter {
+func New(ctx context.Context, terminateFunc func(error), cfg *enginev1.TaskShimConfiguration) starter.Starter {
 	s := enginehttp.NewServer(&cfg.Webserver)
 
 	// Health API

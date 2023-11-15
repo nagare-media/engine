@@ -147,13 +147,23 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	// We work with two separate contexts:
 	//   ctx     : was given to CLI and should normally only cancel if a termination signal was send by the OS
 	//   httpCtx : is used for the HTTP server
-	httpCtx, terminateCliFunc := context.WithCancel(context.Background())
+	httpCtx, httpCtxCancel := context.WithCancel(context.Background())
 	httpCtx = log.IntoContext(httpCtx, l)
-	httpServer := taskshim.New(ctx, terminateCliFunc, cfg)
+
+	var taskErr error
+	terminateCliFn := func(err error) {
+		taskErr = err
+		if err != nil {
+			setupLog.Error(err, "problem running task")
+		}
+		httpCtxCancel()
+	}
+
+	httpServer := taskshim.New(ctx, terminateCliFn, cfg)
 	if err = httpServer.Start(httpCtx); err != nil {
-		setupLog.Error(err, "problem running task-shim")
+		setupLog.Error(err, "problem running webserver")
 		return err
 	}
 
-	return nil
+	return taskErr
 }

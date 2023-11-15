@@ -43,7 +43,7 @@ type taskService struct {
 	cfg *enginev1.TaskShimTaskServiceConfiguration
 
 	rootCtx       context.Context
-	terminateFunc func()
+	terminateFunc func(error)
 
 	mtx          sync.RWMutex
 	tsk          *nbmpv2.Task       // protected by mtx
@@ -55,7 +55,7 @@ type taskService struct {
 
 var _ nbmpsvcv2.TaskService = &taskService{}
 
-func NewTaskService(ctx context.Context, terminateFunc func(), cfg *enginev1.TaskShimTaskServiceConfiguration) *taskService {
+func NewTaskService(ctx context.Context, terminateFunc func(error), cfg *enginev1.TaskShimTaskServiceConfiguration) *taskService {
 	s := &taskService{
 		cfg:           cfg,
 		rootCtx:       ctx,
@@ -83,7 +83,7 @@ func (s *taskService) init() {
 
 		// terminate process
 		l.Info("terminate process")
-		s.terminateFunc()
+		s.terminateFunc(s.rootCtx.Err())
 	}()
 }
 
@@ -134,7 +134,7 @@ func (s *taskService) Delete(ctx context.Context, t *nbmpv2.Task) error {
 
 	// call to Delete should always result in termination of process
 	defer l.Info("terminate process")
-	defer s.terminateFunc()
+	defer s.terminateFunc(s.tskErr)
 
 	// if Task has never been created => just exit
 	if s.tsk == nil {
