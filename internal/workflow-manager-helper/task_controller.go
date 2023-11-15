@@ -193,6 +193,7 @@ func (c *taskCtrl) observeTaskPhase(ctx context.Context) error {
 
 func (c *taskCtrl) observerLoop(ctx context.Context) error {
 	l := log.FromContext(ctx, "function", "observer")
+	ctx = log.IntoContext(ctx, l)
 	l.Info("starting observer")
 
 	t := time.NewTimer(c.cfg.TaskController.ObservePeriode.Duration)
@@ -288,6 +289,7 @@ func (c *taskCtrl) probeTask(ctx context.Context) (*nbmpv2.Task, error) {
 
 func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 	l := log.FromContext(ctx, "function", "event-emitter")
+	ctx = log.IntoContext(ctx, l)
 	l.Info("starting event-emitter")
 
 	// TODO: check if there is an event input
