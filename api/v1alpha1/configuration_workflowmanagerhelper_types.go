@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"errors"
+	"net/url"
 	"strings"
 	"time"
 
@@ -31,6 +32,10 @@ type WorkflowManagerHelperConfigurationSpec struct {
 }
 
 type WorkflowManagerHelperTaskControllerConfiguration struct {
+	TaskAPI         string           `json:"taskAPI"`
+	RequestTimeout  *metav1.Duration `json:"requestTimeout"`
+	ObservePeriode  *metav1.Duration `json:"observePeriode"`
+	MaxFailedProbes *int             `json:"maxFailedProbes"`
 }
 
 type WorkflowManagerHelperReportsControllerConfiguration struct {
@@ -51,6 +56,18 @@ func init() {
 }
 
 func (c *WorkflowManagerHelperConfiguration) Default() {
+	if c.TaskController.RequestTimeout == nil {
+		c.TaskController.RequestTimeout = &metav1.Duration{Duration: 10 * time.Second}
+	}
+
+	if c.TaskController.ObservePeriode == nil {
+		c.TaskController.ObservePeriode = &metav1.Duration{Duration: 2 * time.Second}
+	}
+
+	if c.TaskController.MaxFailedProbes == nil {
+		c.TaskController.MaxFailedProbes = ptr.To[int](10)
+	}
+
 	if c.ReportsController.Webserver.BindAddress == nil {
 		c.ReportsController.Webserver.BindAddress = ptr.To[string]("127.0.0.1:8181")
 	}
@@ -77,6 +94,31 @@ func (c *WorkflowManagerHelperConfiguration) Default() {
 }
 
 func (c *WorkflowManagerHelperConfiguration) Validate() error {
+	if c.TaskController.TaskAPI == "" {
+		return errors.New("missing task.taskAPI")
+	}
+
+	TaskAPIURL, err := url.Parse(c.TaskController.TaskAPI)
+	if err != nil {
+		return errors.New("task.taskAPI is not a URL")
+	}
+
+	if TaskAPIURL.Scheme != "http" && TaskAPIURL.Scheme != "https" {
+		return errors.New("task.taskAPI is not an HTTP URL")
+	}
+
+	if c.TaskController.RequestTimeout == nil {
+		return errors.New("missing task.requestTimeout")
+	}
+
+	if c.TaskController.ObservePeriode == nil {
+		return errors.New("missing task.observePeriode")
+	}
+
+	if c.TaskController.MaxFailedProbes == nil {
+		return errors.New("missing task.maxFailedProbes")
+	}
+
 	if c.ReportsController.Webserver.BindAddress == nil {
 		return errors.New("missing webserver.bindAddress")
 	}
