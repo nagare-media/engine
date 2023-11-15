@@ -96,10 +96,10 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 	}
 
 	if err := c.deleteTaskPhase(ctx); err != nil {
-		// we ignore the error and always try to move on to the delete phase
 		// we will record the error in the Kubernetes termination message
 		fmt.Fprint(terminationMsgBuf, "delete phase failed: ")
 		fmt.Fprintln(terminationMsgBuf, err)
+		return err
 	}
 
 	return nil

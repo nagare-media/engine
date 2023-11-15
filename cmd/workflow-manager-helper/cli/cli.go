@@ -174,39 +174,36 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	// start components
 
-	var reportsCtrlErr error
-	reportsCtrlDone := make(chan struct{})
-	go func() {
-		reportsCtrlErr = reportsCtrl.Start(ctx)
-		close(reportsCtrlDone)
-	}()
+	var (
+		reportsCtrlErr, taskCtrlErr error
+		reportsCtrlDone             = make(chan struct{})
+		taskCtrlDone                = make(chan struct{})
+	)
 
-	var taskCtrlErr error
-	taskCtrlDone := make(chan struct{})
-	go func() {
-		taskCtrlErr = taskCtrl.Start(ctx)
-		close(taskCtrlDone)
-	}()
+	go func() { reportsCtrlErr = reportsCtrl.Start(ctx); close(reportsCtrlDone) }()
+	go func() { taskCtrlErr = taskCtrl.Start(ctx); close(taskCtrlDone) }()
 
 	// termination handling
 
 	select {
 	case <-reportsCtrlDone:
-		err = reportsCtrlErr
-		if err != nil {
-			setupLog.Error(err, "problem running reports controller")
-		}
 		cancel()
 	case <-taskCtrlDone:
-		err = taskCtrlErr
-		if err != nil {
-			setupLog.Error(err, "problem running task controller")
-		}
 		cancel()
 	case <-ctx.Done():
 	}
 	<-taskCtrlDone
 	<-reportsCtrlDone
+
+	if reportsCtrlErr != nil {
+		err = reportsCtrlErr
+		setupLog.Error(err, "problem running reports controller")
+	}
+
+	if taskCtrlErr != nil {
+		err = taskCtrlErr
+		setupLog.Error(err, "problem running task controller")
+	}
 
 	return err
 }
