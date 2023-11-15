@@ -5,6 +5,7 @@ go 1.21
 require (
 	dario.cat/mergo v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.3
+	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/cloudevents/sdk-go/v2 v2.14.0
 	github.com/gofiber/fiber/v2 v2.50.0
 	github.com/google/uuid v1.3.1

@@ -170,7 +170,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	// create components
 
 	reportsCtrl := workflowmanagerhelper.NewReportsController(&cfg.ReportsController, data)
-	taskCtrl := workflowmanagerhelper.NewTaskController(&cfg.TaskController, data)
+	taskCtrl := workflowmanagerhelper.NewTaskController(cfg, data)
 
 	// start components
 
@@ -193,11 +193,15 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	select {
 	case <-reportsCtrlDone:
 		err = reportsCtrlErr
-		setupLog.Error(err, "problem running reports controller")
+		if err != nil {
+			setupLog.Error(err, "problem running reports controller")
+		}
 		cancel()
 	case <-taskCtrlDone:
 		err = taskCtrlErr
-		setupLog.Error(err, "problem running task controller")
+		if err != nil {
+			setupLog.Error(err, "problem running task controller")
+		}
 		cancel()
 	case <-ctx.Done():
 	}
