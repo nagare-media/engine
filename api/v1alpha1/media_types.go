@@ -45,8 +45,7 @@ type Media struct {
 	Labels map[string]string `json:"labels,omitempty"`
 
 	// Metadata of this media.
-	// +optional
-	Metadata *MediaMetadata `json:"metadata,omitempty"`
+	Metadata MediaMetadata `json:"metadata"`
 }
 
 type HumanReadableMediaDescription struct {
