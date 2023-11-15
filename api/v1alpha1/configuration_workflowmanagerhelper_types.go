@@ -40,6 +40,7 @@ type WorkflowManagerHelperTaskControllerConfiguration struct {
 
 type WorkflowManagerHelperReportsControllerConfiguration struct {
 	Webserver WebserverConfiguration `json:"webserver"`
+	NATS      NATSConfig             `json:"nats"`
 }
 
 // +kubebuilder:object:root=true

@@ -37,7 +37,8 @@ import (
 )
 
 const (
-	DeleteTimeout = 30 * time.Second
+	// TODO: make configurable
+	TaskDeleteTimeout = 30 * time.Second
 )
 
 type taskCtrl struct {
@@ -341,21 +342,7 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 		l.Error(err, fmt.Sprintf("failed; retrying after %s", t))
 	}
 
-	ctxDelete, cancle := context.WithTimeout(ctx, DeleteTimeout)
+	ctxDelete, cancle := context.WithTimeout(ctx, TaskDeleteTimeout)
 	defer cancle()
 	return backoff.RetryNotify(op, newBackOffWithContext(ctxDelete), no)
-}
-
-func newBackOffWithContext(ctx context.Context) backoff.BackOff {
-	expBackOff := &backoff.ExponentialBackOff{
-		InitialInterval:     500 * time.Millisecond,
-		RandomizationFactor: 0.25,
-		Multiplier:          1.5,
-		MaxInterval:         10 * time.Second,
-		MaxElapsedTime:      0, // = indefinitely (we use contexts for that)
-		Stop:                backoff.Stop,
-		Clock:               backoff.SystemClock,
-	}
-	expBackOff.Reset()
-	return backoff.WithContext(expBackOff, ctx)
 }
