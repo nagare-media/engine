@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -59,9 +60,24 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 	l := log.FromContext(ctx).WithName("task")
 	ctx = log.IntoContext(ctx, l)
 
+	// Kubernetes reads final termination messages in /dev/termination-log
 	terminationMsgBuf := &bytes.Buffer{}
 	defer func() {
-		_ = os.WriteFile("/dev/termination-log", terminationMsgBuf.Bytes(), 0777)
+		if terminationMsgBuf.Len() == 0 {
+			return
+		}
+
+		f, err := os.OpenFile("/dev/termination-log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+		if err != nil {
+			l.Error(err, "failed to open /dev/termination-log")
+			return
+		}
+		defer f.Close()
+
+		if _, err := io.Copy(f, terminationMsgBuf); err != nil {
+			l.Error(err, "failed to write /dev/termination-log")
+			return
+		}
 	}()
 
 	if err := c.createTaskPhase(ctx); err != nil {
