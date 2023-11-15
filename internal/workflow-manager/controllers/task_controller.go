@@ -17,8 +17,8 @@ limitations under the License.
 package controllers
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -30,6 +30,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -767,8 +768,9 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 	}
 
 	// create Secret
-	jsonData, err := json.Marshal(data)
-	if err != nil {
+	buf := &bytes.Buffer{}
+	s := json.NewSerializerWithOptions(json.DefaultMetaFactory, r.Scheme, r.Scheme, json.SerializerOptions{})
+	if err = s.Encode(data, buf); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -785,7 +787,7 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 			},
 		},
 		Data: map[string][]byte{
-			"data.json": jsonData,
+			"data.json": buf.Bytes(),
 		},
 	}
 	if err = jobClient.Create(ctx, secret); err != nil {
