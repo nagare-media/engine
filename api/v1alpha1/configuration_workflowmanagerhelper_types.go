@@ -120,23 +120,23 @@ func (c *WorkflowManagerHelperConfiguration) Validate() error {
 	}
 
 	if c.ReportsController.Webserver.BindAddress == nil {
-		return errors.New("missing webserver.bindAddress")
+		return errors.New("missing reports.webserver.bindAddress")
 	}
 
 	if c.ReportsController.Webserver.ReadTimeout == nil {
-		return errors.New("missing webserver.readTimeout")
+		return errors.New("missing reports.webserver.readTimeout")
 	}
 
 	if c.ReportsController.Webserver.WriteTimeout == nil {
-		return errors.New("missing webserver.writeTimeout")
+		return errors.New("missing reports.webserver.writeTimeout")
 	}
 
 	if c.ReportsController.Webserver.IdleTimeout == nil {
-		return errors.New("missing webserver.idleTimeout")
+		return errors.New("missing reports.webserver.idleTimeout")
 	}
 
 	if c.ReportsController.Webserver.Network == nil {
-		return errors.New("missing webserver.network")
+		return errors.New("missing reports.webserver.network")
 	}
 
 	if c.ReportsController.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.ReportsController.Webserver.PublicBaseURL, "/") {
