@@ -164,7 +164,7 @@ func (s *taskService) Delete(ctx context.Context, t *nbmpv2.Task) error {
 
 func (s *taskService) Retrieve(ctx context.Context, t *nbmpv2.Task) error {
 	l := log.FromContext(s.rootCtx)
-	l.V(2).Info("retrieve task")
+	l.V(1).Info("retrieve task")
 
 	if !s.mtx.TryRLock() {
 		return nbmp.ErrRetryLater

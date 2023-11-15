@@ -49,7 +49,7 @@ func NewWorkflowService(cfg *enginev1.GatewayNBMPWorkflowServiceConfiguration, k
 
 func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
-	l.V(2).Info("creating workflow")
+	l.V(1).Info("creating workflow")
 
 	// convert to Kubernetes resources
 	w, err := s.wddToWorkflow(wf)
@@ -80,7 +80,7 @@ func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error
 
 func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
-	l.V(2).Info("updating workflow")
+	l.V(1).Info("updating workflow")
 
 	// convert to Kubernetes resources
 	w, err := s.wddToWorkflow(wf)
@@ -112,7 +112,7 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 
 func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
-	l.V(2).Info("deleting workflow")
+	l.V(1).Info("deleting workflow")
 
 	// convert to Kubernetes resources
 	w := &enginev1.Workflow{
@@ -133,7 +133,7 @@ func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error
 
 func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
-	l.V(2).Info("retrieving workflow")
+	l.V(1).Info("retrieving workflow")
 
 	// retrieve Kubernetes resources
 	w := &enginev1.Workflow{}
