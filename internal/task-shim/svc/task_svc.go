@@ -17,11 +17,11 @@ limitations under the License.
 package svc
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 	"text/template"
 
@@ -437,17 +437,17 @@ func evaluateConfigToRawJSON(a enginev1.TaskServiceAction, oldTask, currentTask 
 			return nil, err
 		}
 
-		sb := &strings.Builder{}
+		buf := &bytes.Buffer{}
 		tplData := actions.ContextData{
 			OldTask: oldTask,
 			Task:    currentTask,
 		}
-		if err = tpl.Execute(sb, tplData); err != nil {
+		if err = tpl.Execute(buf, tplData); err != nil {
 			return nil, err
 		}
 
 		// ...then parse it as YAML and convert it to a JSON string...
-		raw, err := yaml.YAMLToJSON([]byte(sb.String()))
+		raw, err := yaml.YAMLToJSON(buf.Bytes())
 		if err != nil {
 			return nil, err
 		}
