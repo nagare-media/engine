@@ -97,6 +97,7 @@ func (a *action) Exec(ctx actions.Context) (*nbmpv2.Task, error) {
 	l.Info("start process")
 	if err := cmd.Run(); err != nil {
 		l.Error(err, "process terminated with error")
+		return ctx.Task, err
 	} else {
 		l.Info("process terminated successfully")
 	}
