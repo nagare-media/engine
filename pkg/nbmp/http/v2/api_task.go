@@ -24,6 +24,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/pkg/mime"
 	"github.com/nagare-media/engine/pkg/http"
 	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
@@ -46,7 +47,7 @@ func TaskAPI(cfg *enginev1.WebserverConfiguration, svc nbmpsvcv2.TaskService) *t
 func (api *taskAPI) MountTo(r fiber.Router) {
 	r.
 		// middlewares
-		Use(ValidateHeadersMiddleware(nbmpv2.TaskDescriptionDocumentMIMEType)).
+		Use(ValidateHeadersMiddleware(mime.ApplicationMPEG_NBMP_TDD_JSON)).
 		// API
 		Post("", api.handleRequest(api.svc.Create)).
 		Patch("/:id", api.handleRequest(api.svc.Update)).

@@ -22,6 +22,7 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/nagare-media/engine/internal/pkg/mime"
 	"github.com/nagare-media/engine/pkg/http"
 )
 
@@ -56,11 +57,11 @@ loop:
 			// TODO: should we be more strict?
 			body = c.Body()
 			if body[0] == '{' {
-				ct = cloudevents.ApplicationCloudEventsJSON
+				ct = mime.ApplicationCloudEventsJSON
 			} else if body[0] == '[' {
-				ct = cloudevents.ApplicationCloudEventsBatchJSON
+				ct = mime.ApplicationCloudEventsBatchJSON
 			} else {
-				ct = "application/octet-stream"
+				ct = mime.ApplicationOctetStream
 			}
 			c.Request().Header.SetContentType(ct)
 

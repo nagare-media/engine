@@ -19,6 +19,7 @@ package v2
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/nagare-media/engine/internal/pkg/mime"
 	"github.com/nagare-media/engine/pkg/http"
 )
 
@@ -42,8 +43,8 @@ func ValidateHeadersMiddleware(canonicalAccept string) fiber.Handler {
 				// correct Content-Types (TODO: properly parse MIME type including charset)
 				canonicalAccept,
 				// we allow generic JSON Content-Type types and check during unmarshal
-				fiber.MIMEApplicationJSON,
-				fiber.MIMEApplicationJSONCharsetUTF8:
+				mime.ApplicationJSON,
+				mime.ApplicationJSONCharsetUTF8:
 
 			default:
 				return fiber.ErrUnsupportedMediaType
