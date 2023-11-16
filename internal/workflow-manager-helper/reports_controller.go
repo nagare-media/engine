@@ -115,6 +115,8 @@ func (c *reportsCtrl) Start(ctx context.Context) error {
 			return nil
 
 		case e := <-c.eventCh:
+			// Structured Content Mode
+			// TODO: move to binary mode?
 			d, err := json.Marshal(e)
 			if err != nil {
 				l.Error(err, "failed to encode event for publication")
