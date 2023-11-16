@@ -29,6 +29,7 @@ import (
 type WorkflowManagerHelperConfigurationSpec struct {
 	TaskController    WorkflowManagerHelperTaskControllerConfiguration    `json:"task"`
 	ReportsController WorkflowManagerHelperReportsControllerConfiguration `json:"reports"`
+	NATS              NATSConfig                                          `json:"nats"`
 }
 
 type WorkflowManagerHelperTaskControllerConfiguration struct {
@@ -40,7 +41,6 @@ type WorkflowManagerHelperTaskControllerConfiguration struct {
 
 type WorkflowManagerHelperReportsControllerConfiguration struct {
 	Webserver WebserverConfiguration `json:"webserver"`
-	NATS      NATSConfig             `json:"nats"`
 }
 
 // +kubebuilder:object:root=true

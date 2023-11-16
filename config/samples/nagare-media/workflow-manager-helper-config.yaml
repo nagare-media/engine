@@ -1,6 +1,9 @@
 apiVersion: engine.nagare.media/v1alpha1
 kind: WorkflowManagerHelperConfiguration
 
+nats:
+  URL: nats://127.0.0.1:4222
+
 reports:
   webserver:
     bindAddress: 127.0.0.1:8181

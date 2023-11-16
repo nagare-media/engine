@@ -43,7 +43,7 @@ const (
 )
 
 type reportsCtrl struct {
-	cfg  *enginev1.WorkflowManagerHelperReportsControllerConfiguration
+	cfg  *enginev1.WorkflowManagerHelperConfiguration
 	data *enginev1.WorkflowManagerHelperData
 
 	http    starter.Starter
@@ -54,8 +54,8 @@ type reportsCtrl struct {
 
 var _ starter.Starter = &reportsCtrl{}
 
-func NewReportsController(cfg *enginev1.WorkflowManagerHelperReportsControllerConfiguration, data *enginev1.WorkflowManagerHelperData) starter.Starter {
-	s := enginehttp.NewServer(&cfg.Webserver)
+func NewReportsController(cfg *enginev1.WorkflowManagerHelperConfiguration, data *enginev1.WorkflowManagerHelperData) starter.Starter {
+	s := enginehttp.NewServer(&cfg.ReportsController.Webserver)
 
 	// Health API
 

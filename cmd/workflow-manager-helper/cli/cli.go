@@ -169,7 +169,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	// create components
 
-	reportsCtrl := workflowmanagerhelper.NewReportsController(&cfg.ReportsController, data)
+	reportsCtrl := workflowmanagerhelper.NewReportsController(cfg, data)
 	taskCtrl := workflowmanagerhelper.NewTaskController(cfg, data)
 
 	// start components
