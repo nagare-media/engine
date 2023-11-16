@@ -50,10 +50,8 @@ type WorkflowManagerConfiguration struct {
 }
 
 type NATSConfig struct {
-	// TODO: add other auth methods
-	URL      base.URI `json:"url"`
-	Username string   `json:"username"`
-	Password string   `json:"password"`
+	// TODO: add auth methods
+	URL base.URI `json:"url"`
 }
 
 func (c *WorkflowManagerConfiguration) Default() {
