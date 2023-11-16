@@ -29,8 +29,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	backoff "github.com/cenkalti/backoff/v4"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/nats-io/nats.go/jetstream"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/pkg/mime"
+	enginenats "github.com/nagare-media/engine/internal/pkg/nats"
+	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/nbmp"
 	"github.com/nagare-media/engine/pkg/starter"
 	"github.com/nagare-media/models.go/base"
@@ -45,6 +50,7 @@ const (
 type taskCtrl struct {
 	cfg  *enginev1.WorkflowManagerHelperConfiguration
 	data *enginev1.WorkflowManagerHelperData
+
 	http http.Client
 }
 
@@ -294,17 +300,116 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 	ctx = log.IntoContext(ctx, l)
 	l.Info("starting event-emitter")
 
-	// TODO: check if there is an event input
+	var (
+		err error
+		cc  jetstream.ConsumeContext
+	)
 
-	for {
-		select {
-		case <-ctx.Done():
+	defer func() {
+		// even when we return early, we need to wait for ctx to be canceled
+		if err == nil {
+			<-ctx.Done()
 			l.Info("termination requested")
-			return nil
-
-			// TODO: receive NATS events
 		}
+		if cc != nil {
+			cc.Stop()
+		}
+	}()
+
+	// check for task event inputs
+	eventClients := make(map[string]events.Client)
+	for _, in := range c.data.Task.Inputs {
+		if in.Type != enginev1.MetadataMediaType {
+			continue
+		}
+		if in.Metadata.MimeType != nil && *in.Metadata.MimeType != mime.ApplicationCloudEventsJSON {
+			continue
+		}
+		if in.Direction != nil && *in.Direction != enginev1.PushMediaDirection {
+			l.Info(fmt.Sprintf("skipping task event input '%s' with no push direction", in.ID))
+			continue
+		}
+		if in.URL == nil {
+			l.Info(fmt.Sprintf("skipping task event input '%s' with missing URL", in.ID))
+			continue
+		}
+
+		// TODO: implement event filters
+		ec := &events.HTTPClient{
+			URL:    *in.URL,
+			Client: http.DefaultClient,
+		}
+		expBackOff := &backoff.ExponentialBackOff{
+			InitialInterval:     500 * time.Millisecond,
+			RandomizationFactor: 0.25,
+			Multiplier:          1.5,
+			MaxInterval:         2 * time.Second,
+			MaxElapsedTime:      0, // = indefinitely (we use contexts for that)
+			Stop:                backoff.Stop,
+			Clock:               backoff.SystemClock,
+		}
+		eventClients[in.ID] = events.ClientWithBackoff(ec, expBackOff)
 	}
+
+	if len(eventClients) == 0 {
+		// even when we return early, we need to wait for ctx to be canceled
+		l.Info("no task event inputs; terminating")
+		<-ctx.Done()
+		return nil
+	}
+
+	// connect to NATS
+	nc, js, err := enginenats.CreateJetStreamConn(ctx, string(c.cfg.NATS.URL))
+	if err != nil {
+		return err
+	}
+	defer nc.Close()
+
+	// ensure stream exists for messages to persist
+	// TODO: add support for streams created by user
+	s, err := enginenats.CreateOrUpdateEngineStream(ctx, js)
+	if err != nil {
+		return err
+	}
+
+	subjectName := enginenats.Subject(enginenats.SubjectPrefix, c.data.Workflow.ID, c.data.Task.ID)
+	con, err := s.OrderedConsumer(ctx, jetstream.OrderedConsumerConfig{
+		FilterSubjects: []string{subjectName},
+		DeliverPolicy:  jetstream.DeliverAllPolicy,
+		ReplayPolicy:   jetstream.ReplayInstantPolicy,
+	})
+	if err != nil {
+		return err
+	}
+
+	cc, err = con.Consume(func(msg jetstream.Msg) {
+		defer func() {
+			if err := msg.Ack(); err != nil {
+				l.Error(err, "failed to acknowledge consumption of NATS message")
+			}
+		}()
+
+		e := cloudevents.Event{}
+		if err := json.Unmarshal(msg.Data(), &e); err != nil {
+			l.Error(err, "failed to decode event as CloudEvent; skipping")
+			return
+		}
+
+		for name, ec := range eventClients {
+			if err := ec.SendAsyncAck(ctx, e); err != nil {
+				l.Error(err, fmt.Sprintf("failed to send event to task input '%s'", name))
+				continue
+			}
+		}
+	})
+	if err != nil {
+		return err
+	}
+
+	<-ctx.Done()
+	l.Info("termination requested")
+	cc.Stop()
+	return nil
 }
 
 func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
