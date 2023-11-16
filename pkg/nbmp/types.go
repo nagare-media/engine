@@ -28,6 +28,10 @@ var (
 	BrandNagareMediaEngineV1 = base.URI("urn:nagare-media:engine:schema:nbmp:v1")
 )
 
+const (
+	ReportTypeEngineCloudEvents = "engine.nagare.media/cloud-events"
+)
+
 // Function interface.
 type Function interface {
 	// Execute this function.

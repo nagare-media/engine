@@ -31,6 +31,7 @@ import (
 	backoff "github.com/cenkalti/backoff/v4"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/pkg/nbmp"
 	"github.com/nagare-media/engine/pkg/starter"
 	"github.com/nagare-media/models.go/base"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
@@ -118,7 +119,7 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 		return err
 	}
 	t.Reporting = &nbmpv2.Reporting{
-		ReportType:     "engine.nagare.media/cloud-events",
+		ReportType:     nbmp.ReportTypeEngineCloudEvents,
 		URL:            base.URI(fmt.Sprintf("%s/events", *c.cfg.ReportsController.Webserver.PublicBaseURL)),
 		DeliveryMethod: nbmpv2.HTTP_POSTDeliveryMethod,
 	}
