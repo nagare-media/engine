@@ -89,11 +89,6 @@ func (c *reportsCtrl) Start(ctx context.Context) error {
 	if err := c.createJetStream(ctx); err != nil {
 		return err
 	}
-	defer func() {
-		if err := c.nc.FlushTimeout(ReportNATSFlushTimeout); err != nil {
-			l.Error(err, "failed to flush undelivered messages")
-		}
-	}()
 	defer c.nc.Close()
 
 	// ensure stream exists for messages to persist
