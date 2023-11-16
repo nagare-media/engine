@@ -52,6 +52,11 @@ func (m *workflowValidatorSpecLaxMiddleware) Create(ctx context.Context, w *nbmp
 func (m *workflowValidatorSpecLaxMiddleware) Update(ctx context.Context, w *nbmpv2.Workflow) error {
 	m.common(ctx, w)
 
+	// workflows must have an ID
+	if w.General.ID == "" {
+		w.Acknowledge.Failed = append(w.Acknowledge.Failed, "$.general.id")
+	}
+
 	if err := nbmputils.AcknowledgeStatusToErr(nbmputils.UpdateAcknowledgeStatus(w.Acknowledge)); err != nil {
 		return err
 	}

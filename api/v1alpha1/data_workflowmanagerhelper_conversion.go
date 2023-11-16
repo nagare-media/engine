@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/nagare-media/engine/pkg/nbmp"
+	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	"github.com/nagare-media/models.go/base"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
@@ -32,7 +33,7 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 			URI: nbmpv2.SchemaURI,
 		},
 		General: nbmpv2.General{
-			ID:        d.Task.ID,
+			// ID should be set during Task creation
 			NBMPBrand: &nbmp.BrandNagareMediaEngineV1,
 			State:     &nbmpv2.InstantiatedState,
 		},
@@ -216,15 +217,10 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 
 	// Configuration
 
+	task.Configuration.Parameters = nbmputils.SetStringParameterValue(task.Configuration.Parameters, nbmp.EngineWorkflowIDParameterKey, d.Workflow.ID)
+	task.Configuration.Parameters = nbmputils.SetStringParameterValue(task.Configuration.Parameters, nbmp.EngineTaskIDParameterKey, d.Task.ID)
 	for k, v := range d.Task.Config {
-		p := nbmpv2.Parameter{
-			Name:     k,
-			Datatype: nbmpv2.StringDatatype,
-			Values: []nbmpv2.ParameterValue{nbmpv2.StringParameterValue{
-				Restrictions: []string{v},
-			}},
-		}
-		task.Configuration.Parameters = append(task.Configuration.Parameters, p)
+		task.Configuration.Parameters = nbmputils.SetStringParameterValue(task.Configuration.Parameters, k, v)
 	}
 
 	return nil

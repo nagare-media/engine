@@ -40,7 +40,7 @@ import (
 	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
-	"github.com/nagare-media/engine/pkg/nbmp/utils"
+	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	"github.com/nagare-media/engine/pkg/strobj"
 	"github.com/nagare-media/engine/pkg/tplfuncs"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
@@ -57,12 +57,15 @@ type taskService struct {
 	rootCtx       context.Context
 	terminateFunc func(error)
 
-	mtx          sync.RWMutex
-	tsk          *nbmpv2.Task       // protected by mtx
-	tskErr       error              // protected by mtx
-	tskDone      chan struct{}      // protected by mtx
-	tskCtx       context.Context    // protected by mtx
-	tskCtxCancel context.CancelFunc // protected by mtx
+	mtx              sync.RWMutex
+	engineWorkflowID string             // protected by mtx, but constant once Create was called
+	engineTaskID     string             // protected by mtx, but constant once Create was called
+	engineInstanceID string             // protected by mtx, but constant once Create was called
+	tsk              *nbmpv2.Task       // protected by mtx
+	tskErr           error              // protected by mtx
+	tskDone          chan struct{}      // protected by mtx
+	tskCtx           context.Context    // protected by mtx
+	tskCtxCancel     context.CancelFunc // protected by mtx
 
 	reportClient events.Client
 }
@@ -82,10 +85,10 @@ func NewTaskService(ctx context.Context, terminateFunc func(error), cfg *enginev
 func (s *taskService) init() {
 	// Go routine to handle root context cancellation
 	go func() {
-		l := log.FromContext(s.rootCtx)
-
 		// wait for cancellation
 		<-s.rootCtx.Done()
+
+		l := log.FromContext(s.rootCtx)
 
 		// check if task is running and wait for it to terminate
 		s.mtx.Lock()
@@ -113,11 +116,23 @@ func (s *taskService) Create(ctx context.Context, t *nbmpv2.Task) error {
 	l := log.FromContext(s.rootCtx)
 	l.Info("create task")
 
+	s.engineInstanceID = t.General.ID
+	if t.Configuration != nil {
+		s.engineWorkflowID, _ = nbmputils.GetStringParameterValue(t.Configuration.Parameters, nbmp.EngineWorkflowIDParameterKey)
+		s.engineTaskID, _ = nbmputils.GetStringParameterValue(t.Configuration.Parameters, nbmp.EngineTaskIDParameterKey)
+	}
+	l = l.WithValues(
+		"workflow", s.engineWorkflowID,
+		"task", s.engineTaskID,
+		"instance", s.engineInstanceID,
+	)
+	s.rootCtx = log.IntoContext(s.rootCtx, l)
+
 	// create reportClient if Task includes Reporting descriptors
 	if err := s.createReportClient(t); err != nil {
 		l.Error(err, "disable event reporting")
 	}
-	s.observeEvent(events.TaskCreated, t.General.ID)
+	s.observeEvent(events.TaskCreated)
 
 	// run onCreate actions
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "create"))
@@ -160,7 +175,7 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 	defer s.mtx.Unlock()
 
 	// update is only allowed if Task was created, IDs match...
-	if s.tsk == nil || s.tsk.General.ID != t.General.ID {
+	if s.tsk == nil || s.engineInstanceID != t.General.ID {
 		return nbmp.ErrNotFound
 	}
 	// ...and it has not terminated
@@ -170,7 +185,7 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 
 	l := log.FromContext(s.rootCtx)
 	l.Info("update task")
-	s.observeEvent(events.TaskUpdated, s.tsk.General.ID)
+	s.observeEvent(events.TaskUpdated)
 
 	// run onUpdate actions
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "update"))
@@ -180,7 +195,7 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 func (s *taskService) Delete(ctx context.Context, t *nbmpv2.Task) error {
 	l := log.FromContext(s.rootCtx)
 	l.Info("delete task")
-	s.observeEvent(events.TaskDeleted, s.tsk.General.ID)
+	s.observeEvent(events.TaskDeleted)
 
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
@@ -225,7 +240,7 @@ func (s *taskService) Retrieve(ctx context.Context, t *nbmpv2.Task) error {
 	defer s.mtx.RUnlock()
 
 	// retrieve is only allowed if Task was created and IDs match
-	if s.tsk == nil || s.tsk.General.ID != t.General.ID {
+	if s.tsk == nil || s.engineInstanceID != t.General.ID {
 		return nbmp.ErrNotFound
 	}
 
@@ -296,7 +311,7 @@ func (s *taskService) startTask(ctx context.Context, currentTask *nbmpv2.Task) {
 	// start task
 	l.Info("starting task")
 	s.tsk.General.State = &nbmpv2.RunningState
-	s.observeEvent(events.TaskStarted, s.tsk.General.ID)
+	s.observeEvent(events.TaskStarted)
 	go func() {
 		s.tskErr = s.execTask(s.tskCtx, currentTask)
 
@@ -304,10 +319,10 @@ func (s *taskService) startTask(ctx context.Context, currentTask *nbmpv2.Task) {
 		if s.tskErr != nil {
 			l.Error(s.tskErr, "task failed")
 			s.tsk.General.State = &nbmpv2.InErrorState
-			s.observeEvent(events.TaskFailed, s.tsk.General.ID)
+			s.observeEvent(events.TaskFailed)
 		} else {
 			s.tsk.General.State = &nbmpv2.DestroyedState
-			s.observeEvent(events.TaskSucceeded, s.tsk.General.ID)
+			s.observeEvent(events.TaskSucceeded)
 		}
 		l.Info("task finished")
 		s.mtx.Unlock()
@@ -344,7 +359,7 @@ func (s *taskService) stopTask(ctx context.Context) {
 	l.Info("waiting for task termination")
 	<-s.tskDone
 	l.Info("task stopped")
-	s.observeEvent(events.TaskStopped, s.tsk.General.ID)
+	s.observeEvent(events.TaskStopped)
 }
 
 func (s *taskService) execTask(ctx context.Context, currentTask *nbmpv2.Task) error {
@@ -409,7 +424,7 @@ func (s *taskService) execTask(ctx context.Context, currentTask *nbmpv2.Task) er
 		l.Info("execute action")
 		var err error
 		tskCopy := &nbmpv2.Task{}
-		utils.MustDeepCopyInto(currentTask, tskCopy)
+		nbmputils.MustDeepCopyInto(currentTask, tskCopy)
 		currentTask, err = execAction(log.IntoContext(ctx, l), a, nil, tskCopy)
 		if err != nil {
 			l.Error(err, "action failed")
@@ -438,7 +453,7 @@ func (s *taskService) hasTerminated() bool {
 	}
 }
 
-func (s *taskService) observeEvent(t string, tskID string) {
+func (s *taskService) observeEvent(t string) {
 	if s.reportClient == nil {
 		return
 	}
@@ -450,8 +465,8 @@ func (s *taskService) observeEvent(t string, tskID string) {
 	e := cloudevents.NewEvent()
 	e.SetID(uuid.UUIDv4())
 	e.SetType(t)
-	e.SetSource(fmt.Sprintf("/engine.nagare.media/task-shim/%s", tskID))
-	e.SetSubject(fmt.Sprintf("/engine.nagare.media/task/%s", tskID))
+	e.SetSource("/engine.nagare.media/task-shim")
+	e.SetSubject(fmt.Sprintf("/engine.nagare.media/workflow(%s)/task(%s)/instance(%s)", s.engineWorkflowID, s.engineTaskID, s.engineInstanceID))
 	e.SetTime(time.Now())
 	if err := e.Validate(); err != nil {
 		panic(fmt.Sprintf("Event creation results in invalid CloudEvent; fix implementation! error: %s", err))

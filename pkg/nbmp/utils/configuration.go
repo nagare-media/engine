@@ -42,3 +42,22 @@ func GetStringParameterValue(parameters []nbmpv2.Parameter, key string) (string,
 
 	return "", false
 }
+
+func SetStringParameterValue(parameters []nbmpv2.Parameter, key, value string) []nbmpv2.Parameter {
+	pnew := nbmpv2.Parameter{
+		Name:     key,
+		Datatype: nbmpv2.StringDatatype,
+		Values: []nbmpv2.ParameterValue{nbmpv2.StringParameterValue{
+			Restrictions: []string{value},
+		}},
+	}
+
+	for i, p := range parameters {
+		if p.Name == key {
+			parameters[i] = pnew
+			return parameters
+		}
+	}
+
+	return append(parameters, pnew)
+}

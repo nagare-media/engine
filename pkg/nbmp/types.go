@@ -32,6 +32,11 @@ const (
 	ReportTypeEngineCloudEvents = "engine.nagare.media/cloud-events"
 )
 
+const (
+	EngineWorkflowIDParameterKey = "engine.nagare.media/workflow-id"
+	EngineTaskIDParameterKey     = "engine.nagare.media/task-id"
+)
+
 // Function interface.
 type Function interface {
 	// Execute this function.

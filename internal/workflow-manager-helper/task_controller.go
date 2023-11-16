@@ -51,6 +51,9 @@ type taskCtrl struct {
 	cfg  *enginev1.WorkflowManagerHelperConfiguration
 	data *enginev1.WorkflowManagerHelperData
 
+	// NBMP Task ID returned by the Task API
+	tskInstanceID string
+
 	http http.Client
 }
 
@@ -65,8 +68,13 @@ func NewTaskController(cfg *enginev1.WorkflowManagerHelperConfiguration, data *e
 }
 
 func (c *taskCtrl) Start(ctx context.Context) error {
-	l := log.FromContext(ctx).WithName("task")
+	l := log.FromContext(ctx,
+		"workflow", c.data.Workflow.ID,
+		"task", c.data.Task.ID,
+	).WithName("task")
 	ctx = log.IntoContext(ctx, l)
+
+	// TODO: add Go routine that checks for updates to the secret resulting in PATCH requests to the Task API
 
 	// Kubernetes reads final termination messages in /dev/termination-log
 	terminationMsgBuf := &bytes.Buffer{}
@@ -94,7 +102,8 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 		return err
 	}
 
-	// TODO: add Go routine that checks for updates to the secret resulting in PATCH requests to the Task API
+	l = l.WithValues("instance", c.tskInstanceID)
+	ctx = log.IntoContext(ctx, l)
 
 	if err := c.observeTaskPhase(ctx); err != nil {
 		// we ignore the error and always try to move on to the delete phase
@@ -157,6 +166,14 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 			// TODO: parse response body to give more infos in log
 			return fmt.Errorf("unexpected HTTP status code in response: %d", resp.StatusCode)
 		}
+
+		t = &nbmpv2.Task{}
+		dec := json.NewDecoder(resp.Body)
+		err = dec.Decode(t)
+		if err != nil {
+			return err
+		}
+		c.tskInstanceID = t.General.ID
 
 		return nil
 	}
@@ -272,8 +289,7 @@ func (c *taskCtrl) probeTask(ctx context.Context) (*nbmpv2.Task, error) {
 	ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
 	defer cancel()
 
-	// TODO: allow ID to be set by Task API
-	url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.data.Task.ID)
+	url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -424,8 +440,7 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
 		defer cancel()
 
-		// TODO: allow ID to be set by Task API
-		url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.data.Task.ID)
+		url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
 		req, err := http.NewRequestWithContext(ctx, "DELETE", url, nil)
 		if err != nil {
 			return err
