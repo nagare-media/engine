@@ -31,7 +31,7 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	enginehttp "github.com/nagare-media/engine/internal/pkg/http"
 	enginenats "github.com/nagare-media/engine/internal/pkg/nats"
-	eventshttp "github.com/nagare-media/engine/pkg/events/http"
+	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/http"
 	"github.com/nagare-media/engine/pkg/starter"
 )
@@ -64,7 +64,7 @@ func NewReportsController(cfg *enginev1.WorkflowManagerHelperReportsControllerCo
 	// Event API
 
 	eventCh := make(chan cloudevents.Event)
-	eventshttp.API(eventCh).MountTo(s.App)
+	events.API(eventCh).MountTo(s.App)
 
 	return &reportsCtrl{
 		cfg:     cfg,
