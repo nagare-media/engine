@@ -126,6 +126,10 @@ func (c *reportsCtrl) Start(ctx context.Context) error {
 				continue
 			}
 
+			// we start a new context because the original ctx might have been canceled
+			ctx, cancle := context.WithTimeout(context.Background(), ReportNATSConnectionTimeout)
+			defer cancle()
+
 			_, err = c.js.PublishMsg(ctx, &nats.Msg{
 				Subject: subjectName,
 				Data:    d,
