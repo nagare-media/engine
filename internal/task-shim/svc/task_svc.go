@@ -22,21 +22,33 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"sync"
 	"text/template"
+	"time"
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/yaml"
 
+	backoff "github.com/cenkalti/backoff/v4"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/pkg/uuid"
 	"github.com/nagare-media/engine/internal/task-shim/actions"
 	metaaction "github.com/nagare-media/engine/internal/task-shim/actions/meta"
+	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	"github.com/nagare-media/engine/pkg/nbmp/utils"
 	"github.com/nagare-media/engine/pkg/strobj"
 	"github.com/nagare-media/engine/pkg/tplfuncs"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
+)
+
+const (
+	// TODO: make configurable
+	ReportTimeout = 10 * time.Second
 )
 
 type taskService struct {
@@ -51,6 +63,8 @@ type taskService struct {
 	tskDone      chan struct{}      // protected by mtx
 	tskCtx       context.Context    // protected by mtx
 	tskCtxCancel context.CancelFunc // protected by mtx
+
+	reportClient events.Client
 }
 
 var _ nbmpsvcv2.TaskService = &taskService{}
@@ -99,9 +113,46 @@ func (s *taskService) Create(ctx context.Context, t *nbmpv2.Task) error {
 	l := log.FromContext(s.rootCtx)
 	l.Info("create task")
 
+	// create reportClient if Task includes Reporting descriptors
+	if err := s.createReportClient(t); err != nil {
+		l.Error(err, "disable event reporting")
+	}
+	s.observeEvent(events.TaskCreated, t.General.ID)
+
 	// run onCreate actions
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "create"))
 	return s.execEventActions(ctx, s.cfg.OnCreateActions, t)
+}
+
+func (s *taskService) createReportClient(t *nbmpv2.Task) error {
+	// validate
+	if t.Reporting == nil {
+		return errors.New("not configured")
+	}
+	if t.Reporting.ReportType != nbmp.ReportTypeEngineCloudEvents {
+		return fmt.Errorf("unsupported report type '%s'", t.Reporting.ReportType)
+	}
+	if t.Reporting.DeliveryMethod != nbmpv2.HTTP_POSTDeliveryMethod {
+		return fmt.Errorf("unsupported delivery method '%s'", t.Reporting.ReportType)
+	}
+
+	// create report client
+	c := &events.HTTPClient{
+		URL:    string(t.Reporting.URL),
+		Client: http.DefaultClient,
+	}
+	expBackOff := &backoff.ExponentialBackOff{
+		InitialInterval:     500 * time.Millisecond,
+		RandomizationFactor: 0.25,
+		Multiplier:          1.5,
+		MaxInterval:         2 * time.Second,
+		MaxElapsedTime:      0, // = indefinitely (we use contexts for that)
+		Stop:                backoff.Stop,
+		Clock:               backoff.SystemClock,
+	}
+	s.reportClient = events.ClientWithBackoff(c, expBackOff)
+
+	return nil
 }
 
 func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
@@ -119,6 +170,7 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 
 	l := log.FromContext(s.rootCtx)
 	l.Info("update task")
+	s.observeEvent(events.TaskUpdated, s.tsk.General.ID)
 
 	// run onUpdate actions
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "update"))
@@ -128,6 +180,7 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 func (s *taskService) Delete(ctx context.Context, t *nbmpv2.Task) error {
 	l := log.FromContext(s.rootCtx)
 	l.Info("delete task")
+	s.observeEvent(events.TaskDeleted, s.tsk.General.ID)
 
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
@@ -243,6 +296,7 @@ func (s *taskService) startTask(ctx context.Context, currentTask *nbmpv2.Task) {
 	// start task
 	l.Info("starting task")
 	s.tsk.General.State = &nbmpv2.RunningState
+	s.observeEvent(events.TaskStarted, s.tsk.General.ID)
 	go func() {
 		s.tskErr = s.execTask(s.tskCtx, currentTask)
 
@@ -250,8 +304,10 @@ func (s *taskService) startTask(ctx context.Context, currentTask *nbmpv2.Task) {
 		if s.tskErr != nil {
 			l.Error(s.tskErr, "task failed")
 			s.tsk.General.State = &nbmpv2.InErrorState
+			s.observeEvent(events.TaskFailed, s.tsk.General.ID)
 		} else {
 			s.tsk.General.State = &nbmpv2.DestroyedState
+			s.observeEvent(events.TaskSucceeded, s.tsk.General.ID)
 		}
 		l.Info("task finished")
 		s.mtx.Unlock()
@@ -262,7 +318,8 @@ func (s *taskService) startTask(ctx context.Context, currentTask *nbmpv2.Task) {
 
 func (s *taskService) restartTask(ctx context.Context, currentTask *nbmpv2.Task) {
 	// assumption: s.mtx is already locked by caller
-	log.FromContext(s.rootCtx)
+	l := log.FromContext(s.rootCtx)
+	l.Info("restarting task")
 	s.stopTask(ctx)
 	s.startTask(ctx, currentTask)
 }
@@ -272,9 +329,13 @@ func (s *taskService) stopTask(ctx context.Context) {
 	l := log.FromContext(s.rootCtx)
 	l.Info("stopping task")
 
-	// tskDone is nil => task has not started yet
+	// check if stop is required
 	if s.tskDone == nil {
-		l.Info("task was already stopped")
+		l.Info("task has never started")
+		return
+	}
+	if s.hasTerminated() {
+		l.Info("task has already stopped")
 		return
 	}
 
@@ -283,6 +344,7 @@ func (s *taskService) stopTask(ctx context.Context) {
 	l.Info("waiting for task termination")
 	<-s.tskDone
 	l.Info("task stopped")
+	s.observeEvent(events.TaskStopped, s.tsk.General.ID)
 }
 
 func (s *taskService) execTask(ctx context.Context, currentTask *nbmpv2.Task) error {
@@ -373,6 +435,35 @@ func (s *taskService) hasTerminated() bool {
 	default:
 		// channel is open => task is running
 		return false
+	}
+}
+
+func (s *taskService) observeEvent(t string, tskID string) {
+	if s.reportClient == nil {
+		return
+	}
+
+	// TODO: implement event filtering
+
+	l := log.FromContext(s.rootCtx)
+
+	e := cloudevents.NewEvent()
+	e.SetID(uuid.UUIDv4())
+	e.SetType(t)
+	e.SetSource(fmt.Sprintf("/engine.nagare.media/task-shim/%s", tskID))
+	e.SetSubject(fmt.Sprintf("/engine.nagare.media/task/%s", tskID))
+	e.SetTime(time.Now())
+	if err := e.Validate(); err != nil {
+		panic(fmt.Sprintf("Event creation results in invalid CloudEvent; fix implementation! error: %s", err))
+	}
+
+	// we start a new context because rootCtx might have been canceled
+	ctx, cancel := context.WithTimeout(context.Background(), ReportTimeout)
+	defer cancel()
+
+	if err := s.reportClient.Send(ctx, e); err != nil {
+		l.Error(err, "failed to report event")
+		return
 	}
 }
 
