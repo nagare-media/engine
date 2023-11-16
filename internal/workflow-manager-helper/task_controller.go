@@ -134,8 +134,8 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 	op := func() error {
 		l.Info("create task")
 
-		ctx, cancle := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
-		defer cancle()
+		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
+		defer cancel()
 
 		req, err := http.NewRequestWithContext(ctx, "POST", c.cfg.TaskController.TaskAPI, &buf)
 		if err != nil {
@@ -263,8 +263,8 @@ func (c *taskCtrl) probeTask(ctx context.Context) (*nbmpv2.Task, error) {
 	l.V(1).Info("probe task")
 
 	// send GET request to Task API
-	ctx, cancle := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
+	defer cancel()
 
 	// TODO: allow ID to be set by Task API
 	url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.data.Task.ID)
@@ -316,8 +316,8 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 	op := func() error {
 		l.Info("delete task")
 
-		ctx, cancle := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
-		defer cancle()
+		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
+		defer cancel()
 
 		// TODO: allow ID to be set by Task API
 		url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.data.Task.ID)
@@ -343,7 +343,7 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 		l.Error(err, fmt.Sprintf("failed; retrying after %s", t))
 	}
 
-	ctxDelete, cancle := context.WithTimeout(ctx, TaskDeleteTimeout)
-	defer cancle()
+	ctxDelete, cancel := context.WithTimeout(ctx, TaskDeleteTimeout)
+	defer cancel()
 	return backoff.RetryNotify(op, newBackOffWithContext(ctxDelete), no)
 }

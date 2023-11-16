@@ -124,8 +124,8 @@ func (c *reportsCtrl) Start(ctx context.Context) error {
 			}
 
 			// we start a new context because the original ctx might have been canceled
-			ctx, cancle := context.WithTimeout(context.Background(), ReportNATSConnectionTimeout)
-			defer cancle()
+			ctx, cancel := context.WithTimeout(context.Background(), ReportNATSConnectionTimeout)
+			defer cancel()
 
 			_, err = c.js.PublishMsg(ctx, &nats.Msg{
 				Subject: subjectName,
@@ -177,7 +177,7 @@ func (c *reportsCtrl) createJetStream(ctx context.Context) error {
 		l.Error(err, fmt.Sprintf("failed; retrying after %s", t))
 	}
 
-	ctx, cancle := context.WithTimeout(ctx, ReportNATSConnectionTimeout)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(ctx, ReportNATSConnectionTimeout)
+	defer cancel()
 	return backoff.RetryNotify(op, newBackOffWithContext(ctx), no)
 }
