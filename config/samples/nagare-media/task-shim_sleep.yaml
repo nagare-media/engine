@@ -15,7 +15,7 @@ task:
       action: task-shim.engine.nagare.media/exec
       config:
         command: ./bin/functions-dev-darwin-amd64
-        args: ["--zap-devel", "--zap-log-level", "2", "--zap-stacktrace-level", "error", "sleep", "/tmp/nbmp.tdd"]
+        args: ["--zap-devel", "--zap-log-level=debug", "--zap-stacktrace-level=error", "sleep", "/tmp/nbmp.tdd"]
 
   onCreate:
     - name: write task description document
