@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
@@ -99,6 +100,29 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 				}
 			}
 
+			// TODO: handle multiple streams of the same type
+			for _, s := range in.Metadata.Streams {
+				switch {
+				case s.Audio != nil:
+					// TODO: implement
+				case s.Video != nil:
+					if s.Video.FrameRate != nil && s.Video.FrameRate.Average != nil {
+						// support non-integer frame rates
+						v := strconv.Itoa(int(*s.Video.FrameRate.Average))
+						mp.VideoFormat = nbmputils.SetStringParameterValue(mp.VideoFormat, nbmp.VideoFormatFrameRateAverage, v)
+					}
+
+					if s.Duration != nil {
+						mp.VideoFormat = nbmputils.SetStringParameterValue(mp.VideoFormat, nbmp.FormatFrameDuration, s.Duration.Duration.String())
+					}
+					// TODO: implement
+				case s.Subtitle != nil:
+					// TODO: implement
+				case s.Data != nil:
+					// TODO: implement
+				}
+			}
+
 			task.Input.MediaParameters = append(task.Input.MediaParameters, mp)
 
 		case MetadataMediaType:
@@ -139,6 +163,7 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 
 	for _, out := range d.Task.Outputs {
 		for _, pb := range out.PortBindings {
+			// check for duplicates?
 			p := nbmpv2.Port{
 				PortName: pb.ID,
 				Bind: &nbmpv2.PortBinding{

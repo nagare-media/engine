@@ -37,6 +37,12 @@ const (
 	EngineTaskIDParameterKey     = "engine.nagare.media/task-id"
 )
 
+const (
+	FormatFrameDuration = "duration"
+
+	VideoFormatFrameRateAverage = "frame-rate-avg"
+)
+
 // Function interface.
 type Function interface {
 	// Execute this function.
