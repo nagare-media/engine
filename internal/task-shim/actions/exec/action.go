@@ -64,7 +64,7 @@ func (a *action) Exec(ctx actions.Context) (*nbmpv2.Task, error) {
 	// create cmd
 	cmd := exec.CommandContext(ctx.Ctx, a.cfg.Command, a.cfg.Args...)
 	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stderr = os.Stdout // redirect all to stdout
 
 	// after ctx is canceled we send an interrupt signal + kill after a timeout
 	cmd.Cancel = func() error {
