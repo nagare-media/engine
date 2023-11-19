@@ -87,7 +87,7 @@ func (a *action) Exec(ctx actions.Context) (*nbmpv2.Task, error) {
 	}
 
 	// env
-	env := make([]string, 0, len(a.cfg.Env))
+	env := os.Environ()
 	for k, v := range a.cfg.Env {
 		env = append(env, k+"="+v)
 	}
