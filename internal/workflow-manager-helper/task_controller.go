@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -45,6 +46,11 @@ import (
 const (
 	// TODO: make configurable
 	TaskDeleteTimeout = 30 * time.Second
+)
+
+var (
+	probeLaterErr    = errors.New("probe later error")
+	taskRestartedErr = errors.New("task restarted error")
 )
 
 type taskCtrl struct {
@@ -110,6 +116,11 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 		// we will record the error in the Kubernetes termination message
 		fmt.Fprint(terminationMsgBuf, "observe phase failed: ")
 		fmt.Fprintln(terminationMsgBuf, err)
+
+		// don't run delete task phase on restarted tasks
+		if err == taskRestartedErr {
+			return err
+		}
 	}
 
 	if err := c.deleteTaskPhase(ctx); err != nil {
@@ -244,6 +255,14 @@ func (c *taskCtrl) observerLoop(ctx context.Context) error {
 		case <-t.C:
 			tsk, err := c.probeTask(ctx)
 			if err != nil {
+				if err == probeLaterErr {
+					// we should check later
+					continue
+				}
+				if err == taskRestartedErr {
+					l.Error(err, "probe failed likely because the task has been restarted; exit workflow-manager-helper")
+					return err
+				}
 				l.Error(err, "probe failed")
 				failedProbes++
 				continue
@@ -300,7 +319,15 @@ func (c *taskCtrl) probeTask(ctx context.Context) (*nbmpv2.Task, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode == 204 || resp.StatusCode > 299 {
+	switch {
+	case resp.StatusCode == 202:
+		return nil, probeLaterErr
+
+	case 400 <= resp.StatusCode && resp.StatusCode <= 499:
+		// 4xx error => probably a restart of the task => restart workflow-manager-helper
+		return nil, taskRestartedErr
+
+	case resp.StatusCode == 204 || resp.StatusCode >= 500:
 		// TODO: parse response body to give more infos in log
 		return nil, fmt.Errorf("unexpected HTTP status code in response: %d", resp.StatusCode)
 	}
