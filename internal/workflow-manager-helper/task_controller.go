@@ -412,7 +412,10 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 	cc, err := con.Consume(func(msg jetstream.Msg) {
 		defer func() {
 			if err := msg.Ack(); err != nil {
-				l.Error(err, "failed to acknowledge consumption of NATS message")
+				if ctx.Err() == nil {
+					// only log if ctx is still open
+					l.Error(err, "failed to acknowledge consumption of NATS message")
+				}
 			}
 		}()
 
@@ -424,7 +427,10 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 
 		for name, ec := range eventClients {
 			if err := ec.SendAsyncAck(ctx, e); err != nil {
-				l.Error(err, fmt.Sprintf("failed to send event to task input '%s'", name))
+				if ctx.Err() == nil {
+					// only log if ctx is still open
+					l.Error(err, fmt.Sprintf("failed to send event to task input '%s'", name))
+				}
 				continue
 			}
 		}
