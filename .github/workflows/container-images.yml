@@ -29,10 +29,6 @@ jobs:
           # TODO: build multi-plattform container images
           platforms: linux/amd64
 
-      - name: info
-        run: |
-          docker info
-
       - name: build and push container images
         run: |
           make image OS=linux ARCH=amd64
