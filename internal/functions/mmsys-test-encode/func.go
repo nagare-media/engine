@@ -30,6 +30,8 @@ import (
 	"strings"
 	"time"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	backoff "github.com/cenkalti/backoff/v4"
@@ -37,7 +39,9 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
+	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/functions"
+	enginehttp "github.com/nagare-media/engine/internal/pkg/http"
 	"github.com/nagare-media/engine/internal/pkg/mime"
 	"github.com/nagare-media/engine/internal/pkg/uuid"
 	"github.com/nagare-media/engine/pkg/events"
@@ -81,6 +85,11 @@ const (
 )
 
 const (
+	MaxNumberOfSimulatedCrashes = 2
+	SimulatedCrashWaitDuration  = 120 * time.Second
+)
+
+const (
 	MediaEncodedEventType  = "media.nagare.engine.v1alpha1.functions.mmsys-test-encode.media-encoded"
 	MediaPackagedEventType = "media.nagare.engine.v1alpha1.functions.mmsys-test-encode.media-packaged"
 )
@@ -93,10 +102,11 @@ type MediaEventData struct {
 // function mmsys-test-encode implements various video encoding test for the evaluation portion of an MMSys paper.
 type function struct {
 	// meta
-	task       *nbmpv2.Task
-	workflowID string
-	taskID     string
-	instanceID string
+	task           *nbmpv2.Task
+	workflowID     string
+	taskID         string
+	instanceID     string
+	instanceNumber int
 
 	// config
 	test         string
@@ -123,10 +133,13 @@ var _ nbmp.Function = &function{}
 
 // Exec mmsys-test-encode function.
 func (f *function) Exec(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	l := log.FromContext(ctx, "test", f.test).WithName(Name)
 	ctx = log.IntoContext(ctx, l)
 
-	l.Info(fmt.Sprintf("executing %s test", f.test))
+	l.Info(fmt.Sprintf("executing %s", f.test))
 
 	switch f.test {
 	case BaselineSimple:
@@ -148,10 +161,10 @@ func (f *function) Exec(ctx context.Context) error {
 		return f.testNoRecoverySplitMergeDistributed(ctx)
 
 	case TestRecoverySplitMerge:
-		return f.TestRecoverySplitMerge(ctx)
+		return f.testRecoverySplitMerge(ctx)
 
 	case TestRecoverySplitMergeDistributed:
-		return f.TestRecoverySplitMergeDistributed(ctx)
+		return f.testRecoverySplitMergeDistributed(ctx)
 
 	default:
 		return fmt.Errorf("unknown test '%s'", f.test)
@@ -216,22 +229,93 @@ func (f *function) baselineSplitMergeDistributed(ctx context.Context) error {
 }
 
 func (f *function) testNoRecoverySimple(ctx context.Context) error {
-	panic("TODO: implement")
+	l := log.FromContext(ctx)
+
+	// count number of previous task instances for simulated crash
+	_ = f.syncMediaEncodedEvents(ctx)
+	l.Info(fmt.Sprintf("previous task instances: %d", f.instanceNumber))
+	f.setupSimulatedCrash(ctx)
+
+	return f.baselineSimple(ctx)
 }
 
 func (f *function) testNoRecoverySplitMerge(ctx context.Context) error {
-	panic("TODO: implement")
+	l := log.FromContext(ctx)
+
+	// count number of previous task instances for simulated crash
+	_ = f.syncMediaEncodedEvents(ctx)
+	l.Info(fmt.Sprintf("previous task instances: %d", f.instanceNumber))
+	f.setupSimulatedCrash(ctx)
+
+	return f.baselineSplitMerge(ctx)
 }
 
 func (f *function) testNoRecoverySplitMergeDistributed(ctx context.Context) error {
-	panic("TODO: implement")
+	l := log.FromContext(ctx)
+
+	// count number of previous task instances for simulated crash
+	_ = f.syncMediaEncodedEvents(ctx)
+	l.Info(fmt.Sprintf("previous task instances: %d", f.instanceNumber))
+	f.setupSimulatedCrash(ctx)
+
+	return f.baselineSplitMergeDistributed(ctx)
 }
 
-func (f *function) TestRecoverySplitMerge(ctx context.Context) error {
-	panic("TODO: implement")
+func (f *function) testRecoverySplitMerge(ctx context.Context) error {
+	l := log.FromContext(ctx)
+
+	var (
+		chunkObjURLs        = make([]string, 0)
+		chunkObjKeyPrefix   = path.Join("tmp", f.workflowID, f.taskID, f.instanceID)
+		chunkObjNamePattern = "out%d-%d.hevc"
+	)
+
+	// sync with previous instances of this task
+	l.Info("recover from previous task instances")
+	encodedChunks := f.syncMediaEncodedEvents(ctx)
+	if f.instanceNumber > 0 {
+		l.Info(fmt.Sprintf("synced with %d previous task instances", f.instanceNumber))
+	} else {
+		l.Info("no previous task instances found")
+	}
+
+	// simulate crash
+	f.setupSimulatedCrash(ctx)
+
+	// encode
+	inVideoSeconds := int(f.inVideoDur / time.Second)
+	for seekSecond := 0; seekSecond < inVideoSeconds; seekSecond += f.chunkSeconds {
+		var (
+			err          error
+			chunkObjURL  string
+			chunkObjName = fmt.Sprintf(chunkObjNamePattern, seekSecond, seekSecond+f.chunkSeconds)
+		)
+
+		chunkObjURL, ok := encodedChunks[chunkObjName]
+		if !ok {
+			// TODO: add check if chunkObjURL really exists in bucket
+			chunkObjKey := path.Join(chunkObjKeyPrefix, chunkObjName)
+			chunkObjURL, err = f.encode(ctx, true, seekSecond, f.inVideoURL, chunkObjKey)
+			if err != nil {
+				l.Error(err, "encoding failed")
+				return err
+			}
+		}
+
+		chunkObjURLs = append(chunkObjURLs, chunkObjURL)
+	}
+
+	// package to CMAF
+	_, err := f.packageToCMAF(ctx, chunkObjURLs, f.s3ObjectKey)
+	if err != nil {
+		l.Error(err, "packaging failed")
+		return err
+	}
+
+	return nil
 }
 
-func (f *function) TestRecoverySplitMergeDistributed(ctx context.Context) error {
+func (f *function) testRecoverySplitMergeDistributed(ctx context.Context) error {
 	panic("TODO: implement")
 }
 
@@ -447,6 +531,116 @@ func (f *function) packageToCMAF(ctx context.Context, inURLs []string, outObjKey
 	}
 
 	return outObjURL, nil
+}
+
+func (f *function) syncMediaEncodedEvents(ctx context.Context) map[string]string {
+	l := log.FromContext(ctx)
+
+	var (
+		encodedMedia  = make(map[string]string)
+		mediaEventsCh = make(chan cloudevents.Event)
+		synceDone     = make(chan struct{})
+	)
+
+	go f.execEventAPIServer(ctx, mediaEventsCh, synceDone)
+
+	for {
+		select {
+		case <-synceDone:
+			close(mediaEventsCh)
+			return encodedMedia
+
+		case me := <-mediaEventsCh:
+			if me.Type() != MediaEncodedEventType {
+				continue
+			}
+
+			med := &MediaEventData{}
+			if err := me.DataAs(med); err != nil {
+				l.Error(err, "failed to decode media event data")
+				continue
+			}
+
+			encodedMedia[med.Name] = med.URL
+		}
+	}
+}
+
+func (f *function) execEventAPIServer(ctx context.Context, mediaEventsCh chan<- cloudevents.Event, synceDone chan struct{}) {
+	l := log.FromContext(ctx)
+
+	srv := enginehttp.NewServer(&enginev1.WebserverConfiguration{
+		BindAddress:   ptr.To[string]("127.0.0.1:8080"),
+		ReadTimeout:   &metav1.Duration{Duration: 1 * time.Minute},
+		WriteTimeout:  &metav1.Duration{Duration: 1 * time.Minute},
+		IdleTimeout:   &metav1.Duration{Duration: 1 * time.Minute},
+		Network:       ptr.To[string]("tcp"),
+		PublicBaseURL: ptr.To[string]("http://127.0.0.1:8080"),
+	})
+
+	eventCh := make(chan cloudevents.Event)
+	events.API(eventCh).MountTo(srv.App)
+
+	l.Info("start event API server")
+	var (
+		srvErr  error
+		srvDone = make(chan struct{})
+	)
+	go func() { srvErr = srv.Start(ctx); close(srvDone) }()
+
+	synced := false
+	subj := fmt.Sprintf("/engine.nagare.media/workflow(%s)/task(%s)/instance(%s)", f.workflowID, f.taskID, f.instanceID)
+
+	for {
+		select {
+		case <-ctx.Done():
+			l.Info("terminate event API server")
+			return
+
+		case <-srvDone:
+			if srvErr != nil {
+				panic(fmt.Sprintf("event API server failed: %s", srvErr))
+			}
+
+		case e := <-eventCh:
+			// ignore events after synced is done
+			if synced {
+				continue
+			}
+
+			switch e.Type() {
+			case MediaEncodedEventType, MediaPackagedEventType:
+				mediaEventsCh <- e
+
+			case events.TaskCreated:
+				if e.Subject() != subj {
+					f.instanceNumber++
+					continue
+				}
+
+				// we are synced up to this instance
+				synced = true
+				close(synceDone)
+			}
+		}
+	}
+}
+
+func (f *function) setupSimulatedCrash(ctx context.Context) {
+	l := log.FromContext(ctx)
+
+	if f.instanceNumber >= MaxNumberOfSimulatedCrashes {
+		l.Info("reached max number of simulated crashes: disable simulated crash")
+		return
+	}
+
+	// simulate hard crash after 2m
+	l.Info("enable simulated crash")
+	go func() {
+		time.Sleep(SimulatedCrashWaitDuration)
+		l.Info("simulate crash now")
+		os.Exit(1)
+	}()
 }
 
 func (f *function) observeMediaEvent(ctx context.Context, t string, me MediaEventData) {

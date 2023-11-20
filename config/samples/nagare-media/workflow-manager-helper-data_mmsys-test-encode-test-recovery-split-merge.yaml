@@ -2,17 +2,17 @@ apiVersion: engine.nagare.media/v1alpha1
 kind: WorkflowManagerHelperData
 
 workflow:
-  id: 6f078f5d-1889-4bcd-9bb7-3c3c00f6f0c6
+  id: 459a108a-7eeb-40b2-b86c-9bd61ceddefd
   humanReadable:
-    name: baseline-split-merge
+    name: test-recovery-split-merge
   config: ~
 
 task:
-  id: 55fba1c5-6d88-446b-8cbf-654f1645265f
+  id: 31353a5c-1c2e-4654-91ee-45b6d482b841
   humanReadable:
-    name: baseline-split-merge
+    name: test-recovery-split-merge
   inputs:
-    - id: c1a21685-171a-4e4b-b567-e06ac8fe5b12
+    - id: 94f90365-47e7-4681-89d6-790961ad4e72
       type: media
       direction: pull
       portBindings:
@@ -24,8 +24,16 @@ task:
             video:
               frameRate:
                 average: 24
+    - id: 96f6ae8e-b3ef-4391-b2ff-9662adb43904
+      type: metadata
+      direction: push
+      portBindings:
+        - id: report
+      url: http://localhost:8080/events
+      metadata:
+        mimeType: application/cloudevents+json
   outputs:
-    - id: 553f07d1-4a9d-4b60-9adb-b8874d237348
+    - id: 7e84e0f8-b83d-464d-809b-3d35fcd126ad
       type: media
       direction: push
       portBindings:
@@ -33,5 +41,5 @@ task:
       url: s3://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=WYBXHFYFL6X9WBF8CSZI&AWS_SECRET_ACCESS_KEY=DJJ3dxGepD8bKf49bVGpJaAiGypQbKb8ZWDMudKV
       # -> http://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4
   config:
-    mmsys-test-encode.engine.nagare.media/test: baseline-split-merge
+    mmsys-test-encode.engine.nagare.media/test: test-recovery-split-merge
     mmsys-test-encode.engine.nagare.media/chunk-seconds: "60"

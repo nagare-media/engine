@@ -25,7 +25,7 @@ task:
               frameRate:
                 average: 24
   outputs:
-    - id: f1518116-7d65-4458-88e8-c5e7dbb80660
+    - id: a52089ee-c738-4739-899c-70ce048c43b0
       type: media
       direction: push
       portBindings:
