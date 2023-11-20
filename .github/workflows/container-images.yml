@@ -1,0 +1,47 @@
+name: container-images
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: set up Docker buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          # TODO: build multi-plattform container images
+          platforms: linux/amd64
+
+      - name: info
+        run: |
+          docker info
+
+      - name: build and push container images
+        run: |
+          make images OS=linux ARCH=amd64
+
+          docker push ghcr.io/nagare-media/engine/function-mmsys-test-encode:dev
+          docker push ghcr.io/nagare-media/engine/function-noop:dev
+          docker push ghcr.io/nagare-media/engine/function-sleep:dev
+          docker push ghcr.io/nagare-media/engine/gateway-nbmp:dev
+          docker push ghcr.io/nagare-media/engine/workflow-manager:dev
+          docker push ghcr.io/nagare-media/engine/workflow-manager-helper:dev
+          docker push ghcr.io/nagare-media/engine/workflow-opentelemetry-adapter:dev
+          docker push ghcr.io/nagare-media/engine/workflow-vacuum:dev
