@@ -35,7 +35,7 @@ jobs:
 
       - name: build and push container images
         run: |
-          make images OS=linux ARCH=amd64
+          make image OS=linux ARCH=amd64
 
           docker push ghcr.io/nagare-media/engine/function-mmsys-test-encode:dev
           docker push ghcr.io/nagare-media/engine/function-noop:dev
