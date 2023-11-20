@@ -1,0 +1,28 @@
+apiVersion: engine.nagare.media/v1alpha1
+kind: TaskShimConfiguration
+
+webserver:
+  bindAddress: 127.0.0.1:8888
+  readTimeout: 1m
+  writeTimeout: ~ # = unlimited
+  idleTimeout: ~ # = unlimited
+  network: tcp
+  publicBaseURL: http://127.0.0.1:8888
+
+task:
+  actions:
+    - name: execute function
+      action: task-shim.engine.nagare.media/exec
+      config:
+        command: ./bin/functions-dev-darwin-amd64
+        args: ["--zap-devel", "--zap-log-level=debug", "--zap-stacktrace-level=error", "mmsys-test-encode", "/tmp/nbmp.tdd"]
+
+  onCreate:
+    - name: write task description document
+      action: task-shim.engine.nagare.media/file
+      config: |
+        path: /tmp/nbmp.tdd
+        content: |
+          {{ toJson .Task }}
+    - action: task-shim.engine.nagare.media/meta
+      config: start-task

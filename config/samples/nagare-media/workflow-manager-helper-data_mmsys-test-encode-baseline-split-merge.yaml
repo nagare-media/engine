@@ -1,0 +1,37 @@
+apiVersion: engine.nagare.media/v1alpha1
+kind: WorkflowManagerHelperData
+
+workflow:
+  id: 6f078f5d-1889-4bcd-9bb7-3c3c00f6f0c6
+  humanReadable:
+    name: baseline-split-merge
+  config: ~
+
+task:
+  id: 55fba1c5-6d88-446b-8cbf-654f1645265f
+  humanReadable:
+    name: baseline-split-merge
+  inputs:
+    - id: c1a21685-171a-4e4b-b567-e06ac8fe5b12
+      type: media
+      direction: pull
+      portBindings:
+        - id: input
+      url: http://localhost:9000/nagare-media-engine-tests/inputs/sintel.mp4
+      metadata:
+        streams:
+          - duration: 14m48s
+            video:
+              frameRate:
+                average: 24
+  outputs:
+    - id: f1518116-7d65-4458-88e8-c5e7dbb80660
+      type: media
+      direction: push
+      portBindings:
+        - id: output
+      url: s3://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=WYBXHFYFL6X9WBF8CSZI&AWS_SECRET_ACCESS_KEY=DJJ3dxGepD8bKf49bVGpJaAiGypQbKb8ZWDMudKV
+      # -> http://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4
+  config:
+    mmsys-test-encode.engine.nagare.media/test: baseline-split-merge
+    mmsys-test-encode.engine.nagare.media/chunk-seconds: "60"

@@ -1,0 +1,37 @@
+apiVersion: engine.nagare.media/v1alpha1
+kind: WorkflowManagerHelperData
+
+workflow:
+  id: 24f21902-13bb-40f4-ae65-8ceb1bf29633
+  humanReadable:
+    name: baseline-simple
+  config: ~
+
+task:
+  id: d9af6a61-4915-46d9-81d0-cb94e22de6d9
+  humanReadable:
+    name: baseline-simple
+  inputs:
+    - id: 900dfe06-c065-43ce-8653-81fae652882f
+      type: media
+      direction: pull
+      portBindings:
+        - id: input
+      url: http://localhost:9000/nagare-media-engine-tests/inputs/sintel.mp4
+      metadata:
+        streams:
+          - duration: 14m48s
+            video:
+              frameRate:
+                average: 24
+  outputs:
+    - id: f1518116-7d65-4458-88e8-c5e7dbb80660
+      type: media
+      direction: push
+      portBindings:
+        - id: output
+      url: s3://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=WYBXHFYFL6X9WBF8CSZI&AWS_SECRET_ACCESS_KEY=DJJ3dxGepD8bKf49bVGpJaAiGypQbKb8ZWDMudKV
+      # -> http://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4
+  config:
+    mmsys-test-encode.engine.nagare.media/test: baseline-simple
+    mmsys-test-encode.engine.nagare.media/chunk-seconds: "60"
