@@ -68,16 +68,16 @@ const (
 	//     * test 4: split+merge encoding
 	//     * test 5: split+merge encoding distributed
 
-	BaselineSimpleTest                = "baseline-simple"
-	BaselineSplitMergeTest            = "baseline-split-merge"
-	BaselineSplitMergeDistributedTest = "baseline-split-merge-distributed"
+	BaselineSimple                = "baseline-simple"
+	BaselineSplitMerge            = "baseline-split-merge"
+	BaselineSplitMergeDistributed = "baseline-split-merge-distributed"
 
-	NoRecoverySimpleTest                = "no-recovery-simple"
-	NoRecoverySplitMergeTest            = "no-recovery-split-merge"
-	NoRecoverySplitMergeDistributedTest = "no-recovery-split-merge-distributed"
+	TestNoRecoverySimple                = "test-no-recovery-simple"
+	TestNoRecoverySplitMerge            = "test-no-recovery-split-merge"
+	TestNoRecoverySplitMergeDistributed = "test-no-recovery-split-merge-distributed"
 
-	RecoverySplitMergeTest            = "recovery-split-merge"
-	RecoverySplitMergeDistributedTest = "recovery-split-merge-distributed"
+	TestRecoverySplitMerge            = "test-recovery-split-merge"
+	TestRecoverySplitMergeDistributed = "test-recovery-split-merge-distributed"
 )
 
 const (
@@ -129,36 +129,36 @@ func (f *function) Exec(ctx context.Context) error {
 	l.Info(fmt.Sprintf("executing %s test", f.test))
 
 	switch f.test {
-	case BaselineSimpleTest:
-		return f.baselineSimpleTest(ctx)
+	case BaselineSimple:
+		return f.baselineSimple(ctx)
 
-	case BaselineSplitMergeTest:
-		return f.baselineSplitMergeTest(ctx)
+	case BaselineSplitMerge:
+		return f.baselineSplitMerge(ctx)
 
-	case BaselineSplitMergeDistributedTest:
-		return f.baselineSplitMergeDistributedTest(ctx)
+	case BaselineSplitMergeDistributed:
+		return f.baselineSplitMergeDistributed(ctx)
 
-	case NoRecoverySimpleTest:
-		return f.noRecoverySimpleTest(ctx)
+	case TestNoRecoverySimple:
+		return f.testNoRecoverySimple(ctx)
 
-	case NoRecoverySplitMergeTest:
-		return f.noRecoverySplitMergeTest(ctx)
+	case TestNoRecoverySplitMerge:
+		return f.testNoRecoverySplitMerge(ctx)
 
-	case NoRecoverySplitMergeDistributedTest:
-		return f.noRecoverySplitMergeDistributedTest(ctx)
+	case TestNoRecoverySplitMergeDistributed:
+		return f.testNoRecoverySplitMergeDistributed(ctx)
 
-	case RecoverySplitMergeTest:
-		return f.recoverySplitMergeTest(ctx)
+	case TestRecoverySplitMerge:
+		return f.TestRecoverySplitMerge(ctx)
 
-	case RecoverySplitMergeDistributedTest:
-		return f.recoverySplitMergeDistributedTest(ctx)
+	case TestRecoverySplitMergeDistributed:
+		return f.TestRecoverySplitMergeDistributed(ctx)
 
 	default:
 		return fmt.Errorf("unknown test '%s'", f.test)
 	}
 }
 
-func (f *function) baselineSimpleTest(ctx context.Context) error {
+func (f *function) baselineSimple(ctx context.Context) error {
 	l := log.FromContext(ctx)
 
 	// encode
@@ -179,7 +179,7 @@ func (f *function) baselineSimpleTest(ctx context.Context) error {
 	return nil
 }
 
-func (f *function) baselineSplitMergeTest(ctx context.Context) error {
+func (f *function) baselineSplitMerge(ctx context.Context) error {
 	l := log.FromContext(ctx)
 
 	var (
@@ -211,27 +211,27 @@ func (f *function) baselineSplitMergeTest(ctx context.Context) error {
 	return nil
 }
 
-func (f *function) baselineSplitMergeDistributedTest(ctx context.Context) error {
+func (f *function) baselineSplitMergeDistributed(ctx context.Context) error {
 	panic("TODO: implement")
 }
 
-func (f *function) noRecoverySimpleTest(ctx context.Context) error {
+func (f *function) testNoRecoverySimple(ctx context.Context) error {
 	panic("TODO: implement")
 }
 
-func (f *function) noRecoverySplitMergeTest(ctx context.Context) error {
+func (f *function) testNoRecoverySplitMerge(ctx context.Context) error {
 	panic("TODO: implement")
 }
 
-func (f *function) noRecoverySplitMergeDistributedTest(ctx context.Context) error {
+func (f *function) testNoRecoverySplitMergeDistributed(ctx context.Context) error {
 	panic("TODO: implement")
 }
 
-func (f *function) recoverySplitMergeTest(ctx context.Context) error {
+func (f *function) TestRecoverySplitMerge(ctx context.Context) error {
 	panic("TODO: implement")
 }
 
-func (f *function) recoverySplitMergeDistributedTest(ctx context.Context) error {
+func (f *function) TestRecoverySplitMergeDistributed(ctx context.Context) error {
 	panic("TODO: implement")
 }
 
