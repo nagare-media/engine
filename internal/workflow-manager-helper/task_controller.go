@@ -343,22 +343,6 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 	ctx = log.IntoContext(ctx, l)
 	l.Info("starting event-emitter")
 
-	var (
-		err error
-		cc  jetstream.ConsumeContext
-	)
-
-	defer func() {
-		// even when we return early, we need to wait for ctx to be canceled
-		if err == nil {
-			<-ctx.Done()
-			l.Info("termination requested")
-		}
-		if cc != nil {
-			cc.Stop()
-		}
-	}()
-
 	// check for task event inputs
 	eventClients := make(map[string]events.Client)
 	for _, in := range c.data.Task.Inputs {
@@ -425,7 +409,7 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 		return err
 	}
 
-	cc, err = con.Consume(func(msg jetstream.Msg) {
+	cc, err := con.Consume(func(msg jetstream.Msg) {
 		defer func() {
 			if err := msg.Ack(); err != nil {
 				l.Error(err, "failed to acknowledge consumption of NATS message")
