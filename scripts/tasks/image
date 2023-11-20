@@ -35,7 +35,7 @@ DOCKERFILE="build/package/image/${IMAGE}/Dockerfile.${OS}.${ARCH}"
 
 # Main
 
-docker buildx build \
+docker buildx build --load \
   --platform "${OS}/${ARCH}" \
   --build-arg "GOVERSION=${GOVERSION}" \
   --build-arg "OS=${OS}" \
