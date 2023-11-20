@@ -200,6 +200,7 @@ clean: ## Cleanup build output
 .PHONY: image
 image: $(addprefix image-, $(IMAGES)) ## Build all container images
 
+## image-function-mmsys-test-encode:     ## Build mmsys-test-encode function container image
 ## image-function-noop:                  ## Build noop function container image
 ## image-function-sleep:                 ## Build sleep function container image
 ## image-gateway-nbmp:                   ## Build NBMP gateway container image
