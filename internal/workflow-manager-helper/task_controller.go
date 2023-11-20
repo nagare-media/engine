@@ -49,8 +49,9 @@ const (
 )
 
 var (
-	probeLaterErr    = errors.New("probe later error")
-	taskRestartedErr = errors.New("task restarted error")
+	probeLaterErr    = errors.New("probe later")
+	taskRestartedErr = errors.New("task restarted")
+	taskFailedErr    = errors.New("task failed")
 )
 
 type taskCtrl struct {
@@ -111,15 +112,16 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 	l = l.WithValues("instance", c.tskInstanceID)
 	ctx = log.IntoContext(ctx, l)
 
-	if err := c.observeTaskPhase(ctx); err != nil {
+	var observeTaskErr error
+	if observeTaskErr = c.observeTaskPhase(ctx); observeTaskErr != nil {
 		// we ignore the error and always try to move on to the delete phase
 		// we will record the error in the Kubernetes termination message
 		fmt.Fprint(terminationMsgBuf, "observe phase failed: ")
-		fmt.Fprintln(terminationMsgBuf, err)
+		fmt.Fprintln(terminationMsgBuf, observeTaskErr)
 
 		// don't run delete task phase on restarted tasks
-		if err == taskRestartedErr {
-			return err
+		if observeTaskErr == taskRestartedErr {
+			return observeTaskErr
 		}
 	}
 
@@ -130,7 +132,7 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 		return err
 	}
 
-	return nil
+	return observeTaskErr
 }
 
 func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
@@ -276,8 +278,8 @@ func (c *taskCtrl) observerLoop(ctx context.Context) error {
 
 			switch *tsk.General.State {
 			case nbmpv2.InErrorState:
-				l.Info("task failed")
-				return nil
+				l.Error(taskFailedErr, "task failed")
+				return taskFailedErr
 
 			case nbmpv2.DestroyedState:
 				l.Info("task finished successfully")
