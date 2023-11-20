@@ -17,10 +17,3 @@ task:
   outputs: []
   config:
     sleep.engine.nagare.media/duration: 10s
-
-mediaLocations: ~
-
-system:
-  url: ""
-  username : ""
-  password : ""
