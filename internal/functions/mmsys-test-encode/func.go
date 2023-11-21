@@ -570,7 +570,7 @@ func (f *function) execEventAPIServer(ctx context.Context, mediaEventsCh chan<- 
 	l := log.FromContext(ctx)
 
 	srv := enginehttp.NewServer(&enginev1.WebserverConfiguration{
-		BindAddress:   ptr.To[string]("127.0.0.1:8080"),
+		BindAddress:   ptr.To[string](":8080"),
 		ReadTimeout:   &metav1.Duration{Duration: 1 * time.Minute},
 		WriteTimeout:  &metav1.Duration{Duration: 1 * time.Minute},
 		IdleTimeout:   &metav1.Duration{Duration: 1 * time.Minute},

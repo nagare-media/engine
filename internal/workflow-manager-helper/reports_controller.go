@@ -84,7 +84,7 @@ func (c *reportsCtrl) Start(ctx context.Context) error {
 
 	// connect to NATS
 	var err error
-	c.nc, c.js, err = enginenats.CreateJetStreamConn(ctx, string(c.cfg.NATS.URL))
+	c.nc, c.js, err = enginenats.CreateJetStreamConn(ctx, string(c.data.System.NATS.URL))
 	if err != nil {
 		return err
 	}

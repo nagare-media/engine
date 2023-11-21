@@ -1,20 +1,5 @@
 apiVersion: engine.nagare.media/v1alpha1
 kind: WorkflowManagerHelperConfiguration
-
-nats:
-  URL: nats://127.0.0.1:4222
-
-reports:
-  webserver:
-    bindAddress: 127.0.0.1:8181
-    readTimeout: 1m
-    writeTimeout: 1m
-    idleTimeout: 1m
-    network: tcp
-    publicBaseURL: http://127.0.0.1:8181
-
 task:
+  # assume task is a sidecar
   taskAPI: http://127.0.0.1:8888/v2/tasks
-  requestTimeout: 10s
-  observePeriode: 2s
-  maxFailedProbes: 10

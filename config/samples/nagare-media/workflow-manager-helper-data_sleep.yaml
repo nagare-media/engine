@@ -17,3 +17,7 @@ task:
   outputs: []
   config:
     sleep.engine.nagare.media/duration: 10s
+
+system:
+  nats:
+    url: nats://localhost:4222

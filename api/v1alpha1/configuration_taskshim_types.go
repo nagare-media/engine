@@ -61,7 +61,7 @@ func init() {
 
 func (c *TaskShimConfiguration) Default() {
 	if c.Webserver.BindAddress == nil {
-		c.Webserver.BindAddress = ptr.To[string]("127.0.0.1:8888")
+		c.Webserver.BindAddress = ptr.To[string](":8888")
 	}
 
 	if c.Webserver.ReadTimeout == nil {

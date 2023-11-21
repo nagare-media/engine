@@ -388,7 +388,7 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 	}
 
 	// connect to NATS
-	nc, js, err := enginenats.CreateJetStreamConn(ctx, string(c.cfg.NATS.URL))
+	nc, js, err := enginenats.CreateJetStreamConn(ctx, string(c.data.System.NATS.URL))
 	if err != nil {
 		return err
 	}

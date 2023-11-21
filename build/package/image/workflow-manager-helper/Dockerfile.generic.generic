@@ -63,10 +63,8 @@ COPY <<EOF /config/workflow-manager-helper.yaml
 apiVersion: engine.nagare.media/v1alpha1
 kind: WorkflowManagerHelperConfiguration
 task:
-reports:
-  webserver:
-    bindAddress: 127.0.0.1:8181
-    publicBaseURL: http://127.0.0.1:8181
+  # assume task is a sidecar
+  taskAPI: http://127.0.0.1:8888/v2/tasks
 EOF
 
 # event API

@@ -29,7 +29,6 @@ import (
 type WorkflowManagerHelperConfigurationSpec struct {
 	TaskController    WorkflowManagerHelperTaskControllerConfiguration    `json:"task"`
 	ReportsController WorkflowManagerHelperReportsControllerConfiguration `json:"reports"`
-	NATS              NATSConfig                                          `json:"nats"`
 }
 
 type WorkflowManagerHelperTaskControllerConfiguration struct {
@@ -70,7 +69,7 @@ func (c *WorkflowManagerHelperConfiguration) Default() {
 	}
 
 	if c.ReportsController.Webserver.BindAddress == nil {
-		c.ReportsController.Webserver.BindAddress = ptr.To[string]("127.0.0.1:8181")
+		c.ReportsController.Webserver.BindAddress = ptr.To[string](":8181")
 	}
 
 	if c.ReportsController.Webserver.ReadTimeout == nil {

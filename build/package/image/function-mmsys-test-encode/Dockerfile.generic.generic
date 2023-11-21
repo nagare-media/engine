@@ -79,9 +79,6 @@ USER 65532:65532
 COPY <<EOF /config/task-shim.yaml
 apiVersion: engine.nagare.media/v1alpha1
 kind: TaskShimConfiguration
-webserver:
-  bindAddress: 127.0.0.1:8888
-  publicBaseURL: http://127.0.0.1:8888
 task:
   actions:
     - name: execute function
