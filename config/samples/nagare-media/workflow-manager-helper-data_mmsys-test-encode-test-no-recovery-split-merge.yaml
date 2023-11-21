@@ -17,7 +17,7 @@ task:
       direction: pull
       portBindings:
         - id: input
-      url: http://localhost:9000/nagare-media-engine-tests/inputs/sintel.mp4
+      url: http://localhost:9000/nagare-media-engine-tests/inputs/sintel.mov
       metadata:
         streams:
           - duration: 14m48s
@@ -38,7 +38,7 @@ task:
       direction: push
       portBindings:
         - id: output
-      url: s3://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=WYBXHFYFL6X9WBF8CSZI&AWS_SECRET_ACCESS_KEY=DJJ3dxGepD8bKf49bVGpJaAiGypQbKb8ZWDMudKV
+      url: s3://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=MLYEAE6AES7IUSL4APYL&AWS_SECRET_ACCESS_KEY=snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H
       # -> http://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4
   config:
     mmsys-test-encode.engine.nagare.media/test: test-no-recovery-split-merge

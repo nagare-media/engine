@@ -32,11 +32,11 @@ resources:
 users:
   - accessKey: MLYEAE6AES7IUSL4APYL
     secretKey: snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H
-    policy: readwrite
+    policy: consoleAdmin
 
 buckets:
-  - name: nagare-media-engine
-    policy: none
+  - name: nagare-media-engine-tests
+    policy: download
     purge: false
     versioning: false
     objectlocking: false
