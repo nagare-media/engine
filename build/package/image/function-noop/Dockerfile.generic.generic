@@ -67,7 +67,7 @@ COPY --from=build "/app/bin/task-shim-${VERSION}-${OS}-${ARCH}" /task-shim
 COPY --from=build "/app/bin/functions-${VERSION}-${OS}-${ARCH}" /noop
 USER 65532:65532
 
-COPY <<EOF /config/workflow-manager-helper.yaml
+COPY <<EOF /config/task-shim.yaml
 apiVersion: engine.nagare.media/v1alpha1
 kind: TaskShimConfiguration
 webserver:
