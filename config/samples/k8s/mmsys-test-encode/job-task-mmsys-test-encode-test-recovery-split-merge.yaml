@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: task-mmsys-test-encode-baseline-simple
+  name: task-mmsys-test-encode-test-recovery-split-merge
 spec:
   backoffLimit: 10
   podFailurePolicy:
