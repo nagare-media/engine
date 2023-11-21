@@ -43,3 +43,7 @@ task:
   config:
     mmsys-test-encode.engine.nagare.media/test: test-recovery-split-merge
     mmsys-test-encode.engine.nagare.media/chunk-seconds: "60"
+
+system:
+  nats:
+    url: nats://localhost:4222
