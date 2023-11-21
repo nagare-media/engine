@@ -1,0 +1,86 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: task-mmsys-test-encode-baseline-simple
+spec:
+  backoffLimit: 10
+  podFailurePolicy:
+    rules:
+      - action: Ignore
+        onPodConditions:
+          - type: DisruptionTarget
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: function
+    spec:
+      restartPolicy: Never # recreate pod by job controller
+      terminationGracePeriodSeconds: 35
+      containers:
+        - name: function
+          imagePullPolicy: Always
+          image: ghcr.io/nagare-media/engine/function-mmsys-test-encode:dev
+          ports:
+            - name: task-api
+              containerPort: 8888
+              protocol: TCP
+          startupProbe:
+            failureThreshold: 60
+            periodSeconds: 2
+            httpGet:
+              path: /healthz
+              port: task-api
+          readinessProbe:
+            periodSeconds: 2
+            httpGet:
+              path: /readyz
+              port: task-api
+          livenessProbe:
+            periodSeconds: 2
+            httpGet:
+              path: /healthz
+              port: task-api
+          resources:
+            requests:
+              cpu: 7000m
+              memory: 2Gi
+        - name: workflow-manager-helper
+          imagePullPolicy: Always
+          image: ghcr.io/nagare-media/engine/workflow-manager-helper:dev
+          args: [ "--config", "/config/workflow-manager-helper.yaml", "/run/secrets/engine.nagare.media/task/data.yaml" ]
+          ports:
+            - name: event-api
+              containerPort: 8181
+              protocol: TCP
+          startupProbe:
+            failureThreshold: 60
+            periodSeconds: 2
+            httpGet:
+              path: /healthz
+              port: event-api
+          readinessProbe:
+            periodSeconds: 2
+            httpGet:
+              path: /readyz
+              port: event-api
+          livenessProbe:
+            periodSeconds: 2
+            httpGet:
+              path: /healthz
+              port: event-api
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: task-data
+              mountPath: /run/secrets/engine.nagare.media/task
+              readOnly: true
+      volumes:
+        - name: task-data
+          secret:
+            secretName: workflow-manager-helper-data-mmsys-test-encode-test-no-recovery-simple
