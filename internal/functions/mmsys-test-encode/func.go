@@ -54,8 +54,13 @@ import (
 const (
 	Name = "mmsys-test-encode"
 
-	TestParameterKey         = "mmsys-test-encode.engine.nagare.media/test"
-	ChunkSecondsParameterKey = "mmsys-test-encode.engine.nagare.media/chunk-seconds"
+	TestParameterKey                        = "mmsys-test-encode.engine.nagare.media/test"
+	ChunkSecondsParameterKey                = "mmsys-test-encode.engine.nagare.media/chunk-seconds"
+	MaxNumberOfSimulatedCrashesParameterKey = "mmsys-test-encode.engine.nagare.media/max-number-of-simulated-crashes"
+	SimulatedCrashWaitDurationParameterKey  = "mmsys-test-encode.engine.nagare.media/simulated-crash-wait-duration"
+
+	DefaultMaxNumberOfSimulatedCrashes = 2
+	DefaultSimulatedCrashWaitDuration  = 120 * time.Second
 )
 
 const (
@@ -85,11 +90,6 @@ const (
 )
 
 const (
-	MaxNumberOfSimulatedCrashes = 2
-	SimulatedCrashWaitDuration  = 120 * time.Second
-)
-
-const (
 	MediaEncodedEventType  = "media.nagare.engine.v1alpha1.functions.mmsys-test-encode.media-encoded"
 	MediaPackagedEventType = "media.nagare.engine.v1alpha1.functions.mmsys-test-encode.media-packaged"
 )
@@ -109,8 +109,10 @@ type function struct {
 	instanceNumber int
 
 	// config
-	test         string
-	chunkSeconds int
+	test                        string
+	chunkSeconds                int
+	maxNumberOfSimulatedCrashes int
+	simulatedCrashWaitDuration  time.Duration
 
 	// input
 	inVideoURL string
@@ -629,7 +631,7 @@ func (f *function) execEventAPIServer(ctx context.Context, mediaEventsCh chan<- 
 func (f *function) setupSimulatedCrash(ctx context.Context) {
 	l := log.FromContext(ctx)
 
-	if f.instanceNumber >= MaxNumberOfSimulatedCrashes {
+	if f.instanceNumber >= f.maxNumberOfSimulatedCrashes {
 		l.Info("reached max number of simulated crashes: disable simulated crash")
 		return
 	}
@@ -637,7 +639,7 @@ func (f *function) setupSimulatedCrash(ctx context.Context) {
 	// simulate hard crash after 2m
 	l.Info("enable simulated crash")
 	go func() {
-		time.Sleep(SimulatedCrashWaitDuration)
+		time.Sleep(f.simulatedCrashWaitDuration)
 		l.Info("simulate crash now")
 		os.Exit(1)
 	}()
@@ -708,7 +710,25 @@ func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
 	}
 	f.chunkSeconds, err = strconv.Atoi(chunkSecondsStr)
 	if err != nil {
-		return nil, errors.New("chunk-seconds is not an integer")
+		return nil, fmt.Errorf("%s is not an integer", ChunkSecondsParameterKey)
+	}
+
+	f.maxNumberOfSimulatedCrashes = DefaultMaxNumberOfSimulatedCrashes
+	maxNumberOfSimulatedCrashesStr, ok := nbmputils.GetStringParameterValue(t.Configuration.Parameters, MaxNumberOfSimulatedCrashesParameterKey)
+	if ok {
+		f.maxNumberOfSimulatedCrashes, err = strconv.Atoi(maxNumberOfSimulatedCrashesStr)
+		if err != nil {
+			return nil, fmt.Errorf("%s is not an integer", MaxNumberOfSimulatedCrashesParameterKey)
+		}
+	}
+
+	f.simulatedCrashWaitDuration = DefaultSimulatedCrashWaitDuration
+	simulatedCrashWaitDurationStr, ok := nbmputils.GetStringParameterValue(t.Configuration.Parameters, SimulatedCrashWaitDurationParameterKey)
+	if ok {
+		f.simulatedCrashWaitDuration, err = time.ParseDuration(simulatedCrashWaitDurationStr)
+		if err != nil {
+			return nil, fmt.Errorf("%s is not an integer", SimulatedCrashWaitDurationParameterKey)
+		}
 	}
 
 	// input

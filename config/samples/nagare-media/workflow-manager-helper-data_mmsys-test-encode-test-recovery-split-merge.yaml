@@ -43,6 +43,8 @@ task:
   config:
     mmsys-test-encode.engine.nagare.media/test: test-recovery-split-merge
     mmsys-test-encode.engine.nagare.media/chunk-seconds: "60"
+    mmsys-test-encode.engine.nagare.media/max-number-of-simulated-crashes: "2"
+    mmsys-test-encode.engine.nagare.media/simulated-crash-wait-duration: 360s
 
 system:
   nats:
