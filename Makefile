@@ -31,7 +31,7 @@ TESTENV_CERT_MANAGER_VERSION          ?= 1.12.3 # Helm chart versions
 TESTENV_KUBE_PROMETHEUS_STACK_VERSION ?= 48.3.3 # Helm chart versions
 TESTENV_TEMPO_VERSION                 ?= 1.5.1  # Helm chart versions
 TESTENV_MINIO_VERSION                 ?= 5.0.13 # Helm chart versions
-TESTENV_NATS_VERSION                  ?= 1.0.2  # Helm chart versions
+TESTENV_NATS_VERSION                  ?= 1.1.5  # Helm chart versions (2.10.5 app version)
 
 CONTROLLER_TOOLS_VERSION ?= v0.13.0
 KUSTOMIZE_VERSION        ?= v5.1.1

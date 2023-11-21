@@ -1,4 +1,4 @@
-nats:
+config:
   jetstream:
     enabled: true
     memStorage:
@@ -10,24 +10,11 @@ nats:
       storageClassName: standard
       accessModes:
         - ReadWriteOnce
-  # tls:
-  #   allowNonTLS: false
 
 natsbox:
   enabled: true
 
-exporter:
+promExporter:
   enabled: true
-  serviceMonitor:
+  podMonitor:
     enabled: true
-    namespace: monitoring
-
-auth:
-  enabled: true
-  basic:
-    users:
-      - user: nagare-media-engine
-        password: nagare-media-engine
-    defaultPermissions:
-      publish: [">"]
-      subscribe: [">"]
