@@ -42,7 +42,7 @@ task:
       # -> http://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4
   config:
     mmsys-test-encode.engine.nagare.media/test: test-no-recovery-simple
-    mmsys-test-encode.engine.nagare.media/chunk-seconds: "60"
+    mmsys-test-encode.engine.nagare.media/chunk-seconds: "120"
     mmsys-test-encode.engine.nagare.media/max-number-of-simulated-crashes: "2"
     mmsys-test-encode.engine.nagare.media/simulated-crash-wait-duration: 360s
 
