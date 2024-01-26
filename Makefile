@@ -22,8 +22,10 @@ GIT_COMMIT     ?= $(shell git rev-parse --short HEAD || echo "unknown")
 GIT_TREE_STATE ?= $(shell sh -c 'if test -z "$$(git status --porcelain 2>/dev/null)"; then echo clean; else echo dirty; fi')
 BUILD_DATE     ?= $(shell date -u +"%Y-%m-%dT%TZ")
 
-IMAGE_REGISTRY ?= $(shell cat build/package/image/IMAGE_REGISTRY)
-IMAGE_TAG      ?= $(VERSION)
+IMAGE_REGISTRY  ?= $(shell cat build/package/image/IMAGE_REGISTRY)
+IMAGE_TAG       ?= $(VERSION)
+IMAGE_PLATFORMS ?= "" # by default only ${OS}/${ARCH} is built
+BUILDX_OUTPUT   ?= "--load"
 
 TESTENV_K8S_VERSION                   ?= 1.28.0
 TESTENV_INGRESS_NGINX_VERSION         ?= 4.7.1  # Helm chart versions
@@ -215,10 +217,12 @@ image-%:
 		GOVERSION="$(GOVERSION)" \
 		OS="$(OS)" \
 		ARCH="$(ARCH)" \
+		PLATFORMS="$(IMAGE_PLATFORMS)" \
 		VERSION="$(VERSION)" \
 		GIT_COMMIT="$(GIT_COMMIT)" \
 		GIT_TREE_STATE="$(GIT_TREE_STATE)" \
 		BUILD_DATE="$(BUILD_DATE)" \
+		BUILDX_OUTPUT="$(BUILDX_OUTPUT)" \
 	scripts/exec-local image
 
 ##@ Deployment

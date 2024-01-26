@@ -13,8 +13,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 COPY . .
 
 # BUILD_DATE changes ofter so move this section down to allow for caching
-ARG OS \
-    ARCH \
+ARG TARGETOS \
+    TARGETARCH \
     VERSION \
     GIT_COMMIT \
     GIT_TREE_STATE \
@@ -24,15 +24,15 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/app/tmp \
     make build-task-shim \
-      "OS=${OS}" \
-      "ARCH=${ARCH}" \
+      "OS=${TARGETOS}" \
+      "ARCH=${TARGETARCH}" \
       "VERSION=${VERSION}" \
       "GIT_COMMIT=${GIT_COMMIT}" \
       "GIT_TREE_STATE=${GIT_TREE_STATE}" \
       "BUILD_DATE=${BUILD_DATE}" \
  && make build-functions \
-      "OS=${OS}" \
-      "ARCH=${ARCH}" \
+      "OS=${TARGETOS}" \
+      "ARCH=${TARGETARCH}" \
       "VERSION=${VERSION}" \
       "GIT_COMMIT=${GIT_COMMIT}" \
       "GIT_TREE_STATE=${GIT_TREE_STATE}" \
@@ -51,8 +51,8 @@ RUN apt-get update \
 
 ENV GOTRACEBACK=all
 
-ARG OS \
-    ARCH \
+ARG TARGETOS \
+    TARGETARCH \
     VERSION \
     GIT_COMMIT \
     BUILD_DATE
@@ -72,8 +72,8 @@ LABEL maintainer="Matthias Neugebauer <mtneug@mailbox.org>" \
       org.opencontainers.image.base.name="docker.io/ubuntu:23.04"
 
 WORKDIR /
-COPY --from=build "/app/bin/task-shim-${VERSION}-${OS}-${ARCH}" /task-shim
-COPY --from=build "/app/bin/functions-${VERSION}-${OS}-${ARCH}" /mmsys-test-encode
+COPY --from=build "/app/bin/task-shim-${VERSION}-${TARGETOS}-${TARGETARCH}" /task-shim
+COPY --from=build "/app/bin/functions-${VERSION}-${TARGETOS}-${TARGETARCH}" /mmsys-test-encode
 USER 65532:65532
 
 COPY <<EOF /config/task-shim.yaml

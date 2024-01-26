@@ -11,8 +11,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 COPY . .
 
 # BUILD_DATE changes ofter so move this section down to allow for caching
-ARG OS \
-    ARCH \
+ARG TARGETOS \
+    TARGETARCH \
     VERSION \
     GIT_COMMIT \
     GIT_TREE_STATE \
@@ -22,8 +22,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/app/tmp \
     make build-workflow-vacuum \
-      "OS=${OS}" \
-      "ARCH=${ARCH}" \
+      "OS=${TARGETOS}" \
+      "ARCH=${TARGETARCH}" \
       "VERSION=${VERSION}" \
       "GIT_COMMIT=${GIT_COMMIT}" \
       "GIT_TREE_STATE=${GIT_TREE_STATE}" \
@@ -33,8 +33,8 @@ FROM gcr.io/distroless/static:latest
 
 ENV GOTRACEBACK=all
 
-ARG OS \
-    ARCH \
+ARG TARGETOS \
+    TARGETARCH \
     VERSION \
     GIT_COMMIT \
     BUILD_DATE
@@ -54,7 +54,7 @@ LABEL maintainer="Matthias Neugebauer <mtneug@mailbox.org>" \
       org.opencontainers.image.base.name="gcr.io/distroless/static:latest"
 
 WORKDIR /
-COPY --from=build "/app/bin/workflow-vacuum-${VERSION}-${OS}-${ARCH}" /workflow-vacuum
+COPY --from=build "/app/bin/workflow-vacuum-${VERSION}-${TARGETOS}-${TARGETARCH}" /workflow-vacuum
 USER 65532:65532
 
 ENTRYPOINT [ "/workflow-vacuum" ]
