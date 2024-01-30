@@ -12,10 +12,6 @@ jobs:
   build-and-push-images:
     runs-on: ubuntu-latest
 
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
-
     permissions:
       contents: read
       packages: write
@@ -49,10 +45,6 @@ jobs:
 
   cleanup-images:
     runs-on: ubuntu-latest
-
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
 
     permissions:
       contents: read
