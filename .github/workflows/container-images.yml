@@ -16,6 +16,18 @@ jobs:
       contents: read
       packages: write
 
+    strategy:
+      matrix:
+        image:
+          - function-mmsys-test-encode
+          - function-noop
+          - function-sleep
+          - gateway-nbmp
+          - workflow-manager
+          - workflow-manager-helper
+          - workflow-opentelemetry-adapter
+          - workflow-vacuum
+
     steps:
       - uses: actions/checkout@v4
 
@@ -39,30 +51,10 @@ jobs:
                *)  BUILDX_OUTPUT=''       ;;
           esac
 
-          make image \
+          make image-${{ matrix.image }} \
             IMAGE_PLATFORMS=linux/amd64,linux/arm,linux/arm64,linux/ppc64le,linux/s390x \
             BUILDX_OUTPUT="${BUILDX_OUTPUT} --provenance=false"
 
-  cleanup-images:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-
-    strategy:
-      matrix:
-        image:
-          - engine/function-mmsys-test-encode
-          - engine/function-noop
-          - engine/function-sleep
-          - engine/gateway-nbmp
-          - engine/workflow-manager
-          - engine/workflow-manager-helper
-          - engine/workflow-opentelemetry-adapter
-          - engine/workflow-vacuum
-
-    steps:
       - name: delete untagged container images
         uses: snok/container-retention-policy@v2
         with:
@@ -70,6 +62,6 @@ jobs:
           token-type: github-token
           account-type: org
           org-name: nagare-media
-          image-names: ${{ matrix.image }}
+          image-names: engine/${{ matrix.image }}
           untagged-only: true
           cut-off: two hours ago UTC
