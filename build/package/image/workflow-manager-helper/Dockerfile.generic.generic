@@ -22,7 +22,7 @@ ARG TARGETOS \
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/app/tmp \
+    --mount=type=cache,target=/app/tmp,id=app-tmp-${TARGETARCH}-${TARGETVARIANT},sharing=locked \
     make build-workflow-manager-helper \
       "OS=${TARGETOS}" \
       "ARCH=${TARGETARCH}" \
