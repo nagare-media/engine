@@ -276,7 +276,7 @@ func (f *function) testRecoverySplitMerge(ctx context.Context) error {
 	l.Info("recover from previous task instances")
 	encodedChunks := f.syncMediaEncodedEvents(ctx)
 	if f.instanceNumber > 0 {
-		l.Info(fmt.Sprintf("synced with %d previous task instances", f.instanceNumber))
+		l.Info(fmt.Sprintf("synced with %d previous task instance(s)", f.instanceNumber))
 	} else {
 		l.Info("no previous task instances found")
 	}
