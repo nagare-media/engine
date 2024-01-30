@@ -61,14 +61,14 @@ jobs:
     strategy:
       matrix:
         image:
-          - function-mmsys-test-encode
-          - function-noop
-          - function-sleep
-          - gateway-nbmp
-          - workflow-manager
-          - workflow-manager-helper
-          - workflow-opentelemetry-adapter
-          - workflow-vacuum
+          - engine/function-mmsys-test-encode
+          - engine/function-noop
+          - engine/function-sleep
+          - engine/gateway-nbmp
+          - engine/workflow-manager
+          - engine/workflow-manager-helper
+          - engine/workflow-opentelemetry-adapter
+          - engine/workflow-vacuum
 
     steps:
       - name: delete untagged container images
