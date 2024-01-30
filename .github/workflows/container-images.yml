@@ -12,6 +12,10 @@ jobs:
   build-and-push-images:
     runs-on: ubuntu-latest
 
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
     permissions:
       contents: read
       packages: write
@@ -31,6 +35,7 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm,linux/arm64,linux/ppc64le,linux/s390x
 
+      # FIXME: disable provenance due to https://github.com/snok/container-retention-policy/issues/63
       - name: build and push container images
         run: |
           case "${{ github.event_name }}" in
@@ -40,4 +45,39 @@ jobs:
 
           make image \
             IMAGE_PLATFORMS=linux/amd64,linux/arm,linux/arm64,linux/ppc64le,linux/s390x \
-            BUILDX_OUTPUT="${BUILDX_OUTPUT}"
+            BUILDX_OUTPUT="${BUILDX_OUTPUT} --provenance=false"
+
+  cleanup-images:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        image:
+          - function-mmsys-test-encode
+          - function-noop
+          - function-sleep
+          - gateway-nbmp
+          - workflow-manager
+          - workflow-manager-helper
+          - workflow-opentelemetry-adapter
+          - workflow-vacuum
+
+    steps:
+      - name: delete untagged container images
+        uses: snok/container-retention-policy@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          token-type: github-token
+          account-type: org
+          org-name: nagare-media
+          image-names: ${{ matrix.image }}
+          untagged-only: true
+          cut-off: two hours ago UTC
