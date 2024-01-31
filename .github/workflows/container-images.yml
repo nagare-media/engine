@@ -64,4 +64,4 @@ jobs:
           org-name: nagare-media
           image-names: engine/${{ matrix.image }}
           untagged-only: true
-          cut-off: two hours ago UTC
+          cut-off: 1 second ago UTC
