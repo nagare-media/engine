@@ -17,7 +17,7 @@ task:
       direction: pull
       portBindings:
         - id: input
-      url: http://localhost:9000/nagare-media-engine-tests/inputs/sintel.mov
+      url: http://minio.s3.svc.cluster.local:9000/nagare-media-engine-tests/inputs/sintel.mp4
       metadata:
         streams:
           - duration: 14m48s
@@ -30,12 +30,12 @@ task:
       direction: push
       portBindings:
         - id: output
-      url: s3://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=MLYEAE6AES7IUSL4APYL&AWS_SECRET_ACCESS_KEY=snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H
-      # -> http://localhost:9000/nagare-media-engine-tests/outputs/sintel.mp4
+      url: s3://minio.s3.svc.cluster.local:9000/nagare-media-engine-tests/outputs/sintel.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=MLYEAE6AES7IUSL4APYL&AWS_SECRET_ACCESS_KEY=snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H
+      # -> http://minio.s3.svc.cluster.local:9000/nagare-media-engine-tests/outputs/sintel.mp4
   config:
     mmsys-test-encode.engine.nagare.media/test: baseline-simple
-    mmsys-test-encode.engine.nagare.media/chunk-seconds: "120"
+    mmsys-test-encode.engine.nagare.media/chunk-seconds: "60"
 
 system:
   nats:
-    url: nats://localhost:4222
+    url: nats://nats.nats.svc.cluster.local:4222

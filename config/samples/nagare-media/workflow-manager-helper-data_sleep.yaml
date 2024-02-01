@@ -20,4 +20,4 @@ task:
 
 system:
   nats:
-    url: nats://localhost:4222
+    url: nats://nats.nats.svc.cluster.local:4222

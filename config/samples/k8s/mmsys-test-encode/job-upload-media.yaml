@@ -17,5 +17,5 @@ spec:
                 MLYEAE6AES7IUSL4APYL \
                 snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H \
                 --api S3v4
-              curl -sSL -o /tmp/sintel.mov https://public.educast.cloud/media/master/sintel.mov
-              mc cp /tmp/sintel.mov s3/nagare-media-engine-tests/inputs/sintel.mov
+              curl -sSL -o /tmp/sintel.mp4 https://shio-eu-c-public.s3.eu-central-003.backblazeb2.com/media/master/sintel-video-only.mp4
+              mc cp /tmp/sintel.mp4 s3/nagare-media-engine-tests/inputs/sintel.mp4

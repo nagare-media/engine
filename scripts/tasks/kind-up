@@ -50,6 +50,14 @@ kind create cluster \
   --config "hack/kind/config-${EDGE_CLUSTER_NAME}.yaml" \
   --wait 300s
 
+# check if we are within a container, i.e. if we can reach the control plane directly
+if nslookup "${MANAGEMENT_CLUSTER_NAME}-control-plane" > /dev/null; then
+  kind export kubeconfig --name ${MANAGEMENT_CLUSTER_NAME} --internal
+fi
+if nslookup "${EDGE_CLUSTER_NAME}-control-plane" > /dev/null; then
+  kind export kubeconfig --name ${EDGE_CLUSTER_NAME} --internal
+fi
+
 # create kubeconfig secret in management cluster to get access to edge cluster
 kubectl config use "kind-${MANAGEMENT_CLUSTER_NAME}"
 kubectl create secret generic edge-cluster-kubeconfig "--from-literal=kubeconfig=$(
