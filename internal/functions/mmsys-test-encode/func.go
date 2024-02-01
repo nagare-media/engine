@@ -362,6 +362,10 @@ func (f *function) encode(ctx context.Context, chunk bool, chunkSeekSecond int, 
 		ffmpegArgs = append(ffmpegArgs, "-t", strconv.Itoa(f.chunkSeconds+chunkOverlapSeconds))
 	}
 	ffmpegArgs = append(ffmpegArgs,
+		"-reconnect", "1",
+		"-reconnect_on_network_error", "1",
+		"-reconnect_on_http_error", "1",
+		"-reconnect_delay_max", "5",
 		"-i", inUrl,
 		"-filter:v", "scale=1920:1920:force_original_aspect_ratio=decrease:force_divisible_by=2",
 		"-f", "yuv4mpegpipe",
