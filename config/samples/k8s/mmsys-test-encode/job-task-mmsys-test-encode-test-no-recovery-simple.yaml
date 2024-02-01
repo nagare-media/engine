@@ -17,6 +17,9 @@ spec:
     spec:
       restartPolicy: Never # recreate pod by job controller
       terminationGracePeriodSeconds: 35
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
       containers:
         - name: function
           imagePullPolicy: Always
