@@ -1,4 +1,4 @@
-# Example for mmsys-test-encode operation
+# Example for `mmsys-test-encode` function
 
 This example shows task execution of the `mmsys-test-encode` function demonstrating MPEG NBMP task error recovery using event sourcing. The NBMP tasks are created directly without going through the NBMP Workflow API and the full workflow manager. However, the nagare media engine `workflow-manager-helper` is deployed as a sidecar container next to the task container. The `workflow-manager-helper` will read the mounted secret and configure the task using the NBMP Task API. It then monitors the execution status.
 
@@ -8,8 +8,8 @@ The `mmsys-test-encode` function can be configured with the following options:
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `mmsys-test-encode.engine.nagare.media/test`                            | Execution test/mode to use (s. below). (required)                   |
 | `mmsys-test-encode.engine.nagare.media/chunk-seconds`                   | Duration of a chunk for split-merge execution modes. (required)     |
-| `mmsys-test-encode.engine.nagare.media/max-number-of-simulated-crashes` | Number crashes, i.e. hard terminations, to simulate (defaults to 2) |
-| `mmsys-test-encode.engine.nagare.media/simulated-crash-wait-duration`   | Time to wait until simulated crash is triggered. (defaults to 120s) |
+| `mmsys-test-encode.engine.nagare.media/max-number-of-simulated-crashes` | Number crashes, i.e. hard terminations, to simulate (defaults to 1) |
+| `mmsys-test-encode.engine.nagare.media/simulated-crash-wait-duration`   | Time to wait until simulated crash is triggered. (defaults to 60s) |
 
 The following execution tests/modes exist:
 
@@ -17,9 +17,9 @@ The following execution tests/modes exist:
 | ---------------------------- | --------------------------------------------------------------------- |
 | baseline-simple              | Simple encode of the whole file.                                      |
 | baseline-split-merge         | Simple split-and-merge encode. The chunks are processes sequentially. |
-| test-no-recovery-simple      | Encode of the whole file with simulated crashes without recovery.     |
-| test-no-recovery-split-merge | Split-and-merge encode with simulated crashes without recovery.       |
-| test-recovery-split-merge    | Split-and-merge encode with simulated crashed with recovery.          |
+| test-no-recovery-simple      | Encode of the whole file with simulated crashes and no recovery.      |
+| test-no-recovery-split-merge | Split-and-merge encode with simulated crashes and no recovery.        |
+| test-recovery-split-merge    | Split-and-merge encode with simulated crashed and recovery.           |
 
 ## Host environment
 
@@ -94,35 +94,30 @@ In every test case, the output encoding can be accessed at <http://s3.local.gd/n
 # baseline-simple
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-baseline-simple \
     --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-baseline-simple.yaml
-
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-baseline-simple.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-baseline-simple -c function
 
 # baseline-split-merge
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-baseline-split-merge \
     --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-baseline-split-merge.yaml
-
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-baseline-split-merge.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-baseline-split-merge -c function
 
 # test-no-recovery-simple
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-test-no-recovery-simple \
     --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-no-recovery-simple.yaml
-
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-test-no-recovery-simple.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-test-no-recovery-simple -c function
 
 # test-no-recovery-split-merge
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-test-no-recovery-split-merge \
     --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-no-recovery-split-merge.yaml
-
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-test-no-recovery-split-merge.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-test-no-recovery-split-merge -c function
 
 # test-recovery-split-merge
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-test-recovery-split-merge \
     --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-recovery-split-merge.yaml
-
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-test-recovery-split-merge.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-test-recovery-split-merge -c function
 ```

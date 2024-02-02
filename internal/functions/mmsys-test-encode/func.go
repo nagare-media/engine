@@ -59,23 +59,20 @@ const (
 	MaxNumberOfSimulatedCrashesParameterKey = "mmsys-test-encode.engine.nagare.media/max-number-of-simulated-crashes"
 	SimulatedCrashWaitDurationParameterKey  = "mmsys-test-encode.engine.nagare.media/simulated-crash-wait-duration"
 
-	DefaultMaxNumberOfSimulatedCrashes = 2
-	DefaultSimulatedCrashWaitDuration  = 120 * time.Second
+	DefaultMaxNumberOfSimulatedCrashes = 1
+	DefaultSimulatedCrashWaitDuration  = 60 * time.Second
 )
 
 const (
 	// * baseline 1: simple encoding
 	// * baseline 2: split+merge encoding
-	// * baseline 3: split+merge encoding distributed
 	//
-	// with two disruptions:
+	// with n disruptions:
 	//   no event sourcing:
 	//     * test 1: simple encoding
 	//     * test 2: split+merge encoding
-	//     * test 3: split+merge encoding distributed
 	//   event sourcing:
 	//     * test 4: split+merge encoding
-	//     * test 5: split+merge encoding distributed
 
 	BaselineSimple                = "baseline-simple"
 	BaselineSplitMerge            = "baseline-split-merge"
@@ -640,7 +637,7 @@ func (f *function) setupSimulatedCrash(ctx context.Context) {
 		return
 	}
 
-	// simulate hard crash after 2m
+	// simulate hard crash
 	l.Info("enable simulated crash")
 	go func() {
 		time.Sleep(f.simulatedCrashWaitDuration)
