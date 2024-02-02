@@ -202,14 +202,15 @@ clean: ## Cleanup build output
 .PHONY: image
 image: $(addprefix image-, $(IMAGES)) ## Build all container images
 
-## image-function-mmsys-test-encode:     ## Build mmsys-test-encode function container image
-## image-function-noop:                  ## Build noop function container image
-## image-function-sleep:                 ## Build sleep function container image
-## image-gateway-nbmp:                   ## Build NBMP gateway container image
-## image-workflow-manager:               ## Build workflow manager container image
-## image-workflow-manager-helper:        ## Build workflow manager helper container image
-## image-workflow-opentelemetry-adapter: ## Build workflow OpenTelemetry adapter container image
-## image-workflow-vacuum:                ## Build workflow vacuum container image
+## image-function-mmsys-test-encode:          ## Build mmsys-test-encode function container image
+## image-function-mmsys-test-scene-detection: ## Build mmsys-test-scene-detection function container image
+## image-function-noop:                       ## Build noop function container image
+## image-function-sleep:                      ## Build sleep function container image
+## image-gateway-nbmp:                        ## Build NBMP gateway container image
+## image-workflow-manager:                    ## Build workflow manager container image
+## image-workflow-manager-helper:             ## Build workflow manager helper container image
+## image-workflow-opentelemetry-adapter:      ## Build workflow OpenTelemetry adapter container image
+## image-workflow-vacuum:                     ## Build workflow vacuum container image
 image-%:
 	@	IMAGE="$*" \
 		IMAGE_REGISTRY="$(IMAGE_REGISTRY)" \

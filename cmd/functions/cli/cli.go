@@ -36,6 +36,7 @@ import (
 
 	// Import nagare media functions to be included in this multi-binary.
 	_ "github.com/nagare-media/engine/internal/functions/mmsys-test-encode"
+	_ "github.com/nagare-media/engine/internal/functions/mmsys-test-scene-detection"
 	_ "github.com/nagare-media/engine/internal/functions/noop"
 	_ "github.com/nagare-media/engine/internal/functions/sleep"
 )
