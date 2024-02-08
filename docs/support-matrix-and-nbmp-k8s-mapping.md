@@ -1,4 +1,4 @@
-# Mapping of NBMP descriptors
+# Support Matrix and Mapping of NBMP descriptors
 
 The following table gives an overview of currently supported NBMP descriptors as well as the mapping to internal nagare media engine Kubernetes resources.
 
