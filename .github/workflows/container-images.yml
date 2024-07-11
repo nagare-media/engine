@@ -60,13 +60,11 @@ jobs:
             BUILDX_OUTPUT="${BUILDX_OUTPUT} --provenance=false"
 
       - name: delete untagged container images
-        uses: snok/container-retention-policy@v2
+        uses: snok/container-retention-policy@v3.0.0
         if: ${{ github.event_name == 'push' }}
         with:
+          account: nagare-media
           token: ${{ secrets.GITHUB_TOKEN }}
-          token-type: github-token
-          account-type: org
-          org-name: nagare-media
+          tag-selection: untagged
           image-names: engine/${{ matrix.image }}
-          untagged-only: true
-          cut-off: 1 day ago UTC
+          cut-off: 1d
