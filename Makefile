@@ -27,13 +27,13 @@ IMAGE_TAG       ?= $(VERSION)
 IMAGE_PLATFORMS ?= "" # by default only ${OS}/${ARCH} is built
 BUILDX_OUTPUT   ?= "--load"
 
-TESTENV_K8S_VERSION                   ?= 1.28.0
-TESTENV_INGRESS_NGINX_VERSION         ?= 4.7.1  # Helm chart versions
-TESTENV_CERT_MANAGER_VERSION          ?= 1.12.3 # Helm chart versions
-TESTENV_KUBE_PROMETHEUS_STACK_VERSION ?= 48.3.3 # Helm chart versions
-TESTENV_TEMPO_VERSION                 ?= 1.5.1  # Helm chart versions
-TESTENV_MINIO_VERSION                 ?= 5.0.13 # Helm chart versions
-TESTENV_NATS_VERSION                  ?= 1.1.5  # Helm chart versions (2.10.5 app version)
+TESTENV_K8S_VERSION                   ?= 1.30.2
+TESTENV_INGRESS_NGINX_VERSION         ?= 4.10.1 # Helm chart versions
+TESTENV_CERT_MANAGER_VERSION          ?= 1.15.1 # Helm chart versions
+TESTENV_KUBE_PROMETHEUS_STACK_VERSION ?= 61.3.0 # Helm chart versions
+TESTENV_TEMPO_VERSION                 ?= 1.10.1 # Helm chart versions
+TESTENV_MINIO_VERSION                 ?= 5.2.0  # Helm chart versions
+TESTENV_NATS_VERSION                  ?= 1.2.0  # Helm chart versions
 
 CONTROLLER_TOOLS_VERSION ?= v0.13.0
 KUSTOMIZE_VERSION        ?= v5.1.1
