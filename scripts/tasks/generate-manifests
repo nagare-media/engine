@@ -35,8 +35,8 @@
 # RBAC
 "${CONTROLLER_GEN}" \
   paths="./internal/workflow-manager/..." \
-  rbac:roleName=manager \
-  output:stdout > config/rbac/role-manager.yaml
+  rbac:roleName=workflow-manager \
+  output:stdout > config/rbac/role-workflow-manager.yaml
 
 "${CONTROLLER_GEN}" \
   paths="./internal/gateway-nbmp/..." \
