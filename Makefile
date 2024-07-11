@@ -146,11 +146,11 @@ skaffold: kind-up ## Execute skaffold command against kind test cluster
 
 .PHONY: skaffold-run
 skaffold-run: ## Execute skaffold run pipeline against kind test cluster
-	@$(MAKE) skaffold ARGS="run --tail --no-prune=false --cache-artifacts=false"
+	@$(MAKE) skaffold ARGS="run --tail --no-prune=false --cache-artifacts=false --watch-image='none'"
 
 .PHONY: skaffold-debug
 skaffold-debug: ## Execute skaffold debug pipeline against kind test cluster
-	@$(MAKE) skaffold ARGS="debug --tail --no-prune=false --cache-artifacts=false"
+	@$(MAKE) skaffold ARGS="debug --tail --no-prune=false --cache-artifacts=false --watch-image='none'"
 
 ##@ Build
 
