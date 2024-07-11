@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20
 	github.com/minio/minio-go/v7 v7.0.73
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/nagare-media/models.go v0.0.0-20240708142526-1c07eee1404d
+	github.com/nagare-media/models.go v0.0.0-20240711145127-d34bc996c625
 	github.com/nats-io/nats.go v1.36.0
 	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1
