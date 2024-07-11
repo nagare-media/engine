@@ -91,5 +91,5 @@ spec:
       volumes:
         - name: gateway-nbmp-config
           secret:
-            name: gateway-nbmp-config
+            secretName: gateway-nbmp-config
             defaultMode: 420

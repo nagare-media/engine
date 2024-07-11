@@ -98,7 +98,7 @@ spec:
       volumes:
         - name: workflow-manager-config
           secret:
-            name: workflow-manager-config
+            secretName: workflow-manager-config
             defaultMode: 420
         - name: cert-workflow-manager-webhook
           secret:
