@@ -61,6 +61,7 @@ jobs:
 
       - name: delete untagged container images
         uses: snok/container-retention-policy@v2
+        if: ${{ github.event_name == 'push' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           token-type: github-token
