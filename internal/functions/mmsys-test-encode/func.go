@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -750,10 +751,11 @@ func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
 	if !ok {
 		return nil, fmt.Errorf("missing video format %s parameter", nbmp.VideoFormatFrameRateAverage)
 	}
-	f.inVideoFPS, err = strconv.Atoi(fpsStr)
+	fpsFloat, err := strconv.ParseFloat(fpsStr, 64)
 	if err != nil {
 		return nil, errors.New("only integer frame rates are supported")
 	}
+	f.inVideoFPS = int(math.Round(fpsFloat))
 
 	durationStr, ok := nbmputils.GetStringParameterValue(in.VideoFormat, nbmp.FormatFrameDuration)
 	if !ok {

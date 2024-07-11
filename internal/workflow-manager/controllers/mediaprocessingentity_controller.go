@@ -540,7 +540,7 @@ func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) err
 	if err := ctrl.NewControllerManagedBy(mgr).
 		Named(MediaProcessingEntityControllerName).
 		For(&enginev1.MediaProcessingEntity{}).
-		WatchesRawSource(&source.Channel{Source: r.mpeManagerErr}, &handler.EnqueueRequestForObject{}).
+		WatchesRawSource(source.Channel(r.mpeManagerErr, &handler.EnqueueRequestForObject{})).
 		Complete(reconcile.Func(r.reconcileMediaProcessingEntity)); err != nil {
 		return err
 	}
@@ -549,7 +549,7 @@ func (r *MediaProcessingEntityReconciler) SetupWithManager(mgr ctrl.Manager) err
 	if err := ctrl.NewControllerManagedBy(mgr).
 		Named(ClusterMediaProcessingEntityControllerName).
 		For(&enginev1.ClusterMediaProcessingEntity{}).
-		WatchesRawSource(&source.Channel{Source: r.cmpeManagerErr}, &handler.EnqueueRequestForObject{}).
+		WatchesRawSource(source.Channel(r.cmpeManagerErr, &handler.EnqueueRequestForObject{})).
 		Complete(reconcile.Func(r.reconcileClusterMediaProcessingEntity)); err != nil {
 		return err
 	}

@@ -210,17 +210,17 @@ type VideoResolution struct {
 
 	Hight int32 `json:"hight"`
 
-	// +kubebuilder:default=1.0
+	// +kubebuilder:default="1.0"
 	// +optional
-	SAR *float32 `json:"sar,omitempty"`
+	SAR *string `json:"sar,omitempty"`
 }
 
 type FrameRate struct {
 	// +optional
-	Average *float32 `json:"average,omitempty"`
+	Average *string `json:"average,omitempty"`
 
 	// +optional
-	LowestCommon *float32 `json:"lowestCommon,omitempty"`
+	LowestCommon *string `json:"lowestCommon,omitempty"`
 }
 
 // +kubebuilder:validation:Enum=unknown;progressive;top-field-first;bottom-field-first
@@ -254,7 +254,7 @@ type VideoColor struct {
 	Transfer *string `json:"transfer,omitempty"`
 }
 
-// +kubebuilder:validation:Enum=3:1:1;4:1:0;4:1:1;4:2:0;4:2:2;4:4:0;4:4:4
+// +kubebuilder:validation:Enum={"3:1:1","4:1:0","4:1:1","4:2:0","4:2:2","4:4:0","4:4:4"}
 type ChromaSubsampling string
 
 const (

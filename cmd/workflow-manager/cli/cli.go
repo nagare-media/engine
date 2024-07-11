@@ -26,14 +26,18 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -123,13 +127,18 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	ctrl.SetLogger(l)
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
-	options := ctrl.Options{Scheme: scheme}
 	// parse config
 	cfg := &enginev1.WorkflowManagerConfiguration{}
 
 	if cfgFile != "" {
-		// TODO: migrate to custom configuration logic
-		options, err = options.AndFrom(ctrl.ConfigFile().AtPath(cfgFile).OfKind(&cfg))
+		cfgStr, err := os.ReadFile(cfgFile)
+		if err != nil {
+			setupLog.Error(err, "unable to read config file")
+			return err
+		}
+
+		codecs := serializer.NewCodecFactory(scheme)
+		err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, cfg)
 		if err != nil {
 			setupLog.Error(err, "unable to parse config file")
 			return err
@@ -140,6 +149,41 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	if err = cfg.Validate(); err != nil {
 		setupLog.Error(err, "invalid configuration")
 		return err
+	}
+
+	nsCacheConfigMap := map[string]cache.Config{}
+	if cfg.CacheConfiguration.Namespace != nil {
+		nsCacheConfigMap[*cfg.CacheConfiguration.Namespace] = cache.Config{}
+	}
+
+	// TODO: make more options configurable
+	options := ctrl.Options{
+		Scheme: scheme,
+
+		Metrics: server.Options{
+			BindAddress: ":8080",
+		},
+
+		WebhookServer: webhook.NewServer(webhook.Options{
+			Port: 9443,
+		}),
+
+		HealthProbeBindAddress: ":8081",
+		ReadinessEndpointName:  "/readyz",
+		LivenessEndpointName:   "/healthz",
+
+		Cache: cache.Options{
+			SyncPeriod:        &cfg.CacheConfiguration.SyncPeriod.Duration,
+			DefaultNamespaces: nsCacheConfigMap,
+		},
+
+		LeaderElection:             *cfg.LeaderElection.LeaderElect,
+		LeaseDuration:              &cfg.LeaderElection.LeaseDuration.Duration,
+		RenewDeadline:              &cfg.LeaderElection.RenewDeadline.Duration,
+		RetryPeriod:                &cfg.LeaderElection.RetryPeriod.Duration,
+		LeaderElectionResourceLock: cfg.LeaderElection.ResourceLock,
+		LeaderElectionID:           cfg.LeaderElection.ResourceName,
+		LeaderElectionNamespace:    cfg.LeaderElection.ResourceNamespace,
 	}
 
 	// create components

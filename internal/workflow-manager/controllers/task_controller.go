@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"time"
 
-	"dario.cat/mergo"
+	"github.com/imdario/mergo"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -1005,7 +1005,7 @@ func (r *TaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Named(TaskControllerName).
 		For(&enginev1.Task{}).
 		Watches(&enginev1.Workflow{}, handler.EnqueueRequestsFromMapFunc(r.mapWorkflowToTaskRequests)).
-		WatchesRawSource(&source.Channel{Source: r.JobEventChannel}, &handler.EnqueueRequestForObject{}).
+		WatchesRawSource(source.Channel(r.JobEventChannel, &handler.EnqueueRequestForObject{})).
 		Complete(r)
 }
 

@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
@@ -108,8 +107,7 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 				case s.Video != nil:
 					if s.Video.FrameRate != nil && s.Video.FrameRate.Average != nil {
 						// support non-integer frame rates
-						v := strconv.Itoa(int(*s.Video.FrameRate.Average))
-						mp.VideoFormat = nbmputils.SetStringParameterValue(mp.VideoFormat, nbmp.VideoFormatFrameRateAverage, v)
+						mp.VideoFormat = nbmputils.SetStringParameterValue(mp.VideoFormat, nbmp.VideoFormatFrameRateAverage, *s.Video.FrameRate.Average)
 					}
 
 					if s.Duration != nil {

@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: medialocations.engine.nagare.media
 spec:
   group: engine.nagare.media
@@ -23,14 +23,19 @@ spec:
         description: MediaLocation is the Schema for the medialocations API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -40,8 +45,9 @@ spec:
             minProperties: 1
             properties:
               http:
-                description: Configures an HTTP media location. This media location
-                  can be used between NBMP tasks that use the "step" execution mode.
+                description: |-
+                  Configures an HTTP media location.
+                  This media location can be used between NBMP tasks that use the "step" execution mode.
                 properties:
                   auth:
                     description: HTTP authentication configuration.
@@ -52,10 +58,9 @@ spec:
                         description: Configures an HTTP basic authentication method.
                         properties:
                           secretRef:
-                            description: Reference to a Secret that contains the keys
-                              "username" and "password". Only references to Secrets
-                              are allowed. A MediaLocation can only reference Secrets
-                              from its own Namespace.
+                            description: |-
+                              Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
+                              MediaLocation can only reference Secrets from its own Namespace.
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
@@ -80,10 +85,9 @@ spec:
                         description: Configures an HTTP digest authentication method.
                         properties:
                           secretRef:
-                            description: Reference to a Secret that contains the keys
-                              "username" and "password". Only references to Secrets
-                              are allowed. A MediaLocation can only reference Secrets
-                              from its own Namespace.
+                            description: |-
+                              Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
+                              MediaLocation can only reference Secrets from its own Namespace.
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
@@ -119,9 +123,9 @@ spec:
                               token. The default is "Bearer ".
                             type: string
                           secretRef:
-                            description: Reference to a Secret that contains the key
-                              "token". Only references to Secrets are allowed. A MediaLocation
-                              can only reference Secrets from its own Namespace.
+                            description: |-
+                              Reference to a Secret that contains the key "token". Only references to Secrets are allowed. A MediaLocation can
+                              only reference Secrets from its own Namespace.
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
@@ -149,9 +153,9 @@ spec:
                     pattern: ^(http|https)://.*$
                     type: string
                   headers:
-                    description: List of HTTP headers that should be send with HTTP
-                      requests. Note that it is up the the function implementation
-                      to honor these headers.
+                    description: |-
+                      List of HTTP headers that should be send with HTTP requests.
+                      Note that it is up the the function implementation to honor these headers.
                     items:
                       description: Specifies a header.
                       properties:
@@ -159,9 +163,9 @@ spec:
                           description: Name of the header.
                           type: string
                         value:
-                          description: Value of the header. This field is required
-                            if valueFrom is not specified. If both are specified,
-                            value has precedence.
+                          description: |-
+                            Value of the header. This field is required if valueFrom is not specified. If both are specified, value has
+                            precedence.
                           type: string
                       required:
                       - name
@@ -171,9 +175,9 @@ spec:
                     - name
                     x-kubernetes-list-type: map
                   queryArgs:
-                    description: List of HTTP query arguments that should be send
-                      with HTTP requests. Note that it is up the the function implementation
-                      to honor these query arguments.
+                    description: |-
+                      List of HTTP query arguments that should be send with HTTP requests.
+                      Note that it is up the the function implementation to honor these query arguments.
                     items:
                       description: Specifies a URL query argument.
                       properties:
@@ -181,9 +185,9 @@ spec:
                           description: Name of the query argument.
                           type: string
                         value:
-                          description: Value of the query argument. This field is
-                            required if valueFrom is not specified. If both are specified,
-                            value has precedence.
+                          description: |-
+                            Value of the query argument. This field is required if valueFrom is not specified. If both are specified, value has
+                            precedence.
                           type: string
                       required:
                       - name
@@ -196,8 +200,9 @@ spec:
                 - baseURL
                 type: object
               opencast:
-                description: Configures an Opencast media location. This media location
-                  can be used between NBMP tasks that use the "step" execution mode.
+                description: |-
+                  Configures an Opencast media location.
+                  This media location can be used between NBMP tasks that use the "step" execution mode.
                 properties:
                   auth:
                     description: Opencast authentication configuration.
@@ -208,10 +213,9 @@ spec:
                         description: Configures an HTTP basic authentication method.
                         properties:
                           secretRef:
-                            description: Reference to a Secret that contains the keys
-                              "username" and "password". Only references to Secrets
-                              are allowed. A MediaLocation can only reference Secrets
-                              from its own Namespace.
+                            description: |-
+                              Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
+                              MediaLocation can only reference Secrets from its own Namespace.
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
@@ -243,9 +247,9 @@ spec:
                         type: string
                     type: object
                   headers:
-                    description: List of additional HTTP headers that should be send
-                      with HTTP requests. Note that it is up the the function implementation
-                      to honor these headers.
+                    description: |-
+                      List of additional HTTP headers that should be send with HTTP requests.
+                      Note that it is up the the function implementation to honor these headers.
                     items:
                       description: Specifies a header.
                       properties:
@@ -253,9 +257,9 @@ spec:
                           description: Name of the header.
                           type: string
                         value:
-                          description: Value of the header. This field is required
-                            if valueFrom is not specified. If both are specified,
-                            value has precedence.
+                          description: |-
+                            Value of the header. This field is required if valueFrom is not specified. If both are specified, value has
+                            precedence.
                           type: string
                       required:
                       - name
@@ -265,9 +269,9 @@ spec:
                     - name
                     x-kubernetes-list-type: map
                   queryArgs:
-                    description: List of additional HTTP query arguments that should
-                      be send with HTTP requests. Note that it is up the the function
-                      implementation to honor these query arguments.
+                    description: |-
+                      List of additional HTTP query arguments that should be send with HTTP requests.
+                      Note that it is up the the function implementation to honor these query arguments.
                     items:
                       description: Specifies a URL query argument.
                       properties:
@@ -275,9 +279,9 @@ spec:
                           description: Name of the query argument.
                           type: string
                         value:
-                          description: Value of the query argument. This field is
-                            required if valueFrom is not specified. If both are specified,
-                            value has precedence.
+                          description: |-
+                            Value of the query argument. This field is required if valueFrom is not specified. If both are specified, value has
+                            precedence.
                           type: string
                       required:
                       - name
@@ -296,9 +300,9 @@ spec:
                 - serviceRegistryURL
                 type: object
               rist:
-                description: Configures a RIST media location. This media location
-                  can be used between NBMP tasks that use the "streaming" execution
-                  mode.
+                description: |-
+                  Configures a RIST media location.
+                  This media location can be used between NBMP tasks that use the "streaming" execution mode.
                 properties:
                   baseURL:
                     description: RIST base URL. Media referencing this location are
@@ -312,9 +316,9 @@ spec:
                     description: RIST encryption configuration.
                     properties:
                       secretRef:
-                        description: Reference to a Secret that contains the key "secret".
-                          Only references to Secrets are allowed. A MediaLocation
-                          can only reference Secrets from its own Namespace.
+                        description: |-
+                          Reference to a Secret that contains the key "secret". Only references to Secrets are allowed. A MediaLocation can
+                          only reference Secrets from its own Namespace.
                         properties:
                           apiVersion:
                             description: API version of the referred object.
@@ -354,9 +358,9 @@ spec:
                 - baseURL
                 type: object
               rtmp:
-                description: Configures an RTMP media location. This media location
-                  can be used between NBMP tasks that use the "streaming" execution
-                  mode.
+                description: |-
+                  Configures an RTMP media location.
+                  This media location can be used between NBMP tasks that use the "streaming" execution mode.
                 properties:
                   app:
                     description: The RTMP application name. This overwrites application
@@ -370,10 +374,9 @@ spec:
                         description: Configures an RTMP basic authentication method.
                         properties:
                           secretRef:
-                            description: Reference to a Secret that contains the keys
-                              "username" and "password". Only references to Secrets
-                              are allowed. A MediaLocation can only reference Secrets
-                              from its own Namespace.
+                            description: |-
+                              Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
+                              MediaLocation can only reference Secrets from its own Namespace.
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
@@ -399,10 +402,9 @@ spec:
                           method. The streaming key will be used as RTMP playpath.
                         properties:
                           secretRef:
-                            description: Reference to a Secret that contains the key
-                              "streamingKey". Only references to Secrets are allowed.
-                              A MediaLocation can only reference Secrets from its
-                              own Namespace.
+                            description: |-
+                              Reference to a Secret that contains the key "streamingKey". Only references to Secrets are allowed. A MediaLocation
+                              can only reference Secrets from its own Namespace.
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
@@ -430,9 +432,9 @@ spec:
                     pattern: ^(rtmp|rtmpe|rtmps|rtmpt|rtmpte|rtmpts)://.*$
                     type: string
                   queryArgs:
-                    description: List of RTMP query arguments that should be send
-                      with RTMP requests. Note that it is up the the function implementation
-                      to honor these query arguments.
+                    description: |-
+                      List of RTMP query arguments that should be send with RTMP requests.
+                      Note that it is up the the function implementation to honor these query arguments.
                     items:
                       description: Specifies a URL query argument.
                       properties:
@@ -440,9 +442,9 @@ spec:
                           description: Name of the query argument.
                           type: string
                         value:
-                          description: Value of the query argument. This field is
-                            required if valueFrom is not specified. If both are specified,
-                            value has precedence.
+                          description: |-
+                            Value of the query argument. This field is required if valueFrom is not specified. If both are specified, value has
+                            precedence.
                           type: string
                       required:
                       - name
@@ -455,9 +457,9 @@ spec:
                 - baseURL
                 type: object
               rtsp:
-                description: Configures an RTSP media location. This media location
-                  can be used between NBMP tasks that use the "streaming" execution
-                  mode.
+                description: |-
+                  Configures an RTSP media location.
+                  This media location can be used between NBMP tasks that use the "streaming" execution mode.
                 properties:
                   auth:
                     description: RTSP authentication configuration.
@@ -468,10 +470,9 @@ spec:
                         description: Configures an RTSP basic authentication method.
                         properties:
                           secretRef:
-                            description: Reference to a Secret that contains the keys
-                              "username" and "password". Only references to Secrets
-                              are allowed. A MediaLocation can only reference Secrets
-                              from its own Namespace.
+                            description: |-
+                              Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
+                              MediaLocation can only reference Secrets from its own Namespace.
                             properties:
                               apiVersion:
                                 description: API version of the referred object.
@@ -499,9 +500,9 @@ spec:
                     pattern: ^(rtsp|rtsps|rtspu)://.*$
                     type: string
                   queryArgs:
-                    description: List of RTSP query arguments that should be send
-                      with RTSP requests. Note that it is up the the function implementation
-                      to honor these query arguments.
+                    description: |-
+                      List of RTSP query arguments that should be send with RTSP requests.
+                      Note that it is up the the function implementation to honor these query arguments.
                     items:
                       description: Specifies a URL query argument.
                       properties:
@@ -509,9 +510,9 @@ spec:
                           description: Name of the query argument.
                           type: string
                         value:
-                          description: Value of the query argument. This field is
-                            required if valueFrom is not specified. If both are specified,
-                            value has precedence.
+                          description: |-
+                            Value of the query argument. This field is required if valueFrom is not specified. If both are specified, value has
+                            precedence.
                           type: string
                       required:
                       - name
@@ -522,8 +523,8 @@ spec:
                     x-kubernetes-list-type: map
                   transportProtocol:
                     default: auto
-                    description: Forces a specific transport protocol. The default
-                      is "auto" which tries detecting the best transport protocol
+                    description: |-
+                      Forces a specific transport protocol. The default is "auto" which tries detecting the best transport protocol
                       automatically.
                     enum:
                     - auto
@@ -537,8 +538,9 @@ spec:
                 - baseURL
                 type: object
               s3:
-                description: Configures an S3 media location. This media location
-                  can be used between NBMP tasks that use the "step" execution mode.
+                description: |-
+                  Configures an S3 media location.
+                  This media location can be used between NBMP tasks that use the "step" execution mode.
                 properties:
                   auth:
                     description: S3 authentication configuration.
@@ -549,10 +551,9 @@ spec:
                         description: Configures an AWS authentication method.
                         properties:
                           secretRef:
-                            description: Reference to a Secret that contains the keys
-                              "accessKeyID" and "secretAccessKey". Only references
-                              to Secrets are allowed. A MediaLocation can only reference
-                              Secrets from its own Namespace.
+                            description: |-
+                              Reference to a Secret that contains the keys "accessKeyID" and "secretAccessKey". Only references to Secrets are
+                              allowed. A MediaLocation can only reference Secrets from its own Namespace.
                             properties:
                               apiVersion:
                                 description: API version of the referred object.

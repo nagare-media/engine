@@ -19,8 +19,8 @@ package tplfuncs
 import (
 	"text/template"
 
-	"dario.cat/mergo"
 	"github.com/Masterminds/sprig/v3"
+	"github.com/imdario/mergo"
 )
 
 var defaultFuncMap = template.FuncMap{}

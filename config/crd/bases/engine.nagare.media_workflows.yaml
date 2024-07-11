@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: workflows.engine.nagare.media
 spec:
   group: engine.nagare.media
@@ -57,14 +57,19 @@ spec:
         description: Workflow is the Schema for the workflows API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -72,8 +77,10 @@ spec:
             description: Specification of a Workflow.
             properties:
               config:
+                additionalProperties:
+                  type: string
                 description: Workflow configuration values.
-                x-kubernetes-preserve-unknown-fields: true
+                type: object
               humanReadable:
                 description: Human readable description of this Workflow.
                 properties:
@@ -84,6 +91,218 @@ spec:
                     description: Human readable name of this Workflow.
                     type: string
                 type: object
+              inputs:
+                description: Inputs of this workflow.
+                items:
+                  description: Media describes an input or output.
+                  properties:
+                    direction:
+                      description: Direction this media is streamed in.
+                      enum:
+                      - push
+                      - pull
+                      type: string
+                    humanReadable:
+                      description: Human readable description of this media.
+                      properties:
+                        name:
+                          description: Human readable name of this media.
+                          type: string
+                      type: object
+                    id:
+                      description: ID of this media.
+                      type: string
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: Labels of this media.
+                      type: object
+                    metadata:
+                      description: Metadata of this media.
+                      properties:
+                        bitRate:
+                          description: BitRate in bit/s
+                          format: int64
+                          type: integer
+                        checksums:
+                          items:
+                            properties:
+                              alg:
+                                type: string
+                              sum:
+                                type: string
+                            required:
+                            - alg
+                            - sum
+                            type: object
+                          type: array
+                        codecType:
+                          type: string
+                        container:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        duration:
+                          type: string
+                        mimeType:
+                          type: string
+                        size:
+                          description: Size in bytes.
+                          format: int64
+                          type: integer
+                        streams:
+                          items:
+                            maxProperties: 1
+                            minProperties: 1
+                            properties:
+                              audio:
+                                properties:
+                                  bitDepth:
+                                    type: integer
+                                  channelLayout:
+                                    type: string
+                                  channels:
+                                    type: integer
+                                  samplingRate:
+                                    format: int32
+                                    type: integer
+                                type: object
+                              bitRate:
+                                description: BitRate in bit/s
+                                format: int64
+                                type: integer
+                              codec:
+                                properties:
+                                  level:
+                                    type: string
+                                  name:
+                                    type: string
+                                  profile:
+                                    type: string
+                                required:
+                                - name
+                                type: object
+                              data:
+                                type: object
+                              duration:
+                                type: string
+                              id:
+                                type: string
+                              properties:
+                                description: Properties additionally associated with
+                                  this stream.
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                  - name
+                                  - value
+                                  type: object
+                                type: array
+                              subtitle:
+                                properties:
+                                  language:
+                                    type: string
+                                type: object
+                              video:
+                                properties:
+                                  bitDepth:
+                                    type: integer
+                                  color:
+                                    properties:
+                                      chromaSubsampling:
+                                        enum:
+                                        - "3:1:1"
+                                        - "4:1:0"
+                                        - "4:1:1"
+                                        - "4:2:0"
+                                        - "4:2:2"
+                                        - "4:4:0"
+                                        - "4:4:4"
+                                        type: string
+                                      model:
+                                        type: string
+                                      primaries:
+                                        type: string
+                                      range:
+                                        default: limited
+                                        enum:
+                                        - full
+                                        - limited
+                                        type: string
+                                      space:
+                                        type: string
+                                      transfer:
+                                        type: string
+                                    type: object
+                                  fieldOrder:
+                                    default: unknown
+                                    enum:
+                                    - unknown
+                                    - progressive
+                                    - top-field-first
+                                    - bottom-field-first
+                                    type: string
+                                  frameRate:
+                                    properties:
+                                      average:
+                                        type: string
+                                      lowestCommon:
+                                        type: string
+                                    type: object
+                                  resolution:
+                                    properties:
+                                      hight:
+                                        format: int32
+                                        type: integer
+                                      sar:
+                                        default: "1.0"
+                                        type: string
+                                      width:
+                                        format: int32
+                                        type: integer
+                                    required:
+                                    - hight
+                                    - width
+                                    type: object
+                                type: object
+                            required:
+                            - id
+                            type: object
+                          type: array
+                      type: object
+                    portBindings:
+                      items:
+                        properties:
+                          id:
+                            description: ID of the port.
+                            type: string
+                        required:
+                        - id
+                        type: object
+                      type: array
+                    type:
+                      description: Type of this media.
+                      enum:
+                      - media
+                      - metadata
+                      type: string
+                    url:
+                      description: URL of this media.
+                      type: string
+                  required:
+                  - id
+                  - metadata
+                  - portBindings
+                  - type
+                  type: object
+                type: array
               mediaLocations:
                 description: Named references to MediaLocations.
                 items:
@@ -93,8 +312,8 @@ spec:
                       pattern: '[a-zA-Z0-9-]+'
                       type: string
                     ref:
-                      description: Reference to a MediaLocation of ClusterMediaLocation.
-                        Only references to these two kinds are allowed. A Workflow
+                      description: |-
+                        Reference to a MediaLocation of ClusterMediaLocation. Only references to these two kinds are allowed. A Workflow
                         can only reference MediaLocations from its own Namespace.
                       properties:
                         apiVersion:
@@ -117,6 +336,218 @@ spec:
                 x-kubernetes-list-map-keys:
                 - name
                 x-kubernetes-list-type: map
+              outputs:
+                description: Outputs of this workflow.
+                items:
+                  description: Media describes an input or output.
+                  properties:
+                    direction:
+                      description: Direction this media is streamed in.
+                      enum:
+                      - push
+                      - pull
+                      type: string
+                    humanReadable:
+                      description: Human readable description of this media.
+                      properties:
+                        name:
+                          description: Human readable name of this media.
+                          type: string
+                      type: object
+                    id:
+                      description: ID of this media.
+                      type: string
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: Labels of this media.
+                      type: object
+                    metadata:
+                      description: Metadata of this media.
+                      properties:
+                        bitRate:
+                          description: BitRate in bit/s
+                          format: int64
+                          type: integer
+                        checksums:
+                          items:
+                            properties:
+                              alg:
+                                type: string
+                              sum:
+                                type: string
+                            required:
+                            - alg
+                            - sum
+                            type: object
+                          type: array
+                        codecType:
+                          type: string
+                        container:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        duration:
+                          type: string
+                        mimeType:
+                          type: string
+                        size:
+                          description: Size in bytes.
+                          format: int64
+                          type: integer
+                        streams:
+                          items:
+                            maxProperties: 1
+                            minProperties: 1
+                            properties:
+                              audio:
+                                properties:
+                                  bitDepth:
+                                    type: integer
+                                  channelLayout:
+                                    type: string
+                                  channels:
+                                    type: integer
+                                  samplingRate:
+                                    format: int32
+                                    type: integer
+                                type: object
+                              bitRate:
+                                description: BitRate in bit/s
+                                format: int64
+                                type: integer
+                              codec:
+                                properties:
+                                  level:
+                                    type: string
+                                  name:
+                                    type: string
+                                  profile:
+                                    type: string
+                                required:
+                                - name
+                                type: object
+                              data:
+                                type: object
+                              duration:
+                                type: string
+                              id:
+                                type: string
+                              properties:
+                                description: Properties additionally associated with
+                                  this stream.
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                  - name
+                                  - value
+                                  type: object
+                                type: array
+                              subtitle:
+                                properties:
+                                  language:
+                                    type: string
+                                type: object
+                              video:
+                                properties:
+                                  bitDepth:
+                                    type: integer
+                                  color:
+                                    properties:
+                                      chromaSubsampling:
+                                        enum:
+                                        - "3:1:1"
+                                        - "4:1:0"
+                                        - "4:1:1"
+                                        - "4:2:0"
+                                        - "4:2:2"
+                                        - "4:4:0"
+                                        - "4:4:4"
+                                        type: string
+                                      model:
+                                        type: string
+                                      primaries:
+                                        type: string
+                                      range:
+                                        default: limited
+                                        enum:
+                                        - full
+                                        - limited
+                                        type: string
+                                      space:
+                                        type: string
+                                      transfer:
+                                        type: string
+                                    type: object
+                                  fieldOrder:
+                                    default: unknown
+                                    enum:
+                                    - unknown
+                                    - progressive
+                                    - top-field-first
+                                    - bottom-field-first
+                                    type: string
+                                  frameRate:
+                                    properties:
+                                      average:
+                                        type: string
+                                      lowestCommon:
+                                        type: string
+                                    type: object
+                                  resolution:
+                                    properties:
+                                      hight:
+                                        format: int32
+                                        type: integer
+                                      sar:
+                                        default: "1.0"
+                                        type: string
+                                      width:
+                                        format: int32
+                                        type: integer
+                                    required:
+                                    - hight
+                                    - width
+                                    type: object
+                                type: object
+                            required:
+                            - id
+                            type: object
+                          type: array
+                      type: object
+                    portBindings:
+                      items:
+                        properties:
+                          id:
+                            description: ID of the port.
+                            type: string
+                        required:
+                        - id
+                        type: object
+                      type: array
+                    type:
+                      description: Type of this media.
+                      enum:
+                      - media
+                      - metadata
+                      type: string
+                    url:
+                      description: URL of this media.
+                      type: string
+                  required:
+                  - id
+                  - metadata
+                  - portBindings
+                  - type
+                  type: object
+                type: array
             type: object
           status:
             description: Status of a Workflow.
@@ -127,10 +558,10 @@ spec:
                 format: int32
                 type: integer
               conditions:
-                description: The latest available observations of an object's current
-                  state. When a Workflow fails, one of the conditions will have type
-                  "Failed" and status true. When a Workflow is completed, one of the
-                  conditions will have type "Complete" and status true.
+                description: |-
+                  The latest available observations of an object's current state. When a Workflow fails, one of the conditions will
+                  have type "Failed" and status true. When a Workflow is completed, one of the conditions will have type "Complete"
+                  and status true.
                 items:
                   properties:
                     lastTransitionTime:
@@ -158,10 +589,9 @@ spec:
                 type: array
                 x-kubernetes-list-type: atomic
               endTime:
-                description: Represents time when the Workflow has ended processing
-                  (either failed or completed). It is not guaranteed to be set in
-                  happens-before order across separate operations. It is represented
-                  in RFC3339 form and is in UTC.
+                description: |-
+                  Represents time when the Workflow has ended processing (either failed or completed). It is not guaranteed to be set
+                  in happens-before order across separate operations. It is represented in RFC3339 form and is in UTC.
                 format: date-time
                 type: string
               failed:
@@ -182,15 +612,15 @@ spec:
                 - Failed
                 type: string
               queuedTime:
-                description: Represents time when the Workflow controller first started
-                  processing a Workflow. It is represented in RFC3339 form and is
-                  in UTC.
+                description: |-
+                  Represents time when the Workflow controller first started processing a Workflow. It is represented in RFC3339 form
+                  and is in UTC.
                 format: date-time
                 type: string
               startTime:
-                description: Represents time when the Workflow controller transitioned
-                  to the "running" phase. It is represented in RFC3339 form and is
-                  in UTC.
+                description: |-
+                  Represents time when the Workflow controller transitioned to the "running" phase. It is represented in RFC3339 form
+                  and is in UTC.
                 format: date-time
                 type: string
               succeeded:
