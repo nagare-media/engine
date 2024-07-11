@@ -18,7 +18,6 @@ package cli
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -29,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -93,7 +93,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// configure workflow-manager-helper
+	// configure
 
 	if showUsage {
 		fs.Usage()
@@ -111,6 +111,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		WithName("workflow-manager-helper")
 	ctx = log.IntoContext(ctx, l)
 	log.SetLogger(l)
+	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	// parse data
 	if fs.NArg() != 1 {
@@ -127,7 +128,6 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// TODO: decoding seems to be lax; disallow unknown fields
 	data := &enginev1.WorkflowManagerHelperData{}
 	codecs := serializer.NewCodecFactory(scheme)
 	err = runtime.DecodeInto(codecs.UniversalDecoder(), dataStr, data)
@@ -137,32 +137,24 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	}
 
 	// parse config
-	if cfgFile == "" {
-		// TODO: make this optional
-		err := errors.New("--config option missing")
-		setupLog.Error(err, "setup failed")
-		fs.Usage()
-		return err
-	}
-
-	cfgStr, err := os.ReadFile(cfgFile)
-	if err != nil {
-		setupLog.Error(err, "unable to read config file")
-		return err
-	}
-
-	// TODO: decoding seems to be lax; disallow unknown fields
 	cfg := &enginev1.WorkflowManagerHelperConfiguration{}
-	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, cfg)
-	if err != nil {
-		setupLog.Error(err, "unable to parse config file")
-		return err
+
+	if cfgFile != "" {
+		cfgStr, err := os.ReadFile(cfgFile)
+		if err != nil {
+			setupLog.Error(err, "unable to read config file")
+			return err
+		}
+
+		err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, cfg)
+		if err != nil {
+			setupLog.Error(err, "unable to parse config file")
+			return err
+		}
 	}
 
 	cfg.Default()
-
-	err = cfg.Validate()
-	if err != nil {
+	if err = cfg.Validate(); err != nil {
 		setupLog.Error(err, "invalid configuration")
 		return err
 	}

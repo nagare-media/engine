@@ -58,7 +58,7 @@ type TaskReconciler struct {
 	APIReader         client.Reader
 	readOnlyAPIClient client.Client
 
-	Config                          enginev1.WorkflowManagerConfiguration
+	Config                          *enginev1.WorkflowManagerConfiguration
 	Scheme                          *runtime.Scheme
 	JobEventChannel                 <-chan event.GenericEvent
 	MediaProcessingEntityReconciler *MediaProcessingEntityReconciler

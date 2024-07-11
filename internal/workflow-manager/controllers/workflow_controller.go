@@ -44,7 +44,7 @@ type WorkflowReconciler struct {
 	client.Client
 	APIReader client.Reader
 
-	Config enginev1.WorkflowManagerConfiguration
+	Config *enginev1.WorkflowManagerConfiguration
 	Scheme *runtime.Scheme
 }
 

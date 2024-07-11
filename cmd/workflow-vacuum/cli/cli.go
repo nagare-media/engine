@@ -19,11 +19,13 @@ package cli
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 
 	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
 
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -45,6 +47,10 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	fs := flag.NewFlagSet("workflow-vacuum", flag.ContinueOnError)
 	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		fmt.Fprint(fs.Output(), "Usage: workflow-vacuum [options]\n")
+		fs.PrintDefaults()
+	}
 
 	var showUsage bool
 	fs.BoolVar(&showUsage, "help", false, "Show help and exit")
@@ -67,10 +73,11 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	err := fs.Parse(args)
 	if err != nil {
+		setupLog.Error(err, "setup failed")
 		return err
 	}
 
-	// configure workflow-vacuum
+	// configure
 
 	if showUsage {
 		fs.Usage()
@@ -88,6 +95,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		WithName("workflow-vacuum")
 	ctx = log.IntoContext(ctx, l)
 	log.SetLogger(l)
+	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	// TODO: configure
 
@@ -105,6 +113,8 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	}
 	// TODO: wait for components
 	// TODO: check for components errors
+	// TODO: delete NATS stream if workflow is deleted
+	// TODO: should we monitor NATS events and emit Kubernetes events?
 
 	return nil
 }

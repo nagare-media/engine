@@ -19,6 +19,7 @@ package cli
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 
 	"github.com/mattn/go-isatty"
@@ -61,17 +62,21 @@ func New() *cli {
 }
 
 func (c *cli) Execute(ctx context.Context, args []string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	setupLog := log.FromContext(ctx).WithName("setup")
 
 	// setup CLI flags
 
 	fs := flag.NewFlagSet("workflow-manager", flag.ContinueOnError)
 	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		fmt.Fprint(fs.Output(), "Usage: workflow-manager [options]\n")
+		fs.PrintDefaults()
+	}
 
 	var cfgFile string
-	fs.StringVar(&cfgFile, "config", "",
-		"The controller will load its initial configuration from this file. "+
-			"Omit this flag to use the default configuration values.")
+	fs.StringVar(&cfgFile, "config", "", "Location of the workflow-manager configuration file")
 
 	var showUsage bool
 	fs.BoolVar(&showUsage, "help", false, "Show help and exit")
@@ -98,7 +103,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// configure workflow-manager
+	// configure
 
 	if showUsage {
 		fs.Usage()
@@ -118,19 +123,20 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	ctrl.SetLogger(l)
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
-	cfg := enginev1.WorkflowManagerConfiguration{}
 	options := ctrl.Options{Scheme: scheme}
+	// parse config
+	cfg := &enginev1.WorkflowManagerConfiguration{}
+
 	if cfgFile != "" {
 		// TODO: migrate to custom configuration logic
 		options, err = options.AndFrom(ctrl.ConfigFile().AtPath(cfgFile).OfKind(&cfg))
 		if err != nil {
-			setupLog.Error(err, "unable to load config file")
+			setupLog.Error(err, "unable to parse config file")
 			return err
 		}
 	}
 
 	cfg.Default()
-
 	if err = cfg.Validate(); err != nil {
 		setupLog.Error(err, "invalid configuration")
 		return err

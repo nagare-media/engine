@@ -27,6 +27,7 @@ import (
 	"github.com/mattn/go-isatty"
 	"go.uber.org/zap/zapcore"
 
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -56,6 +57,8 @@ func New() *cli {
 }
 
 func (c *cli) Execute(ctx context.Context, fn string, args []string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	setupLog := log.FromContext(ctx).WithName("setup")
 
 	// setup CLI flags
@@ -103,7 +106,7 @@ func (c *cli) Execute(ctx context.Context, fn string, args []string) error {
 		return err
 	}
 
-	// configure functions
+	// configure
 
 	if showUsage {
 		fs.Usage()
@@ -121,6 +124,7 @@ func (c *cli) Execute(ctx context.Context, fn string, args []string) error {
 		WithName("functions")
 	ctx = log.IntoContext(ctx, l)
 	log.SetLogger(l)
+	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	if fs.NArg() != requiredNArgs {
 		err = fmt.Errorf("invalid number or positional arguments: %d", fs.NArg())

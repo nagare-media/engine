@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"os"
 
 	"github.com/mattn/go-isatty"
@@ -71,6 +72,10 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	fs := flag.NewFlagSet("gateway-nbmp", flag.ContinueOnError)
 	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		fmt.Fprint(fs.Output(), "Usage: gateway-nbmp [options]\n")
+		fs.PrintDefaults()
+	}
 
 	var cfgFile string
 	fs.StringVar(&cfgFile, "config", "", "Location of the gateway-nbmp configuration file")
@@ -100,7 +105,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// configure gateway-nbmp
+	// configure
 
 	if showUsage {
 		fs.Usage()
@@ -120,33 +125,26 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	log.SetLogger(l)
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
-	if cfgFile == "" {
-		// TODO: make this optional
-		err := errors.New("--config option missing")
-		setupLog.Error(err, "setup failed")
-		fs.Usage()
-		return err
-	}
-
-	cfgStr, err := os.ReadFile(cfgFile)
-	if err != nil {
-		setupLog.Error(err, "unable to read config file")
-		return err
-	}
-
-	// TODO: decoding seems to be lax; disallow unknown fields
+	// parse config
 	cfg := &enginev1.GatewayNBMPConfiguration{}
-	codecs := serializer.NewCodecFactory(scheme)
-	err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, cfg)
-	if err != nil {
-		setupLog.Error(err, "unable to parse config file")
-		return err
+
+	if cfgFile != "" {
+		cfgStr, err := os.ReadFile(cfgFile)
+		if err != nil {
+			setupLog.Error(err, "unable to read config file")
+			return err
+		}
+
+		codecs := serializer.NewCodecFactory(scheme)
+		err = runtime.DecodeInto(codecs.UniversalDecoder(), cfgStr, cfg)
+		if err != nil {
+			setupLog.Error(err, "unable to parse config file")
+			return err
+		}
 	}
 
 	cfg.Default()
-
-	err = cfg.Validate()
-	if err != nil {
+	if err = cfg.Validate(); err != nil {
 		setupLog.Error(err, "invalid configuration")
 		return err
 	}
