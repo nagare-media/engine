@@ -61,7 +61,7 @@ func init() {
 
 func (c *TaskShimConfiguration) Default() {
 	if c.Webserver.BindAddress == nil {
-		c.Webserver.BindAddress = ptr.To[string](":8888")
+		c.Webserver.BindAddress = ptr.To(":8888")
 	}
 
 	if c.Webserver.ReadTimeout == nil {
@@ -77,11 +77,11 @@ func (c *TaskShimConfiguration) Default() {
 	}
 
 	if c.Webserver.Network == nil {
-		c.Webserver.Network = ptr.To[string]("tcp")
+		c.Webserver.Network = ptr.To("tcp")
 	}
 
 	if c.Webserver.PublicBaseURL == nil {
-		c.Webserver.PublicBaseURL = ptr.To[string]("http://127.0.0.1:8888")
+		c.Webserver.PublicBaseURL = ptr.To("http://127.0.0.1:8888")
 	}
 
 	if len(c.TaskService.OnCreateActions) == 0 {

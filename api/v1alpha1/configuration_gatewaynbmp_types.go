@@ -71,7 +71,7 @@ func init() {
 
 func (c *GatewayNBMPConfiguration) Default() {
 	if c.Webserver.BindAddress == nil {
-		c.Webserver.BindAddress = ptr.To[string](":8080")
+		c.Webserver.BindAddress = ptr.To(":8080")
 	}
 
 	if c.Webserver.ReadTimeout == nil {
@@ -87,7 +87,7 @@ func (c *GatewayNBMPConfiguration) Default() {
 	}
 
 	if c.Webserver.Network == nil {
-		c.Webserver.Network = ptr.To[string]("tcp")
+		c.Webserver.Network = ptr.To("tcp")
 	}
 
 	if c.WorkflowService.DefaultKubernetesGPUResource == "" {

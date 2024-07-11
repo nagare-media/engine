@@ -56,8 +56,8 @@ func (s *workflowService) wddToWorkflow(nbmpWf *nbmpv2.Workflow) (*enginev1.Work
 		},
 		Spec: enginev1.WorkflowSpec{
 			HumanReadable: &enginev1.HumanReadableWorkflowDescription{
-				Name:        ptr.To[string](strings.Clone(nbmpWf.General.Name)),
-				Description: ptr.To[string](strings.Clone(nbmpWf.General.Description)),
+				Name:        ptr.To(strings.Clone(nbmpWf.General.Name)),
+				Description: ptr.To(strings.Clone(nbmpWf.General.Description)),
 			},
 		},
 	}
@@ -356,8 +356,8 @@ func (s *workflowService) wddToTasks(nbmpWf *nbmpv2.Workflow, wf *enginev1.Workf
 			},
 			Spec: enginev1.TaskSpec{
 				HumanReadable: &enginev1.HumanReadableTaskDescription{
-					Name:        ptr.To[string](strings.Clone(fr.General.Name)),
-					Description: ptr.To[string](strings.Clone(fr.General.Description)),
+					Name:        ptr.To(strings.Clone(fr.General.Name)),
+					Description: ptr.To(strings.Clone(fr.General.Description)),
 				},
 				MediaProcessingEntitySelector: mpeSel,
 				WorkflowRef:                   meta.LocalObjectReference{Name: wf.Name},

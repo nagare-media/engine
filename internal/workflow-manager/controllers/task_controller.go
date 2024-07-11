@@ -312,8 +312,8 @@ func (r *TaskReconciler) reconcileWorkflow(ctx context.Context, task *enginev1.T
 		Kind:               wf.GroupVersionKind().Kind,
 		Name:               wf.Name,
 		UID:                wf.UID,
-		Controller:         ptr.To[bool](true),
-		BlockOwnerDeletion: ptr.To[bool](true),
+		Controller:         ptr.To(true),
+		BlockOwnerDeletion: ptr.To(true),
 	})
 
 	// is Workflow marked for deletion

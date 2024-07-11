@@ -65,11 +65,11 @@ func (c *WorkflowManagerHelperConfiguration) Default() {
 	}
 
 	if c.TaskController.MaxFailedProbes == nil {
-		c.TaskController.MaxFailedProbes = ptr.To[int](10)
+		c.TaskController.MaxFailedProbes = ptr.To(10)
 	}
 
 	if c.ReportsController.Webserver.BindAddress == nil {
-		c.ReportsController.Webserver.BindAddress = ptr.To[string](":8181")
+		c.ReportsController.Webserver.BindAddress = ptr.To(":8181")
 	}
 
 	if c.ReportsController.Webserver.ReadTimeout == nil {
@@ -85,11 +85,11 @@ func (c *WorkflowManagerHelperConfiguration) Default() {
 	}
 
 	if c.ReportsController.Webserver.Network == nil {
-		c.ReportsController.Webserver.Network = ptr.To[string]("tcp")
+		c.ReportsController.Webserver.Network = ptr.To("tcp")
 	}
 
 	if c.ReportsController.Webserver.PublicBaseURL == nil {
-		c.ReportsController.Webserver.PublicBaseURL = ptr.To[string]("http://127.0.0.1:8181")
+		c.ReportsController.Webserver.PublicBaseURL = ptr.To("http://127.0.0.1:8181")
 	}
 }
 

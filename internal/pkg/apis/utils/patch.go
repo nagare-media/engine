@@ -40,7 +40,7 @@ func FullServerSideApply(ctx context.Context, c client.Client, obj client.Object
 func ServerSideApply(ctx context.Context, c client.Client, obj client.Object, manager string) error {
 	obj.SetManagedFields(nil)
 	return c.Patch(ctx, obj, client.Apply, &client.PatchOptions{
-		Force:        ptr.To[bool](true),
+		Force:        ptr.To(true),
 		FieldManager: manager,
 	})
 }
@@ -49,7 +49,7 @@ func ServerSideApplyStatus(ctx context.Context, c client.Client, obj client.Obje
 	obj.SetManagedFields(nil)
 	return c.Status().Patch(ctx, obj, client.Apply, &client.SubResourcePatchOptions{
 		PatchOptions: client.PatchOptions{
-			Force:        ptr.To[bool](true),
+			Force:        ptr.To(true),
 			FieldManager: manager,
 		},
 	})

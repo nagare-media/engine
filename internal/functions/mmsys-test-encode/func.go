@@ -573,12 +573,12 @@ func (f *function) execEventAPIServer(ctx context.Context, mediaEventsCh chan<- 
 	l := log.FromContext(ctx)
 
 	srv := enginehttp.NewServer(&enginev1.WebserverConfiguration{
-		BindAddress:   ptr.To[string](":8080"),
+		BindAddress:   ptr.To(":8080"),
 		ReadTimeout:   &metav1.Duration{Duration: 1 * time.Minute},
 		WriteTimeout:  &metav1.Duration{Duration: 1 * time.Minute},
 		IdleTimeout:   &metav1.Duration{Duration: 1 * time.Minute},
-		Network:       ptr.To[string]("tcp"),
-		PublicBaseURL: ptr.To[string]("http://127.0.0.1:8080"),
+		Network:       ptr.To("tcp"),
+		PublicBaseURL: ptr.To("http://127.0.0.1:8080"),
 	})
 
 	eventCh := make(chan cloudevents.Event)
