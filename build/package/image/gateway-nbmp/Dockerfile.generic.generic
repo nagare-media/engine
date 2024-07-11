@@ -40,9 +40,9 @@ ARG TARGETOS \
     GIT_COMMIT \
     BUILD_DATE
 
-LABEL maintainer="Matthias Neugebauer <mtneug@mailbox.org>" \
+LABEL maintainer="Matthias Neugebauer <mtneug@shio.solutions>" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.authors="Matthias Neugebauer <mtneug@mailbox.org>" \
+      org.opencontainers.image.authors="Matthias Neugebauer <mtneug@shio.solutions>" \
       org.opencontainers.image.url="ghcr.io/nagare-media/engine/gateway-nbmp" \
       org.opencontainers.image.documentation="https://nagare.media" \
       org.opencontainers.image.source="https://github.com/nagare-media/engine" \
