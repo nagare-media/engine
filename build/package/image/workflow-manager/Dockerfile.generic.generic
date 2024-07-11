@@ -13,6 +13,7 @@ COPY . .
 # BUILD_DATE changes ofter so move this section down to allow for caching
 ARG TARGETOS \
     TARGETARCH \
+    TARGETVARIANT \
     VERSION \
     GIT_COMMIT \
     GIT_TREE_STATE \
