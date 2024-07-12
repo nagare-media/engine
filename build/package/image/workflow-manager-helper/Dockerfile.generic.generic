@@ -33,6 +33,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
       "BUILD_DATE=${BUILD_DATE}"
 
 FROM gcr.io/distroless/static:latest
+LABEL org.opencontainers.image.base.name="gcr.io/distroless/static:latest"
 
 ENV GOTRACEBACK=all
 
@@ -53,8 +54,7 @@ LABEL maintainer="Matthias Neugebauer <mtneug@shio.solutions>" \
       org.opencontainers.image.vendor="nagare media" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.title="nagare media engine" \
-      org.opencontainers.image.description="nagare media engine — an open source modern cloud- and edge-native media workflow system running on Kubernetes" \
-      org.opencontainers.image.base.name="gcr.io/distroless/static:latest"
+      org.opencontainers.image.description="nagare media engine — an open source modern cloud- and edge-native media workflow system running on Kubernetes"
 
 WORKDIR /
 COPY --from=build "/app/bin/workflow-manager-helper-${VERSION}-${TARGETOS}-${TARGETARCH}" /workflow-manager-helper

@@ -39,7 +39,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
       "GIT_TREE_STATE=${GIT_TREE_STATE}" \
       "BUILD_DATE=${BUILD_DATE}"
 
-FROM docker.io/ubuntu:23.04
+FROM docker.io/library/ubuntu:24.04
+LABEL org.opencontainers.image.base.name="docker.io/library/ubuntu:24.04"
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -67,8 +68,7 @@ LABEL maintainer="Matthias Neugebauer <mtneug@shio.solutions>" \
       org.opencontainers.image.vendor="nagare media" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.title="nagare media engine" \
-      org.opencontainers.image.description="nagare media engine — an open source modern cloud- and edge-native media workflow system running on Kubernetes" \
-      org.opencontainers.image.base.name="docker.io/ubuntu:23.04"
+      org.opencontainers.image.description="nagare media engine — an open source modern cloud- and edge-native media workflow system running on Kubernetes"
 
 WORKDIR /
 COPY --from=build "/app/bin/task-shim-${VERSION}-${TARGETOS}-${TARGETARCH}" /task-shim
