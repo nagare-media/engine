@@ -73,10 +73,7 @@ jobs:
       - name: fetch container image shas
         id: container-image
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y jq
-          docker manifest inspect ghcr.io/nagare-media/engine/${{ matrix.image }}:${{ steps.info.outputs.VERSION }}
-          shas=$(docker manifest inspect ghcr.io/nagare-media/engine/${{ matrix.image }}:${{ steps.info.outputs.VERSION }} | jq -r '.manifests.[] | .digest' | paste -s -d ' ' -)
+          shas=$(docker manifest inspect ghcr.io/nagare-media/engine/${{ matrix.image }}:${{ steps.info.outputs.VERSION }} | jq -r '.manifests[].digest' | paste -s -d ' ' -)
           echo "SHAS=$shas" | tee -a "$GITHUB_OUTPUT"
 
       - name: delete untagged container images
