@@ -58,7 +58,6 @@ jobs:
           fi
           echo "VERSION=${VERSION}" | tee -a "$GITHUB_OUTPUT"
 
-      # FIXME: disable provenance due to https://github.com/snok/container-retention-policy/issues/63
       - name: build and push container images
         run: |
           case "${{ github.event_name }}" in
@@ -69,7 +68,13 @@ jobs:
           make image-${{ matrix.image }} \
             VERSION=${{ steps.info.outputs.VERSION }} \
             IMAGE_PLATFORMS=${{ env.IMAGE_PLATFORMS }} \
-            BUILDX_OUTPUT="${BUILDX_OUTPUT} --provenance=false"
+            BUILDX_OUTPUT="${BUILDX_OUTPUT}"
+
+      - name: fetch container image shas
+        id: container-image
+        run: |
+          shas=$(docker manifest inspect ghcr.io/nagare-media/engine/${{ matrix.image }}:${{ steps.info.outputs.VERSION }} | jq -r '.manifests.[] | .digest' | paste -s -d ' ' -)
+          echo "SHAS=$shas" >> $GITHUB_OUTPUT
 
       - name: delete untagged container images
         uses: snok/container-retention-policy@v3.0.0
@@ -79,4 +84,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag-selection: untagged
           image-names: engine/${{ matrix.image }}
-          cut-off: 1d
+          image-tags: ${{ steps.info.outputs.VERSION }}
+          skip-shas: ${{ steps.container-image.outputs.SHAS }}
+          cut-off: 0s
