@@ -69,3 +69,21 @@ jobs:
             VERSION=${{ steps.info.outputs.VERSION }} \
             IMAGE_PLATFORMS=${{ env.IMAGE_PLATFORMS }} \
             BUILDX_OUTPUT="${BUILDX_OUTPUT}"
+
+      - name: fetch container image shas
+        id: container-image
+        run: |
+          shas=$(docker manifest inspect ghcr.io/nagare-media/engine/${{ matrix.image }}:${{ steps.info.outputs.VERSION }} | jq -r '.manifests.[] | .digest' | paste -s -d ' ' -)
+          echo "SHAS=$shas" | tee -a "$GITHUB_OUTPUT"
+
+      - name: delete untagged container images
+        uses: snok/container-retention-policy@v3.0.0
+        if: ${{ github.event_name == 'push' }}
+        with:
+          account: nagare-media
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag-selection: untagged
+          image-names: engine/${{ matrix.image }}
+          image-tags: ${{ steps.info.outputs.VERSION }}
+          skip-shas: ${{ steps.container-image.outputs.SHAS }}
+          cut-off: 0s
