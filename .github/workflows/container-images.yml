@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '**'
   pull_request:
     branches:
       - main
@@ -47,6 +49,15 @@ jobs:
         with:
           platforms: ${{ env.IMAGE_PLATFORMS }}
 
+      - name: info
+        id: info
+        run: |
+          VERSION=dev
+          if [ "${{ github.ref_type }}" = 'tag' ]; then
+            VERSION="${{ github.ref_name }}"
+          fi
+          echo "VERSION=${VERSION}" | tee -a "$GITHUB_OUTPUT"
+
       # FIXME: disable provenance due to https://github.com/snok/container-retention-policy/issues/63
       - name: build and push container images
         run: |
@@ -56,6 +67,7 @@ jobs:
           esac
 
           make image-${{ matrix.image }} \
+            VERSION=${{ steps.info.outputs.VERSION }} \
             IMAGE_PLATFORMS=${{ env.IMAGE_PLATFORMS }} \
             BUILDX_OUTPUT="${BUILDX_OUTPUT} --provenance=false"
 
