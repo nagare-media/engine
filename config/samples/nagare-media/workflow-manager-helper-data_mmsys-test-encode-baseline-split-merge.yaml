@@ -23,7 +23,7 @@ task:
           - duration: 1m30s
             video:
               frameRate:
-                average: 24
+                average: "24"
   outputs:
     - id: 553f07d1-4a9d-4b60-9adb-b8874d237348
       type: media

@@ -23,7 +23,7 @@ task:
           - duration: 1m30s
             video:
               frameRate:
-                average: 24
+                average: "24"
     - id: 18de69db-50d0-4dd9-bd34-4e33fdbe71df
       type: metadata
       direction: push
