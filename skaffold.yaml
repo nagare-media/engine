@@ -142,7 +142,8 @@ build:
           - os: ["linux", "darwin"]
             command: ["sh", "-c", "kind load docker-image --name nagare-media-edge $SKAFFOLD_IMAGE"]
   tagPolicy:
-    sha256: {}
+    customTemplate:
+      template: "dev"
   local:
     push: false
     useBuildkit: true

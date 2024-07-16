@@ -18,7 +18,7 @@ spec:
         spec:
           containers:
             - name: function
-              image: ghcr.io/nagare-media/engine/function-noop:latest
+              image: ghcr.io/nagare-media/engine/function-noop:dev
               imagePullPolicy: IfNotPresent
               resources:
                 requests:
@@ -49,7 +49,7 @@ spec:
         spec:
           containers:
             - name: function
-              image: ghcr.io/nagare-media/engine/function-sleep:latest
+              image: ghcr.io/nagare-media/engine/function-sleep:dev
               imagePullPolicy: IfNotPresent
               resources:
                 requests:
