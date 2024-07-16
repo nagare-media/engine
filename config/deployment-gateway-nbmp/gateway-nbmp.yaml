@@ -52,6 +52,7 @@ spec:
       containers:
         - name: gateway-nbmp
           image: ghcr.io/nagare-media/engine/gateway-nbmp:dev
+          imagePullPolicy: IfNotPresent
           command:
             - /gateway-nbmp
           args:

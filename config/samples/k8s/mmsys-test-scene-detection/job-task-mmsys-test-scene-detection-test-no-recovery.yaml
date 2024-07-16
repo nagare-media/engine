@@ -22,8 +22,8 @@ spec:
         runAsGroup: 0
       containers:
         - name: function
-          imagePullPolicy: Always
           image: ghcr.io/nagare-media/engine/function-mmsys-test-scene-detection:dev
+          imagePullPolicy: IfNotPresent
           ports:
             - name: task-api
               containerPort: 8888
@@ -49,8 +49,8 @@ spec:
               cpu: 7000m
               memory: 2Gi
         - name: workflow-manager-helper
-          imagePullPolicy: Always
           image: ghcr.io/nagare-media/engine/workflow-manager-helper:dev
+          imagePullPolicy: IfNotPresent
           args: [ "--config", "/config/workflow-manager-helper.yaml", "/run/secrets/engine.nagare.media/task/data.yaml" ]
           ports:
             - name: event-api

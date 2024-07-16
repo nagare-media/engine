@@ -52,6 +52,7 @@ spec:
       containers:
         - name: workflow-manager
           image: ghcr.io/nagare-media/engine/workflow-manager:dev
+          imagePullPolicy: IfNotPresent
           command:
             - /workflow-manager
           args:
