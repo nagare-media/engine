@@ -19,12 +19,12 @@ ingress:
   enabled: true
   path: /
   hosts:
-    - s3.local.gd
+    - s3.localtest.me
 
 consoleIngress:
   enabled: true
   hosts:
-    - minio.local.gd
+    - minio.localtest.me
 
 resources:
   requests: ~

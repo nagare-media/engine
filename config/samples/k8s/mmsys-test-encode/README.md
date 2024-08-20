@@ -88,7 +88,7 @@ $ kubectl logs -f -n mmsys-test-encode jobs/upload-media
 
 ## Create Tasks (`Secret` + `Job`)
 
-In every test case, the output encoding can be accessed at <http://s3.local.gd/nagare-media-engine-tests/outputs/caminandes-1-llama-drama.mp4> (`s3.local.gd` resolves to 127.0.0.1 assuming the local DNS resolver allows that; the Kubernetes cluster has an Ingress that routes `s3.local.gd` requests to the in-cluster S3).
+In every test case, the output encoding can be accessed at <http://s3.localtest.me/nagare-media-engine-tests/outputs/caminandes-1-llama-drama.mp4> (`s3.localtest.me` resolves to 127.0.0.1 assuming the local DNS resolver allows that; the Kubernetes cluster has an Ingress that routes `s3.localtest.me` requests to the in-cluster S3).
 
 ```sh
 # baseline-simple

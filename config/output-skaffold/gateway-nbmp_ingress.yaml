@@ -14,7 +14,7 @@ metadata:
   namespace: system
 spec:
   rules:
-    - host: engine.nagare.local.gd
+    - host: engine.nagare.localtest.me
       http:
         paths:
           - pathType: Prefix

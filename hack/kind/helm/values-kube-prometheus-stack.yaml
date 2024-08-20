@@ -2,7 +2,7 @@ prometheus:
   ingress:
     enabled: true
     hosts:
-      - prometheus.local.gd
+      - prometheus.localtest.me
   prometheusSpec:
     storageSpec:
       volumeClaimTemplate:
@@ -17,7 +17,7 @@ alertmanager:
   ingress:
     enabled: true
     hosts:
-      - alertmanager.local.gd
+      - alertmanager.localtest.me
   alertmanagerSpec:
     storageSpec:
       volumeClaimTemplate:
@@ -37,7 +37,7 @@ grafana:
   ingress:
     enabled: true
     hosts:
-      - grafana.local.gd
+      - grafana.localtest.me
   additionalDataSources:
     - name: Tempo
       type: tempo
