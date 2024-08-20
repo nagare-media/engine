@@ -157,7 +157,7 @@ skaffold-debug: ## Execute skaffold debug pipeline against kind test cluster
 .PHONY: build
 build: $(addprefix build-, $(CMDS)) ## Build all binaries
 
-## build-functions:                      ## Build functinos binary
+## build-functions:                      ## Build functions binary
 ## build-gateway-nbmp:                   ## Build NBMP gateway binary 
 ## build-task-shim:                      ## Build task shim binary
 ## build-workflow-manager:               ## Build workflow manager binary
