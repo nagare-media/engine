@@ -9,6 +9,5 @@ tmp/
 build/
 config/
 docs/
-hack/
 README.md
 skaffold.yaml
