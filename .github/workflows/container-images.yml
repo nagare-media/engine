@@ -37,6 +37,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: set up Docker
+        uses: crazy-max/ghaction-setup-docker@v3
+        with:
+          # containerd image store allows to load multi-platform images
+          daemon-config: |
+            {
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+
       - uses: docker/login-action@v3
         if: ${{ github.event_name == 'push' }}
         with:
