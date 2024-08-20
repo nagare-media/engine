@@ -39,17 +39,6 @@ rules:
   - engine.nagare.media
   resources:
   - tasks
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - engine.nagare.media
-  resources:
   - workflows
   verbs:
   - create

@@ -27,17 +27,17 @@ IMAGE_TAG       ?= $(VERSION)
 IMAGE_PLATFORMS ?= # by default only ${OS}/${ARCH} is built
 BUILDX_OUTPUT   ?= "--load"
 
-TESTENV_K8S_VERSION                   ?= 1.30.2
-TESTENV_INGRESS_NGINX_VERSION         ?= 4.10.1 # Helm chart versions
-TESTENV_CERT_MANAGER_VERSION          ?= 1.15.1 # Helm chart versions
-TESTENV_KUBE_PROMETHEUS_STACK_VERSION ?= 61.3.0 # Helm chart versions
-TESTENV_TEMPO_VERSION                 ?= 1.10.1 # Helm chart versions
+TESTENV_K8S_VERSION                   ?= 1.31.0
+TESTENV_INGRESS_NGINX_VERSION         ?= 4.10.4 # Helm chart versions
+TESTENV_CERT_MANAGER_VERSION          ?= 1.15.3 # Helm chart versions
+TESTENV_KUBE_PROMETHEUS_STACK_VERSION ?= 62.1.0 # Helm chart versions
+TESTENV_TEMPO_VERSION                 ?= 1.10.3 # Helm chart versions
 TESTENV_MINIO_VERSION                 ?= 5.2.0  # Helm chart versions
-TESTENV_NATS_VERSION                  ?= 1.2.0  # Helm chart versions
+TESTENV_NATS_VERSION                  ?= 1.2.2  # Helm chart versions
 
-CONTROLLER_TOOLS_VERSION ?= v0.15.0
-KUSTOMIZE_VERSION        ?= v5.4.2
-YQ_VERSION               ?= v4.44.2
+CONTROLLER_TOOLS_VERSION ?= v0.16.1
+KUSTOMIZE_VERSION        ?= v5.4.3
+YQ_VERSION               ?= v4.44.3
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 
 # Do not change
