@@ -40,8 +40,6 @@ fi
 
 [ -e "${DOCKERFILE}" ] || fatal "selected platform is unsupported"
 
-BUILDX_OUTPUT="${BUILDX_OUTPUT:---load}"
-
 # Main
 
 docker buildx build \
