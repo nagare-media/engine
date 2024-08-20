@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.4
 
 ARG GOVERSION
-FROM --platform=${BUILDPLATFORM} docker.io/golang:${GOVERSION} AS build
+FROM --platform=${BUILDPLATFORM} docker.io/library/golang:${GOVERSION} AS build
 
 ARG SKAFFOLD_GO_GCFLAGS=""
 
