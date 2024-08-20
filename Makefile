@@ -24,7 +24,7 @@ BUILD_DATE     ?= $(shell date -u +"%Y-%m-%dT%TZ")
 
 IMAGE_REGISTRY  ?= $(shell cat build/package/image/IMAGE_REGISTRY)
 IMAGE_TAG       ?= $(VERSION)
-IMAGE_PLATFORMS ?= "" # by default only ${OS}/${ARCH} is built
+IMAGE_PLATFORMS ?= # by default only ${OS}/${ARCH} is built
 BUILDX_OUTPUT   ?= "--load"
 
 TESTENV_K8S_VERSION                   ?= 1.30.2
