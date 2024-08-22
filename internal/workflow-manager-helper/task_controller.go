@@ -162,7 +162,7 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 	op := func() error {
 		l.Info("create task")
 
-		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
+		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.CreateRequestTimeout.Duration)
 		defer cancel()
 
 		req, err := http.NewRequestWithContext(ctx, "POST", c.cfg.TaskController.TaskAPI, &buf)
@@ -307,7 +307,7 @@ func (c *taskCtrl) probeTask(ctx context.Context) (*nbmpv2.Task, error) {
 	l.V(1).Info("probe task")
 
 	// send GET request to Task API
-	ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
+	ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RetrieveRequestTimeout.Duration)
 	defer cancel()
 
 	url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
@@ -456,7 +456,7 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 	op := func() error {
 		l.Info("delete task")
 
-		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RequestTimeout.Duration)
+		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.DeleteRequestTimeout.Duration)
 		defer cancel()
 
 		url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)

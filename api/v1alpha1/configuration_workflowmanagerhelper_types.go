@@ -27,18 +27,41 @@ import (
 )
 
 type WorkflowManagerHelperConfigurationSpec struct {
-	TaskController    WorkflowManagerHelperTaskControllerConfiguration    `json:"task"`
+	// Task controller configuration.
+	TaskController WorkflowManagerHelperTaskControllerConfiguration `json:"task"`
+
+	// Reports controller configuration.
 	ReportsController WorkflowManagerHelperReportsControllerConfiguration `json:"reports"`
 }
 
 type WorkflowManagerHelperTaskControllerConfiguration struct {
-	TaskAPI         string           `json:"taskAPI"`
-	RequestTimeout  *metav1.Duration `json:"requestTimeout"`
-	ObservePeriode  *metav1.Duration `json:"observePeriode"`
-	MaxFailedProbes *int             `json:"maxFailedProbes"`
+	// TaskAPI HTTP URL.
+	TaskAPI string `json:"taskAPI"`
+
+	// CreateRequestTimeout is the timeout used for Create requests. Defaults to "3m".
+	// +optional
+	CreateRequestTimeout *metav1.Duration `json:"createRequestTimeout,omitempty"`
+
+	// RetrieveRequestTimeout is the timeout used for Retrieve requests (i.e. task probes). Defaults to "10s".
+	// +optional
+	RetrieveRequestTimeout *metav1.Duration `json:"retrieveRequestTimeout,omitempty"`
+
+	// DeleteRequestTimeout is the timeout used for Delete requests. Defaults to "10m".
+	// +optional
+	DeleteRequestTimeout *metav1.Duration `json:"deleteRequestTimeout,omitempty"`
+
+	// ObservePeriode is the period the task is probed to retrieve the current state. Defaults to "2s".
+	// +optional
+	ObservePeriode *metav1.Duration `json:"observePeriode,omitempty"`
+
+	// MaxFailedProbes indicates the maximum number of consecutive failed probes after which workflow-manager-helper will
+	// terminate with an error. Defaults to "10".
+	// +optional
+	MaxFailedProbes *int `json:"maxFailedProbes,omitempty"`
 }
 
 type WorkflowManagerHelperReportsControllerConfiguration struct {
+	// Webserver configuration.
 	Webserver WebserverConfiguration `json:"webserver"`
 }
 
@@ -56,8 +79,16 @@ func init() {
 }
 
 func (c *WorkflowManagerHelperConfiguration) Default() {
-	if c.TaskController.RequestTimeout == nil {
-		c.TaskController.RequestTimeout = &metav1.Duration{Duration: 10 * time.Minute}
+	if c.TaskController.CreateRequestTimeout == nil {
+		c.TaskController.CreateRequestTimeout = &metav1.Duration{Duration: 3 * time.Minute}
+	}
+
+	if c.TaskController.RetrieveRequestTimeout == nil {
+		c.TaskController.RetrieveRequestTimeout = &metav1.Duration{Duration: 10 * time.Second}
+	}
+
+	if c.TaskController.DeleteRequestTimeout == nil {
+		c.TaskController.DeleteRequestTimeout = &metav1.Duration{Duration: 10 * time.Minute}
 	}
 
 	if c.TaskController.ObservePeriode == nil {
@@ -107,8 +138,16 @@ func (c *WorkflowManagerHelperConfiguration) Validate() error {
 		return errors.New("task.taskAPI is not an HTTP URL")
 	}
 
-	if c.TaskController.RequestTimeout == nil {
-		return errors.New("missing task.requestTimeout")
+	if c.TaskController.CreateRequestTimeout == nil {
+		return errors.New("missing task.createRequestTimeout")
+	}
+
+	if c.TaskController.RetrieveRequestTimeout == nil {
+		return errors.New("missing task.retrieveRequestTimeout")
+	}
+
+	if c.TaskController.DeleteRequestTimeout == nil {
+		return errors.New("missing task.deleteRequestTimeout")
 	}
 
 	if c.TaskController.ObservePeriode == nil {
