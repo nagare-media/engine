@@ -161,40 +161,43 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	// create components
 
-	reportsCtrl := workflowmanagerhelper.NewReportsController(cfg, data)
 	taskCtrl := workflowmanagerhelper.NewTaskController(cfg, data)
+	reportsCtrl := workflowmanagerhelper.NewReportsController(cfg, data)
 
 	// start components
 
 	var (
-		reportsCtrlErr, taskCtrlErr error
-		reportsCtrlDone             = make(chan struct{})
+		taskCtrlErr, reportsCtrlErr error
 		taskCtrlDone                = make(chan struct{})
+		reportsCtrlDone             = make(chan struct{})
+
+		// create a new context for the reports controller as it should only be terminated after the task controller has terminated
+		reportsCtx, reportsCtxCancel = context.WithCancel(context.Background())
 	)
 
-	go func() { reportsCtrlErr = reportsCtrl.Start(ctx); close(reportsCtrlDone) }()
-	go func() { taskCtrlErr = taskCtrl.Start(ctx); close(taskCtrlDone) }()
+	go func() { taskCtrlErr = taskCtrl.Start(ctx); close(taskCtrlDone); reportsCtxCancel() }()
+	go func() { reportsCtrlErr = reportsCtrl.Start(reportsCtx); close(reportsCtrlDone) }()
 
 	// termination handling
 
 	select {
-	case <-reportsCtrlDone:
-		cancel()
 	case <-taskCtrlDone:
+		// we already canceled reportsCtx in the Go routine
+	case <-reportsCtrlDone:
 		cancel()
 	case <-ctx.Done():
 	}
 	<-taskCtrlDone
 	<-reportsCtrlDone
 
-	if reportsCtrlErr != nil {
-		err = reportsCtrlErr
-		setupLog.Error(err, "problem running reports controller")
-	}
-
 	if taskCtrlErr != nil {
 		err = taskCtrlErr
 		setupLog.Error(err, "problem running task controller")
+	}
+
+	if reportsCtrlErr != nil {
+		err = reportsCtrlErr
+		setupLog.Error(err, "problem running reports controller")
 	}
 
 	return err
