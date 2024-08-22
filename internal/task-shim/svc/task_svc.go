@@ -213,21 +213,7 @@ func (s *taskService) Delete(ctx context.Context, t *nbmpv2.Task) error {
 
 	// Task is running or has terminated => run onDelete actions
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "delete"))
-	if err := s.execEventActions(ctx, s.cfg.OnDeleteActions, t); err != nil {
-		return err
-	}
-
-	// if Task has terminated => just exit
-	if s.hasTerminated() {
-		l.Info("task has already terminated")
-		return nil
-	}
-
-	// Task is running => stop it and wait for termination
-	l.Info("terminate task")
-	s.tskCtxCancel()
-	<-s.tskDone
-	return nil
+	return s.execEventActions(ctx, s.cfg.OnDeleteActions, t)
 }
 
 func (s *taskService) Retrieve(ctx context.Context, t *nbmpv2.Task) error {
