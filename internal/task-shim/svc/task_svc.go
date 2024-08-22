@@ -315,7 +315,9 @@ func (s *taskService) startTask(currentTask *nbmpv2.Task) {
 	go func() {
 		s.tskErr = s.execTask(s.tskCtx, currentTask)
 
-		s.mtx.Lock()
+		// Although we touch s.tsk.General.State, we don't lock s.mtx as this will result in a deadlock during parallel NBMP
+		// service requests. A race is possible, but probably not critical as the task will either terminate or restart
+		// which will set the correct s.tsk.General.State.
 		if s.tskErr != nil {
 			l.Error(s.tskErr, "task failed")
 			s.tsk.General.State = &nbmpv2.InErrorState
@@ -325,7 +327,6 @@ func (s *taskService) startTask(currentTask *nbmpv2.Task) {
 			s.observeEvent(events.TaskSucceeded)
 		}
 		l.Info("task finished")
-		s.mtx.Unlock()
 
 		close(s.tskDone)
 	}()
