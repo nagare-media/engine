@@ -29,18 +29,18 @@ import (
 )
 
 type TaskShimConfigurationSpec struct {
-	// Webserver configuration.
-	Webserver WebserverConfiguration `json:"webserver"`
-
 	// TaskService configuration.
 	TaskService TaskShimTaskServiceConfiguration `json:"task"`
+
+	// Webserver configuration.
+	Webserver WebserverConfiguration `json:"webserver"`
 }
 
 type TaskShimTaskServiceConfiguration struct {
 	// Actions that define the task execution.
 	Actions []TaskServiceAction `json:"actions"`
 
-	// OnCreateActions are executed when a Create request was received.  Defaults to the "start-task" meta action.
+	// OnCreateActions are executed when a Create request was received. Defaults to the "start-task" meta action.
 	// +optional
 	OnCreateActions []TaskServiceAction `json:"onCreate,omitempty"`
 
@@ -52,7 +52,7 @@ type TaskShimTaskServiceConfiguration struct {
 	// +optional
 	OnDeleteActions []TaskServiceAction `json:"onDelete,omitempty"`
 
-	// CreateTimeout is the duration after which the process will terminate if no Create request is ever made.  Defaults
+	// CreateTimeout is the duration after which the process will terminate if no Create request is ever made. Defaults
 	// to "2m".
 	// +optional
 	CreateTimeout *metav1.Duration `json:"createTimeout,omitempty"`
@@ -64,7 +64,7 @@ type TaskShimTaskServiceConfiguration struct {
 }
 
 type TaskServiceAction struct {
-	// Name that is user defined and human readable. Can be blank.
+	// Name that is user defined and human readable. Might be blank.
 	Name string `json:"name"`
 
 	// Action that should be executed.
@@ -89,30 +89,6 @@ func init() {
 }
 
 func (c *TaskShimConfiguration) Default() {
-	if c.Webserver.BindAddress == nil {
-		c.Webserver.BindAddress = ptr.To(":8888")
-	}
-
-	if c.Webserver.ReadTimeout == nil {
-		c.Webserver.ReadTimeout = &metav1.Duration{Duration: time.Minute}
-	}
-
-	if c.Webserver.WriteTimeout == nil {
-		c.Webserver.WriteTimeout = &metav1.Duration{} // = unlimited
-	}
-
-	if c.Webserver.IdleTimeout == nil {
-		c.Webserver.IdleTimeout = &metav1.Duration{} // = unlimited
-	}
-
-	if c.Webserver.Network == nil {
-		c.Webserver.Network = ptr.To("tcp")
-	}
-
-	if c.Webserver.PublicBaseURL == nil {
-		c.Webserver.PublicBaseURL = ptr.To("http://127.0.0.1:8888")
-	}
-
 	if len(c.TaskService.OnCreateActions) == 0 {
 		c.TaskService.OnCreateActions = append(c.TaskService.OnCreateActions, TaskServiceAction{
 			Action: metaaction.Name,
@@ -150,9 +126,57 @@ func (c *TaskShimConfiguration) Default() {
 	if c.TaskService.DeleteTimeout == nil {
 		c.TaskService.DeleteTimeout = &metav1.Duration{Duration: 5 * time.Minute}
 	}
+
+	if c.Webserver.BindAddress == nil {
+		c.Webserver.BindAddress = ptr.To(":8888")
+	}
+
+	if c.Webserver.ReadTimeout == nil {
+		c.Webserver.ReadTimeout = &metav1.Duration{Duration: time.Minute}
+	}
+
+	if c.Webserver.WriteTimeout == nil {
+		c.Webserver.WriteTimeout = &metav1.Duration{} // = unlimited
+	}
+
+	if c.Webserver.IdleTimeout == nil {
+		c.Webserver.IdleTimeout = &metav1.Duration{} // = unlimited
+	}
+
+	if c.Webserver.Network == nil {
+		c.Webserver.Network = ptr.To("tcp")
+	}
+
+	if c.Webserver.PublicBaseURL == nil {
+		c.Webserver.PublicBaseURL = ptr.To("http://127.0.0.1:8888")
+	}
 }
 
 func (c *TaskShimConfiguration) Validate() error {
+	if len(c.TaskService.Actions) == 0 {
+		return errors.New("missing task.actions")
+	}
+
+	if len(c.TaskService.OnCreateActions) == 0 {
+		return errors.New("missing task.onCreateActions")
+	}
+
+	if len(c.TaskService.OnUpdateActions) == 0 {
+		return errors.New("missing task.onUpdateActions")
+	}
+
+	if len(c.TaskService.OnDeleteActions) == 0 {
+		return errors.New("missing task.onDeleteActions")
+	}
+
+	if c.TaskService.CreateTimeout == nil {
+		return errors.New("missing task.createTimeout")
+	}
+
+	if c.TaskService.DeleteTimeout == nil {
+		return errors.New("missing task.deleteTimeout")
+	}
+
 	if c.Webserver.BindAddress == nil {
 		return errors.New("missing webserver.bindAddress")
 	}
@@ -167,10 +191,6 @@ func (c *TaskShimConfiguration) Validate() error {
 
 	if c.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.Webserver.PublicBaseURL, "/") {
 		return errors.New("trailing slash in webserver.publicBaseURL")
-	}
-
-	if len(c.TaskService.Actions) == 0 {
-		return errors.New("missing task actions")
 	}
 
 	return nil
