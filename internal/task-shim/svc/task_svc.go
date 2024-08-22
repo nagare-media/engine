@@ -271,15 +271,15 @@ func (s *taskService) execEventActions(ctx context.Context, al []enginev1.TaskSe
 
 			switch metaaction.ConfigType(cfg) {
 			case metaaction.ConfigTypeStartTask:
-				s.startTask(log.IntoContext(ctx, l), currentTask)
+				s.startTask(currentTask)
 				continue
 
 			case metaaction.ConfigTypeRestartTask:
-				s.restartTask(log.IntoContext(ctx, l), currentTask)
+				s.restartTask(currentTask)
 				continue
 
 			case metaaction.ConfigTypeStopTask:
-				s.stopTask(log.IntoContext(ctx, l))
+				s.stopTask()
 				continue
 			}
 		}
@@ -299,7 +299,7 @@ func (s *taskService) execEventActions(ctx context.Context, al []enginev1.TaskSe
 	return nil
 }
 
-func (s *taskService) startTask(ctx context.Context, currentTask *nbmpv2.Task) {
+func (s *taskService) startTask(currentTask *nbmpv2.Task) {
 	// assumption: s.mtx is already locked by caller
 	l := log.FromContext(s.rootCtx)
 
@@ -331,15 +331,15 @@ func (s *taskService) startTask(ctx context.Context, currentTask *nbmpv2.Task) {
 	}()
 }
 
-func (s *taskService) restartTask(ctx context.Context, currentTask *nbmpv2.Task) {
+func (s *taskService) restartTask(currentTask *nbmpv2.Task) {
 	// assumption: s.mtx is already locked by caller
 	l := log.FromContext(s.rootCtx)
 	l.Info("restarting task")
-	s.stopTask(ctx)
-	s.startTask(ctx, currentTask)
+	s.stopTask()
+	s.startTask(currentTask)
 }
 
-func (s *taskService) stopTask(ctx context.Context) {
+func (s *taskService) stopTask() {
 	// assumption: s.mtx is already locked by caller
 	l := log.FromContext(s.rootCtx)
 	l.Info("stopping task")
