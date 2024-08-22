@@ -90,19 +90,19 @@ In every test case, the output can be accessed at <http://s3.localtest.me/nagare
 ```sh
 # baseline
 $ kubectl -n mmsys-test-scene-detection create secret generic workflow-manager-helper-data-mmsys-test-scene-detection-baseline \
-    --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-scene-detection-baseline.yaml
+    "--from-literal=data.yaml=$(sed 's/.localtest.me//g' config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-scene-detection-baseline.yaml)"
 $ kubectl -n mmsys-test-scene-detection apply -f config/samples/k8s/mmsys-test-scene-detection/job-task-mmsys-test-scene-detection-baseline.yaml
 $ kubectl logs -f -n mmsys-test-scene-detection jobs/task-mmsys-test-scene-detection-baseline -c function
 
 # test-no-recovery
 $ kubectl -n mmsys-test-scene-detection create secret generic workflow-manager-helper-data-mmsys-test-scene-detection-test-no-recovery \
-    --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-scene-detection-test-no-recovery.yaml
+    "--from-literal=data.yaml=$(sed 's/.localtest.me//g' config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-scene-detection-test-no-recovery.yaml)"
 $ kubectl -n mmsys-test-scene-detection apply -f config/samples/k8s/mmsys-test-scene-detection/job-task-mmsys-test-scene-detection-test-no-recovery.yaml
 $ kubectl logs -f -n mmsys-test-scene-detection jobs/task-mmsys-test-scene-detection-test-no-recovery -c function
 
 # test-recovery
 $ kubectl -n mmsys-test-scene-detection create secret generic workflow-manager-helper-data-mmsys-test-scene-detection-test-recovery \
-    --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-scene-detection-test-recovery.yaml
+    "--from-literal=data.yaml=$(sed 's/.localtest.me//g' config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-scene-detection-test-recovery.yaml)"
 $ kubectl -n mmsys-test-scene-detection apply -f config/samples/k8s/mmsys-test-scene-detection/job-task-mmsys-test-scene-detection-test-recovery.yaml
 $ kubectl logs -f -n mmsys-test-scene-detection jobs/task-mmsys-test-scene-detection-test-recovery -c function
 ```

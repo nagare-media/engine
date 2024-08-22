@@ -17,7 +17,7 @@ task:
       direction: pull
       portBindings:
         - id: input
-      url: http://minio.s3.svc.cluster.local:9000/nagare-media-engine-tests/inputs/caminandes-1-llama-drama.mp4
+      url: http://minio.s3.svc.cluster.local.localtest.me:9000/nagare-media-engine-tests/inputs/caminandes-1-llama-drama.mp4
       metadata:
         streams:
           - duration: 1m30s
@@ -30,12 +30,12 @@ task:
       direction: push
       portBindings:
         - id: output
-      url: s3://minio.s3.svc.cluster.local:9000/nagare-media-engine-tests/outputs/caminandes-1-llama-drama.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=MLYEAE6AES7IUSL4APYL&AWS_SECRET_ACCESS_KEY=snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H
-      # -> http://minio.s3.svc.cluster.local:9000/nagare-media-engine-tests/outputs/caminandes-1-llama-drama.mp4
+      url: s3://minio.s3.svc.cluster.local.localtest.me:9000/nagare-media-engine-tests/outputs/caminandes-1-llama-drama.mp4?INSECURE=true&AWS_ACCESS_KEY_ID=MLYEAE6AES7IUSL4APYL&AWS_SECRET_ACCESS_KEY=snTrPIV2NDBoQOjpL10Nk6KY6EyWlePkF1NLMX3H
+      # -> http://minio.s3.svc.cluster.local.localtest.me:9000/nagare-media-engine-tests/outputs/caminandes-1-llama-drama.mp4
   config:
     mmsys-test-encode.engine.nagare.media/test: baseline-split-merge
     mmsys-test-encode.engine.nagare.media/chunk-seconds: "30"
 
 system:
   nats:
-    url: nats://nats.nats.svc.cluster.local:4222
+    url: nats://nats.nats.svc.cluster.local.localtest.me:4222

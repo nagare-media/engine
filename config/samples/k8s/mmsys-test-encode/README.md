@@ -93,31 +93,31 @@ In every test case, the output encoding can be accessed at <http://s3.localtest.
 ```sh
 # baseline-simple
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-baseline-simple \
-    --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-baseline-simple.yaml
+    "--from-literal=data.yaml=$(sed 's/.localtest.me//g' config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-baseline-simple.yaml)"
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-baseline-simple.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-baseline-simple -c function
 
 # baseline-split-merge
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-baseline-split-merge \
-    --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-baseline-split-merge.yaml
+    "--from-literal=data.yaml=$(sed 's/.localtest.me//g' config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-baseline-split-merge.yaml)"
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-baseline-split-merge.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-baseline-split-merge -c function
 
 # test-no-recovery-simple
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-test-no-recovery-simple \
-    --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-no-recovery-simple.yaml
+    "--from-literal=data.yaml=$(sed 's/.localtest.me//g' config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-no-recovery-simple.yaml)"
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-test-no-recovery-simple.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-test-no-recovery-simple -c function
 
 # test-no-recovery-split-merge
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-test-no-recovery-split-merge \
-    --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-no-recovery-split-merge.yaml
+    "--from-literal=data.yaml=$(sed 's/.localtest.me//g' config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-no-recovery-split-merge.yaml)"
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-test-no-recovery-split-merge.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-test-no-recovery-split-merge -c function
 
 # test-recovery-split-merge
 $ kubectl -n mmsys-test-encode create secret generic workflow-manager-helper-data-mmsys-test-encode-test-recovery-split-merge \
-    --from-file=data.yaml=config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-recovery-split-merge.yaml
+    "--from-literal=data.yaml=$(sed 's/.localtest.me//g' config/samples/nagare-media/workflow-manager-helper-data_mmsys-test-encode-test-recovery-split-merge.yaml)"
 $ kubectl -n mmsys-test-encode apply -f config/samples/k8s/mmsys-test-encode/job-task-mmsys-test-encode-test-recovery-split-merge.yaml
 $ kubectl logs -f -n mmsys-test-encode jobs/task-mmsys-test-encode-test-recovery-split-merge -c function
 ```
