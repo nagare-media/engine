@@ -18,6 +18,7 @@ package sleep
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -33,11 +34,6 @@ const (
 	Name = "sleep"
 
 	DurationParameterKey = "sleep.engine.nagare.media/duration"
-)
-
-// Default configuration
-var (
-	DefaultDuration = 30 * time.Second
 )
 
 // function sleeps for a certain amount of time. It can be used for debugging.
@@ -64,16 +60,15 @@ func (f *function) Exec(ctx context.Context) error {
 
 // BuildTask from sleep function.
 func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
-	f := &function{
-		duration: DefaultDuration,
-	}
+	var err error
+	f := &function{}
 
-	if d, ok := nbmputils.GetStringParameterValue(t.Configuration.Parameters, DurationParameterKey); ok {
-		var err error
-		f.duration, err = time.ParseDuration(d)
-		if err != nil {
-			return nil, err
-		}
+	d, ok := nbmputils.GetStringParameterValue(t.Configuration.Parameters, DurationParameterKey)
+	if !ok {
+		return nil, fmt.Errorf("missing %s parameter", DurationParameterKey)
+	}
+	if f.duration, err = time.ParseDuration(d); err != nil {
+		return nil, err
 	}
 
 	return f, nil
