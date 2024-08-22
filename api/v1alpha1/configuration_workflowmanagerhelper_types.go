@@ -57,7 +57,7 @@ func init() {
 
 func (c *WorkflowManagerHelperConfiguration) Default() {
 	if c.TaskController.RequestTimeout == nil {
-		c.TaskController.RequestTimeout = &metav1.Duration{Duration: 10 * time.Second}
+		c.TaskController.RequestTimeout = &metav1.Duration{Duration: 10 * time.Minute}
 	}
 
 	if c.TaskController.ObservePeriode == nil {
