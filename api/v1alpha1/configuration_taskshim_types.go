@@ -29,15 +29,28 @@ import (
 )
 
 type TaskShimConfigurationSpec struct {
-	Webserver   WebserverConfiguration           `json:"webserver"`
+	// Webserver configuration.
+	Webserver WebserverConfiguration `json:"webserver"`
+
+	// TaskService configuration.
 	TaskService TaskShimTaskServiceConfiguration `json:"task"`
 }
 
 type TaskShimTaskServiceConfiguration struct {
-	Actions         []TaskServiceAction `json:"actions"`
-	OnCreateActions []TaskServiceAction `json:"onCreate"`
-	OnUpdateActions []TaskServiceAction `json:"onUpdate"`
-	OnDeleteActions []TaskServiceAction `json:"onDelete"`
+	// Actions that define the task execution.
+	Actions []TaskServiceAction `json:"actions"`
+
+	// OnCreateActions are executed when a Create request was received.  Defaults to the "start-task" meta action.
+	// +optional
+	OnCreateActions []TaskServiceAction `json:"onCreate,omitempty"`
+
+	// OnUpdateActions are executed when a Update request was received. Defaults to the "restart-task" meta action.
+	// +optional
+	OnUpdateActions []TaskServiceAction `json:"onUpdate,omitempty"`
+
+	// OnDeleteActions are executed when a Delete request was received. Defaults to the "stop-task" meta action.
+	// +optional
+	OnDeleteActions []TaskServiceAction `json:"onDelete,omitempty"`
 
 	// CreateTimeout is the duration after which the process will terminate if no Create request is ever made.  Defaults
 	// to "2m".
@@ -51,9 +64,15 @@ type TaskShimTaskServiceConfiguration struct {
 }
 
 type TaskServiceAction struct {
-	Name   string                 `json:"name"`
-	Action string                 `json:"action"`
-	Config *strobj.StringOrObject `json:"config"`
+	// Name that is user defined and human readable. Can be blank.
+	Name string `json:"name"`
+
+	// Action that should be executed.
+	Action string `json:"action"`
+
+	// Config options for this action.
+	// +optional
+	Config *strobj.StringOrObject `json:"config,omitempty"`
 }
 
 // +kubebuilder:object:root=true
