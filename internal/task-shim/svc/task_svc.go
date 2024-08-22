@@ -102,6 +102,48 @@ func (s *taskService) init() {
 		l.Info("terminate process")
 		s.terminateFunc(s.rootCtx.Err())
 	}()
+
+	// Go routine to handle termination if Create is never called
+	go func() {
+		l := log.FromContext(s.rootCtx)
+
+		<-time.After(s.cfg.CreateTimeout.Duration)
+
+		s.mtx.Lock()
+		defer s.mtx.Unlock()
+
+		// do we have a running task?
+		if s.tsk == nil {
+			err := errors.New("did not receive create request")
+			l.Error(err, fmt.Sprintf("terminate after %s", s.cfg.CreateTimeout.Duration))
+			s.terminateFunc(err)
+		}
+	}()
+}
+
+func (s *taskService) initTermination() {
+	// Go routine to handle termination after task was stopped if Delete is never called
+	go func() {
+		l := log.FromContext(s.rootCtx)
+
+		s.mtx.Lock()
+		defer s.mtx.Unlock()
+
+		// check if task was only restarted
+		if !s.hasTerminated() {
+			return
+		}
+
+		// terminate after timeout even if Delete is never called
+		<-time.After(s.cfg.DeleteTimeout.Duration)
+		err := errors.New("did not receive delete request")
+		l.Error(err, fmt.Sprintf("terminate after %s", s.cfg.DeleteTimeout.Duration))
+		// we use err here instead of s.tskErr => the process is guaranteed to terminate with an error code
+		// Since we did not receive an Delete request, it might be the case that the workflow-manager-helper process
+		// terminated with an error which will result in a restart of that container by Kubernetes. In that case we want the
+		// task-shim process to restart as well. If the task finished successfully before, it should use recover mechanisms.
+		s.terminateFunc(err)
+	}()
 }
 
 func (s *taskService) Create(ctx context.Context, t *nbmpv2.Task) error {
@@ -314,6 +356,7 @@ func (s *taskService) startTask(currentTask *nbmpv2.Task) {
 		}
 		l.Info("task finished")
 
+		s.initTermination()
 		close(s.tskDone)
 	}()
 }

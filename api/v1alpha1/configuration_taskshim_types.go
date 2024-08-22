@@ -38,6 +38,16 @@ type TaskShimTaskServiceConfiguration struct {
 	OnCreateActions []TaskServiceAction `json:"onCreate"`
 	OnUpdateActions []TaskServiceAction `json:"onUpdate"`
 	OnDeleteActions []TaskServiceAction `json:"onDelete"`
+
+	// CreateTimeout is the duration after which the process will terminate if no Create request is ever made.  Defaults
+	// to "2m".
+	// +optional
+	CreateTimeout *metav1.Duration `json:"createTimeout,omitempty"`
+
+	// DeleteTimeout is the duration after which the process will terminate if the task has stopped and no Delete request
+	// is ever made. Defaults to "5m".
+	// +optional
+	DeleteTimeout *metav1.Duration `json:"deleteTimeout,omitempty"`
 }
 
 type TaskServiceAction struct {
@@ -112,6 +122,14 @@ func (c *TaskShimConfiguration) Default() {
 				StrVal: string(metaaction.ConfigTypeStopTask),
 			},
 		})
+	}
+
+	if c.TaskService.CreateTimeout == nil {
+		c.TaskService.CreateTimeout = &metav1.Duration{Duration: 2 * time.Minute}
+	}
+
+	if c.TaskService.DeleteTimeout == nil {
+		c.TaskService.DeleteTimeout = &metav1.Duration{Duration: 5 * time.Minute}
 	}
 }
 
