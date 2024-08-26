@@ -19,7 +19,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nagare-media/models.go v0.0.0-20240711145127-d34bc996c625
 	github.com/nats-io/nats.go v1.37.0
-	github.com/onsi/ginkgo/v2 v2.20.0
+	github.com/onsi/ginkgo/v2 v2.20.1
 	github.com/onsi/gomega v1.34.1
 	go.uber.org/zap v1.27.0
 	k8s.io/api v0.31.0
