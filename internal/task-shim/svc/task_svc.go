@@ -66,8 +66,7 @@ type taskService struct {
 	tskDone          chan struct{}      // protected by mtx
 	tskCtx           context.Context    // protected by mtx
 	tskCtxCancel     context.CancelFunc // protected by mtx
-
-	reportClient events.Client
+	reportClient     events.Client      // protected by mtx (assignment)
 }
 
 var _ nbmpsvcv2.TaskService = &taskService{}
@@ -227,6 +226,11 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 
 	l := log.FromContext(s.rootCtx)
 	l.Info("update task")
+
+	// create reportClient if Task includes Reporting descriptors
+	if err := s.createReportClient(t); err != nil {
+		l.Error(err, "disable event reporting")
+	}
 
 	// run onUpdate actions
 	s.observeEvent(events.TaskUpdated)
