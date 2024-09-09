@@ -153,7 +153,7 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 		DeliveryMethod: nbmpv2.HTTP_POSTDeliveryMethod,
 	}
 
-	buf := bytes.Buffer{}
+	buf := strings.Builder{}
 	enc := json.NewEncoder(&buf)
 	if err := enc.Encode(t); err != nil {
 		l.Error(err, "failed to encode NBMP Task as JSON")
@@ -166,7 +166,7 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.CreateRequestTimeout.Duration)
 		defer cancel()
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.TaskController.TaskAPI, &buf)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.TaskController.TaskAPI, strings.NewReader(buf.String()))
 		if err != nil {
 			return err
 		}
