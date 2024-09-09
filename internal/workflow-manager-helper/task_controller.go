@@ -165,7 +165,7 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.CreateRequestTimeout.Duration)
 		defer cancel()
 
-		req, err := http.NewRequestWithContext(ctx, "POST", c.cfg.TaskController.TaskAPI, &buf)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.TaskController.TaskAPI, &buf)
 		if err != nil {
 			return err
 		}
@@ -311,7 +311,7 @@ func (c *taskCtrl) probeTask(ctx context.Context) (*nbmpv2.Task, error) {
 	defer cancel()
 
 	url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -460,7 +460,7 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 		defer cancel()
 
 		url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
-		req, err := http.NewRequestWithContext(ctx, "DELETE", url, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 		if err != nil {
 			return err
 		}

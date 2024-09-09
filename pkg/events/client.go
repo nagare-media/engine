@@ -69,7 +69,7 @@ func (c *HTTPClient) doSend(ctx context.Context, e cloudevents.Event, async bool
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", c.URL, buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.URL, buf)
 	if err != nil {
 		return err
 	}
