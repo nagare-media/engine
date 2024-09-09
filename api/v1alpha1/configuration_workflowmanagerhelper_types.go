@@ -46,6 +46,10 @@ type WorkflowManagerHelperTaskControllerConfiguration struct {
 	// +optional
 	RetrieveRequestTimeout *metav1.Duration `json:"retrieveRequestTimeout,omitempty"`
 
+	// UpdateRequestTimeout is the timeout used for Update requests. Defaults to "10m".
+	// +optional
+	UpdateRequestTimeout *metav1.Duration `json:"updateRequestTimeout,omitempty"`
+
 	// DeleteRequestTimeout is the timeout used for Delete requests. Defaults to "10m".
 	// +optional
 	DeleteRequestTimeout *metav1.Duration `json:"deleteRequestTimeout,omitempty"`
@@ -85,6 +89,10 @@ func (c *WorkflowManagerHelperConfiguration) Default() {
 
 	if c.TaskController.RetrieveRequestTimeout == nil {
 		c.TaskController.RetrieveRequestTimeout = &metav1.Duration{Duration: 10 * time.Second}
+	}
+
+	if c.TaskController.UpdateRequestTimeout == nil {
+		c.TaskController.UpdateRequestTimeout = &metav1.Duration{Duration: 10 * time.Minute}
 	}
 
 	if c.TaskController.DeleteRequestTimeout == nil {
@@ -144,6 +152,10 @@ func (c *WorkflowManagerHelperConfiguration) Validate() error {
 
 	if c.TaskController.RetrieveRequestTimeout == nil {
 		return errors.New("missing task.retrieveRequestTimeout")
+	}
+
+	if c.TaskController.UpdateRequestTimeout == nil {
+		return errors.New("missing task.updateRequestTimeout")
 	}
 
 	if c.TaskController.DeleteRequestTimeout == nil {

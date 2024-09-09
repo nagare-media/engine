@@ -2679,6 +2679,11 @@ func (in *WorkflowManagerHelperTaskControllerConfiguration) DeepCopyInto(out *Wo
 		*out = new(v1.Duration)
 		**out = **in
 	}
+	if in.UpdateRequestTimeout != nil {
+		in, out := &in.UpdateRequestTimeout, &out.UpdateRequestTimeout
+		*out = new(v1.Duration)
+		**out = **in
+	}
 	if in.DeleteRequestTimeout != nil {
 		in, out := &in.DeleteRequestTimeout, &out.DeleteRequestTimeout
 		*out = new(v1.Duration)

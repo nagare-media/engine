@@ -35,6 +35,7 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/version"
 	workflowmanagerhelper "github.com/nagare-media/engine/internal/workflow-manager-helper"
+	"github.com/nagare-media/engine/pkg/updatable"
 )
 
 var (
@@ -121,20 +122,23 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
+	codecs := serializer.NewCodecFactory(scheme)
+
 	dataFile := fs.Arg(0)
-	dataStr, err := os.ReadFile(dataFile)
+	data, err := updatable.NewFileWithTransform(dataFile, func(s []byte) (*enginev1.WorkflowManagerHelperData, error) {
+		data := &enginev1.WorkflowManagerHelperData{}
+		err = runtime.DecodeInto(codecs.UniversalDecoder(), s, data)
+		if err != nil {
+			setupLog.Error(err, "unable to parse data file")
+			return nil, err
+		}
+		return data, nil
+	})
 	if err != nil {
 		setupLog.Error(err, "unable to read data file")
 		return err
 	}
-
-	data := &enginev1.WorkflowManagerHelperData{}
-	codecs := serializer.NewCodecFactory(scheme)
-	err = runtime.DecodeInto(codecs.UniversalDecoder(), dataStr, data)
-	if err != nil {
-		setupLog.Error(err, "unable to parse data file")
-		return err
-	}
+	defer data.Close()
 
 	// parse config
 	cfg := &enginev1.WorkflowManagerHelperConfiguration{}

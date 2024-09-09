@@ -32,6 +32,7 @@ import (
 	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/http"
 	"github.com/nagare-media/engine/pkg/starter"
+	"github.com/nagare-media/engine/pkg/updatable"
 )
 
 const (
@@ -51,7 +52,7 @@ type reportsCtrl struct {
 
 var _ starter.Starter = &reportsCtrl{}
 
-func NewReportsController(cfg *enginev1.WorkflowManagerHelperConfiguration, data *enginev1.WorkflowManagerHelperData) starter.Starter {
+func NewReportsController(cfg *enginev1.WorkflowManagerHelperConfiguration, data updatable.Updatable[*enginev1.WorkflowManagerHelperData]) starter.Starter {
 	s := enginehttp.NewServer(&cfg.ReportsController.Webserver)
 
 	// Health API
@@ -65,7 +66,7 @@ func NewReportsController(cfg *enginev1.WorkflowManagerHelperConfiguration, data
 
 	return &reportsCtrl{
 		cfg:     cfg,
-		data:    data,
+		data:    data.Get().Value, // assumption: System.NATS.URL, Workflow.ID and Task.ID will not change when data is updated
 		http:    s,
 		eventCh: eventCh,
 	}

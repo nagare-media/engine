@@ -25,6 +25,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -39,6 +40,7 @@ import (
 	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/nbmp"
 	"github.com/nagare-media/engine/pkg/starter"
+	"github.com/nagare-media/engine/pkg/updatable"
 	"github.com/nagare-media/models.go/base"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
@@ -46,6 +48,7 @@ import (
 const (
 	// TODO: make configurable
 	TaskCreateTimeout = 1 * time.Minute
+	TaskUpdateTimeout = 1 * time.Minute
 	TaskDeleteTimeout = 1 * time.Minute
 )
 
@@ -57,7 +60,7 @@ var (
 
 type taskCtrl struct {
 	cfg  *enginev1.WorkflowManagerHelperConfiguration
-	data *enginev1.WorkflowManagerHelperData
+	data updatable.Updatable[*enginev1.WorkflowManagerHelperData]
 
 	// NBMP Task ID returned by the Task API
 	tskInstanceID string
@@ -67,7 +70,7 @@ type taskCtrl struct {
 
 var _ starter.Starter = &taskCtrl{}
 
-func NewTaskController(cfg *enginev1.WorkflowManagerHelperConfiguration, data *enginev1.WorkflowManagerHelperData) starter.Starter {
+func NewTaskController(cfg *enginev1.WorkflowManagerHelperConfiguration, data updatable.Updatable[*enginev1.WorkflowManagerHelperData]) starter.Starter {
 	return &taskCtrl{
 		cfg:  cfg,
 		data: data,
@@ -76,13 +79,7 @@ func NewTaskController(cfg *enginev1.WorkflowManagerHelperConfiguration, data *e
 }
 
 func (c *taskCtrl) Start(ctx context.Context) error {
-	l := log.FromContext(ctx,
-		"workflow", c.data.Workflow.ID,
-		"task", c.data.Task.ID,
-	).WithName("task")
-	ctx = log.IntoContext(ctx, l)
-
-	// TODO: add Go routine that checks for updates to the secret resulting in PATCH requests to the Task API
+	l := log.FromContext(ctx).WithName("task")
 
 	// Kubernetes reads final termination messages in /dev/termination-log
 	terminationMsgBuf := &bytes.Buffer{}
@@ -104,17 +101,27 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 		}
 	}()
 
-	if err := c.createTaskPhase(ctx); err != nil {
+	// subscribe to data changes
+	data, dataSub := c.data.Subscribe()
+	l = l.WithValues(
+		"workflow", data.Value.Workflow.ID,
+		"task", data.Value.Task.ID,
+	)
+	ctx = log.IntoContext(ctx, l)
+
+	// create phase
+	if err := c.createTaskPhase(ctx, data.Value); err != nil {
 		fmt.Fprint(terminationMsgBuf, "create phase failed: ")
 		fmt.Fprintln(terminationMsgBuf, err)
 		return err
 	}
 
+	// observe phase
 	l = l.WithValues("instance", c.tskInstanceID)
 	ctx = log.IntoContext(ctx, l)
 
 	var observeTaskErr error
-	if observeTaskErr = c.observeTaskPhase(ctx); observeTaskErr != nil {
+	if observeTaskErr = c.observeTaskPhase(ctx, data.Value, dataSub); observeTaskErr != nil {
 		// we ignore the error and always try to move on to the delete phase
 		// we will record the error in the Kubernetes termination message
 		fmt.Fprint(terminationMsgBuf, "observe phase failed: ")
@@ -126,6 +133,7 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 		}
 	}
 
+	// delete phase
 	if err := c.deleteTaskPhase(ctx); err != nil {
 		// we will record the error in the Kubernetes termination message
 		fmt.Fprint(terminationMsgBuf, "delete phase failed: ")
@@ -136,21 +144,16 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 	return observeTaskErr
 }
 
-func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
+func (c *taskCtrl) createTaskPhase(ctx context.Context, data *enginev1.WorkflowManagerHelperData) error {
 	l := log.FromContext(ctx, "phase", "create-task")
 	ctx = log.IntoContext(ctx, l)
 	l.Info("starting new phase")
 
 	// convert data to NBMP Task
-	t := &nbmpv2.Task{}
-	if err := c.data.ConvertToNBMPTask(t); err != nil {
+	t, err := c.convertToNBMPTask(data)
+	if err != nil {
 		l.Error(err, "failed to convert passed nagare media engine data to NBMP Task")
 		return err
-	}
-	t.Reporting = &nbmpv2.Reporting{
-		ReportType:     nbmp.ReportTypeEngineCloudEvents,
-		URL:            base.URI(fmt.Sprintf("%s/events", *c.cfg.ReportsController.Webserver.PublicBaseURL)),
-		DeliveryMethod: nbmpv2.HTTP_POSTDeliveryMethod,
 	}
 
 	buf := strings.Builder{}
@@ -206,31 +209,84 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 	return err
 }
 
-func (c *taskCtrl) observeTaskPhase(ctx context.Context) error {
+func (c *taskCtrl) convertToNBMPTask(data *enginev1.WorkflowManagerHelperData) (*nbmpv2.Task, error) {
+	t := &nbmpv2.Task{}
+	if err := data.ConvertToNBMPTask(t); err != nil {
+		return nil, err
+	}
+	t.Reporting = &nbmpv2.Reporting{
+		ReportType:     nbmp.ReportTypeEngineCloudEvents,
+		URL:            base.URI(fmt.Sprintf("%s/events", *c.cfg.ReportsController.Webserver.PublicBaseURL)),
+		DeliveryMethod: nbmpv2.HTTP_POSTDeliveryMethod,
+	}
+	return t, nil
+}
+
+func (c *taskCtrl) observeTaskPhase(ctx context.Context, data *enginev1.WorkflowManagerHelperData,
+	dataSub <-chan updatable.VersionedValue[*enginev1.WorkflowManagerHelperData]) error {
 	l := log.FromContext(ctx, "phase", "observe-task")
 	ctx = log.IntoContext(ctx, l)
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	l.Info("starting new phase")
 
 	var (
-		observerErr, eventEmitterErr error
-		observerDone                 = make(chan struct{})
-		eventEmitterDone             = make(chan struct{})
-	)
-	go func() { observerErr = c.observerLoop(ctx); close(observerDone) }()
-	go func() { eventEmitterErr = c.eventEmitterLoop(ctx); close(eventEmitterDone) }()
+		tskUpdateErr, observerErr, eventEmitterErr error
+		observerDone, eventEmitterDone             chan struct{}
 
-	select {
-	case <-observerDone:
-		cancel()
-	case <-eventEmitterDone:
-		cancel()
+		ctx2   context.Context
+		cancel context.CancelFunc
+	)
+
+loop:
+	for {
+		// start observation
+		ctx2, cancel = context.WithCancel(ctx)
+		observerDone = make(chan struct{})
+		eventEmitterDone = make(chan struct{})
+
+		go func() { observerErr = c.observerLoop(ctx2); close(observerDone) }()
+		go func() { eventEmitterErr = c.eventEmitterLoop(ctx2, data); close(eventEmitterDone) }()
+
+		select {
+		// data update
+		case dv, ok := <-dataSub:
+			if !ok {
+				// unexpected channel close
+				tskUpdateErr = errors.New("unexpected data subscription channel closed")
+				break loop
+			}
+
+			l.Info("observed data change; update task")
+
+			// stop observation
+			cancel()
+			<-observerDone
+			<-eventEmitterDone
+
+			// update task
+			data = dv.Value
+			if tskUpdateErr = c.updateTask(ctx, data); tskUpdateErr != nil {
+				break loop
+			}
+
+		// unexpected termination
+		case <-observerDone:
+			break loop
+		case <-eventEmitterDone:
+			break loop
+
+		// requested termination
+		case <-ctx.Done():
+			break loop
+		}
 	}
+
+	cancel()
 	<-observerDone
 	<-eventEmitterDone
 
+	if tskUpdateErr != nil {
+		return tskUpdateErr
+	}
 	if observerErr != nil {
 		return observerErr
 	}
@@ -348,14 +404,14 @@ func (c *taskCtrl) probeTask(ctx context.Context) (*nbmpv2.Task, error) {
 	return t, err
 }
 
-func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
+func (c *taskCtrl) eventEmitterLoop(ctx context.Context, data *enginev1.WorkflowManagerHelperData) error {
 	l := log.FromContext(ctx, "function", "event-emitter")
 	ctx = log.IntoContext(ctx, l)
 	l.Info("starting event-emitter")
 
 	// check for task event inputs
 	eventClients := make(map[string]events.Client)
-	for _, in := range c.data.Task.Inputs {
+	for _, in := range data.Task.Inputs {
 		if in.Type != enginev1.MetadataMediaType {
 			continue
 		}
@@ -396,7 +452,7 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 	}
 
 	// connect to NATS
-	nc, js, err := enginenats.CreateJetStreamConn(ctx, string(c.data.System.NATS.URL))
+	nc, js, err := enginenats.CreateJetStreamConn(ctx, string(data.System.NATS.URL))
 	if err != nil {
 		return err
 	}
@@ -409,7 +465,7 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 		return err
 	}
 
-	subjectName := enginenats.Subject(enginenats.SubjectPrefix, c.data.Workflow.ID, c.data.Task.ID)
+	subjectName := enginenats.Subject(enginenats.SubjectPrefix, data.Workflow.ID, data.Task.ID)
 	con, err := s.OrderedConsumer(ctx, jetstream.OrderedConsumerConfig{
 		FilterSubjects: []string{subjectName},
 		DeliverPolicy:  jetstream.DeliverAllPolicy,
@@ -436,13 +492,13 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 		}
 
 		for name, ec := range eventClients {
+			// TODO: make configurable
+			ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 			if err := ec.SendAsyncAck(ctx, e); err != nil {
-				if ctx.Err() == nil {
-					// only log if ctx is still open
-					l.Error(err, fmt.Sprintf("failed to send event to task input '%s'", name))
-				}
-				continue
+				// only log if ctx is still open
+				l.Error(err, fmt.Sprintf("failed to send event to task input '%s'", name))
 			}
+			cancel()
 		}
 	})
 	if err != nil {
@@ -453,6 +509,67 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context) error {
 	l.Info("termination requested")
 	cc.Stop()
 	return nil
+}
+
+func (c *taskCtrl) updateTask(ctx context.Context, data *enginev1.WorkflowManagerHelperData) error {
+	l := log.FromContext(ctx)
+
+	// convert data to NBMP Task
+	t, err := c.convertToNBMPTask(data)
+	if err != nil {
+		l.Error(err, "failed to convert passed nagare media engine data to NBMP Task")
+		return err
+	}
+	t.General.ID = c.tskInstanceID
+
+	buf := strings.Builder{}
+	enc := json.NewEncoder(&buf)
+	if err := enc.Encode(t); err != nil {
+		l.Error(err, "failed to encode NBMP Task as JSON")
+		return err
+	}
+
+	op := func() error {
+		l.Info("update task")
+
+		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.UpdateRequestTimeout.Duration)
+		defer cancel()
+
+		url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPatch, url, strings.NewReader(buf.String()))
+		if err != nil {
+			return err
+		}
+
+		resp, err := c.http.Do(req)
+		if err != nil {
+			return err
+		}
+
+		if resp.StatusCode > 299 {
+			// TODO: parse response body to give more infos in log
+			return fmt.Errorf("unexpected HTTP status code in response: %d", resp.StatusCode)
+		}
+
+		if c.tskInstanceID != t.General.ID {
+			return fmt.Errorf("NBMP task ID '%s' doesn't match task instance ID '%s'", t.General.ID, c.tskInstanceID)
+		}
+
+		return nil
+	}
+
+	no := func(err error, t time.Duration) {
+		l.Error(err, fmt.Sprintf("failed; retrying after %s", t))
+	}
+
+	ctxUpdate, cancel := context.WithTimeout(ctx, TaskUpdateTimeout)
+	defer cancel()
+
+	err = backoff.RetryNotify(op, newBackOffWithContext(ctxUpdate), no)
+	if err != nil {
+		l.Error(err, "failed to update task")
+	}
+	return err
 }
 
 func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
@@ -482,6 +599,8 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 			// TODO: parse response body to give more infos in log
 			return fmt.Errorf("unexpected HTTP status code in response: %d", resp.StatusCode)
 		}
+
+		// TODO: should we assume task is deleted if connection cannot be established?
 
 		return nil
 	}
