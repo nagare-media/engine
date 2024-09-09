@@ -93,7 +93,7 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 
 			for k, v := range in.Labels {
 				if v == "" {
-					mp.Keywords = append(mp.Keywords, fmt.Sprintf("%s", k))
+					mp.Keywords = append(mp.Keywords, k)
 				} else {
 					mp.Keywords = append(mp.Keywords, fmt.Sprintf("%s=%s", k, v))
 				}
@@ -144,7 +144,7 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 
 			for k, v := range in.Labels {
 				if v == "" {
-					mp.Keywords = append(mp.Keywords, fmt.Sprintf("%s", k))
+					mp.Keywords = append(mp.Keywords, k)
 				} else {
 					mp.Keywords = append(mp.Keywords, fmt.Sprintf("%s=%s", k, v))
 				}
@@ -196,7 +196,7 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 
 			for k, v := range out.Labels {
 				if v == "" {
-					mp.Keywords = append(mp.Keywords, fmt.Sprintf("%s", k))
+					mp.Keywords = append(mp.Keywords, k)
 				} else {
 					mp.Keywords = append(mp.Keywords, fmt.Sprintf("%s=%s", k, v))
 				}
@@ -225,7 +225,7 @@ func (d *WorkflowManagerHelperData) ConvertToNBMPTask(task *nbmpv2.Task) error {
 
 			for k, v := range out.Labels {
 				if v == "" {
-					mp.Keywords = append(mp.Keywords, fmt.Sprintf("%s", k))
+					mp.Keywords = append(mp.Keywords, k)
 				} else {
 					mp.Keywords = append(mp.Keywords, fmt.Sprintf("%s=%s", k, v))
 				}
