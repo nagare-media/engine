@@ -45,7 +45,8 @@ import (
 
 const (
 	// TODO: make configurable
-	TaskDeleteTimeout = 30 * time.Second
+	TaskCreateTimeout = 1 * time.Minute
+	TaskDeleteTimeout = 1 * time.Minute
 )
 
 var (
@@ -195,7 +196,14 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context) error {
 		l.Error(err, fmt.Sprintf("failed; retrying after %s", t))
 	}
 
-	return backoff.RetryNotify(op, newBackOffWithContext(ctx), no)
+	ctxCreate, cancel := context.WithTimeout(ctx, TaskCreateTimeout)
+	defer cancel()
+
+	err = backoff.RetryNotify(op, newBackOffWithContext(ctxCreate), no)
+	if err != nil {
+		l.Error(err, "failed to create task")
+	}
+	return err
 }
 
 func (c *taskCtrl) observeTaskPhase(ctx context.Context) error {
@@ -484,5 +492,10 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 
 	ctxDelete, cancel := context.WithTimeout(ctx, TaskDeleteTimeout)
 	defer cancel()
-	return backoff.RetryNotify(op, newBackOffWithContext(ctxDelete), no)
+
+	err := backoff.RetryNotify(op, newBackOffWithContext(ctxDelete), no)
+	if err != nil {
+		l.Error(err, "failed to delete task")
+	}
+	return err
 }

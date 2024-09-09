@@ -454,7 +454,9 @@ func (f *function) observeSceneDetectionEvent(ctx context.Context, t string, me 
 		panic(fmt.Sprintf("Event creation results in invalid CloudEvent; fix implementation! error: %s", err))
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	// we start a new context because rootCtx might have been canceled
+	// TODO: make configurable
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := f.reportClient.Send(ctx, e); err != nil {
