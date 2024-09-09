@@ -174,9 +174,9 @@ func (s *taskService) Create(ctx context.Context, t *nbmpv2.Task) error {
 	if err := s.createReportClient(t); err != nil {
 		l.Error(err, "disable event reporting")
 	}
-	s.observeEvent(events.TaskCreated)
 
 	// run onCreate actions
+	s.observeEvent(events.TaskCreated)
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "create"))
 	return s.execEventActions(ctx, s.cfg.OnCreateActions, t)
 }
@@ -227,9 +227,9 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 
 	l := log.FromContext(s.rootCtx)
 	l.Info("update task")
-	s.observeEvent(events.TaskUpdated)
 
 	// run onUpdate actions
+	s.observeEvent(events.TaskUpdated)
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "update"))
 	return s.execEventActions(ctx, s.cfg.OnUpdateActions, t)
 }
@@ -237,7 +237,6 @@ func (s *taskService) Update(ctx context.Context, t *nbmpv2.Task) error {
 func (s *taskService) Delete(ctx context.Context, t *nbmpv2.Task) error {
 	l := log.FromContext(s.rootCtx)
 	l.Info("delete task")
-	s.observeEvent(events.TaskDeleted)
 
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
@@ -254,6 +253,7 @@ func (s *taskService) Delete(ctx context.Context, t *nbmpv2.Task) error {
 	*t = *s.tsk
 
 	// Task is running or has terminated => run onDelete actions
+	s.observeEvent(events.TaskDeleted)
 	ctx = log.IntoContext(ctx, l.WithValues("reason", "delete"))
 	return s.execEventActions(ctx, s.cfg.OnDeleteActions, t)
 }
