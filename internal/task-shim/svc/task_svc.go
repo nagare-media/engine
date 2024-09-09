@@ -125,6 +125,8 @@ func (s *taskService) initTermination() {
 	go func() {
 		l := log.FromContext(s.rootCtx)
 
+		<-time.After(s.cfg.DeleteTimeout.Duration)
+
 		s.mtx.Lock()
 		defer s.mtx.Unlock()
 
@@ -134,7 +136,6 @@ func (s *taskService) initTermination() {
 		}
 
 		// terminate after timeout even if Delete is never called
-		<-time.After(s.cfg.DeleteTimeout.Duration)
 		err := errors.New("did not receive delete request")
 		l.Error(err, fmt.Sprintf("terminate after %s", s.cfg.DeleteTimeout.Duration))
 		// we use err here instead of s.tskErr => the process is guaranteed to terminate with an error code
