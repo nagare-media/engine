@@ -19,7 +19,6 @@ package svc
 import (
 	"context"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -65,13 +64,13 @@ func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error
 	// create Kubernetes resources
 	err = s.k8s.Create(ctx, w)
 	if err != nil {
-		return apiErrorHandler(err)
+		return err
 	}
 
 	for _, t := range tasks {
 		err = s.k8s.Create(ctx, t)
 		if err != nil {
-			return apiErrorHandler(err)
+			return err
 		}
 	}
 
@@ -96,13 +95,13 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 	// update Kubernetes resources
 	err = s.k8s.Update(ctx, w)
 	if err != nil {
-		return apiErrorHandler(err)
+		return err
 	}
 
 	for _, t := range tasks {
 		err = s.k8s.Update(ctx, t)
 		if err != nil {
-			return apiErrorHandler(err)
+			return err
 		}
 	}
 
@@ -125,7 +124,7 @@ func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error
 	// Tasks have a owner reference and will be deleted automatically
 	err := s.k8s.Delete(ctx, w)
 	if err != nil {
-		return apiErrorHandler(err)
+		return err
 	}
 
 	return nil
@@ -139,7 +138,7 @@ func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) err
 	w := &enginev1.Workflow{}
 	err := s.k8s.Get(ctx, client.ObjectKey{Name: wf.General.ID}, w)
 	if err != nil {
-		return apiErrorHandler(err)
+		return err
 	}
 	if w.Labels[IsNBMPLabel] != "true" {
 		return nbmp.ErrNotFound
@@ -152,22 +151,11 @@ func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) err
 		// TODO: set namespace
 	})
 	if err != nil {
-		return apiErrorHandler(err)
+		return err
 	}
 
 	// convert to NBMP workflow description document
 	// TODO: implement
 
 	return nil
-}
-
-func apiErrorHandler(err error) error {
-	switch {
-	case apierrors.IsNotFound(err),
-		apierrors.IsGone(err):
-		return nbmp.ErrNotFound
-	case apierrors.IsAlreadyExists(err):
-		return nbmp.ErrAlreadyExists
-	}
-	return err
 }

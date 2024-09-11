@@ -30,42 +30,41 @@ const DefaultRetryAfterSeconds = "10"
 
 func handleErr(c *fiber.Ctx, obj any, svcErr error, contentType string) error {
 	var s int
-	switch svcErr {
-	case nbmp.ErrRetryLater:
+	switch {
+	case svcErr == nbmp.ErrRetryLater:
 		c.Status(fiber.StatusAccepted) // 202
 		c.Set(fiber.HeaderRetryAfter, DefaultRetryAfterSeconds)
 		// respond without a body
 		return nil
 
-	case nbmp.ErrInvalid:
+	case svcErr == nbmp.ErrInvalid:
 		s = fiber.StatusBadRequest // 400
 
-	case nbmp.ErrNotFound:
+	case svcErr == nbmp.ErrNotFound,
+		apierrors.IsNotFound(svcErr),
+		apierrors.IsGone(svcErr):
 		// respond without a body
 		return fiber.ErrNotFound // 404
 
-	case nbmp.ErrAlreadyExists:
+	case svcErr == nbmp.ErrAlreadyExists,
+		apierrors.IsAlreadyExists(svcErr):
 		s = fiber.StatusConflict // 409
 
-	case nbmp.ErrUnsupported:
+	case svcErr == nbmp.ErrUnsupported:
 		s = fiber.StatusUnprocessableEntity // 422
 
+	case apierrors.IsServiceUnavailable(svcErr),
+		apierrors.IsUnexpectedServerError(svcErr),
+		apierrors.IsUnexpectedObjectError(svcErr):
+		s = fiber.StatusBadGateway // 502
+
+	case apierrors.IsTimeout(svcErr),
+		apierrors.IsServerTimeout(svcErr):
+		s = fiber.StatusGatewayTimeout // 504
+
 	default:
-		// check for Kubernetes API errors
-		switch {
-		default:
-			// respond without a body
-			return fiber.ErrInternalServerError // 500
-
-		case apierrors.IsServiceUnavailable(svcErr),
-			apierrors.IsUnexpectedServerError(svcErr),
-			apierrors.IsUnexpectedObjectError(svcErr):
-			s = fiber.StatusBadGateway // 502
-
-		case apierrors.IsTimeout(svcErr),
-			apierrors.IsServerTimeout(svcErr):
-			s = fiber.StatusGatewayTimeout // 504
-		}
+		// respond without a body
+		return fiber.ErrInternalServerError // 500
 	}
 
 	c.Status(s)
