@@ -19,9 +19,12 @@ package nbmp
 import "errors"
 
 var (
-	ErrNotFound      = errors.New("nbmp: resource not found")
-	ErrAlreadyExists = errors.New("nbmp: resource already exists")
-	ErrUnsupported   = errors.New("nbmp: resource has unsupported descriptions")
-	ErrInvalid       = errors.New("nbmp: resource is invalid")
-	ErrRetryLater    = errors.New("nbmp: resource accept but retry later")
+	ErrNotFound        = errors.New("nbmp: resource not found")
+	ErrAlreadyExists   = errors.New("nbmp: resource already exists")
+	ErrUnsupported     = errors.New("nbmp: resource has unsupported descriptions")
+	ErrInvalid         = errors.New("nbmp: resource is invalid")
+	ErrRetryLater      = errors.New("nbmp: resource accept but retry later") // TODO: should include a retry-after field
+	ErrUnexpected      = errors.New("nbmp: response is unexpected")
+	ErrUnauthenticated = errors.New("nbmp: client is unauthenticated")
+	ErrUnauthorized    = errors.New("nbmp: client is unauthorized")
 )

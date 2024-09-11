@@ -25,7 +25,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -39,6 +38,7 @@ import (
 	enginenats "github.com/nagare-media/engine/internal/pkg/nats"
 	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/nbmp"
+	nbmpclientv2 "github.com/nagare-media/engine/pkg/nbmp/client/v2"
 	"github.com/nagare-media/engine/pkg/starter"
 	"github.com/nagare-media/engine/pkg/updatable"
 	"github.com/nagare-media/models.go/base"
@@ -65,16 +65,16 @@ type taskCtrl struct {
 	// NBMP Task ID returned by the Task API
 	tskInstanceID string
 
-	http http.Client
+	client nbmpclientv2.TaskClient
 }
 
 var _ starter.Starter = &taskCtrl{}
 
 func NewTaskController(cfg *enginev1.WorkflowManagerHelperConfiguration, data updatable.Updatable[*enginev1.WorkflowManagerHelperData]) starter.Starter {
 	return &taskCtrl{
-		cfg:  cfg,
-		data: data,
-		http: http.Client{},
+		cfg:    cfg,
+		data:   data,
+		client: nbmpclientv2.NewTaskClient(cfg.TaskController.TaskAPI),
 	}
 }
 
@@ -156,40 +156,19 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context, data *enginev1.WorkflowM
 		return err
 	}
 
-	buf := strings.Builder{}
-	enc := json.NewEncoder(&buf)
-	if err := enc.Encode(t); err != nil {
-		l.Error(err, "failed to encode NBMP Task as JSON")
-		return err
-	}
-
 	op := func() error {
 		l.Info("create task")
 
 		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.CreateRequestTimeout.Duration)
 		defer cancel()
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.TaskController.TaskAPI, strings.NewReader(buf.String()))
+		t, err = c.client.Create(ctx, t)
 		if err != nil {
+			// TODO: check if t is not nil to give more infos in log
+			l.Error(err, "failed to create NBMP Task")
 			return err
 		}
 
-		resp, err := c.http.Do(req)
-		if err != nil {
-			return err
-		}
-
-		if resp.StatusCode == 204 || resp.StatusCode > 299 {
-			// TODO: parse response body to give more infos in log
-			return fmt.Errorf("unexpected HTTP status code in response: %d", resp.StatusCode)
-		}
-
-		t = &nbmpv2.Task{}
-		dec := json.NewDecoder(resp.Body)
-		err = dec.Decode(t)
-		if err != nil {
-			return err
-		}
 		c.tskInstanceID = t.General.ID
 
 		return nil
@@ -374,34 +353,23 @@ func (c *taskCtrl) probeTask(ctx context.Context) (*nbmpv2.Task, error) {
 	ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.RetrieveRequestTimeout.Duration)
 	defer cancel()
 
-	url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
+	t, err := c.client.Retrieve(ctx, c.tskInstanceID)
 
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return nil, err
-	}
+	switch err {
+	case nil:
+		return t, nil
 
-	switch {
-	case resp.StatusCode == 202:
+	case nbmp.ErrRetryLater:
 		return nil, probeLaterErr
 
-	case 400 <= resp.StatusCode && resp.StatusCode <= 499:
-		// 4xx error => probably a restart of the task => restart workflow-manager-helper
+	case nbmp.ErrNotFound:
+		// 404 error => probably a restart of the task => restart workflow-manager-helper
 		return nil, taskRestartedErr
 
-	case resp.StatusCode == 204 || resp.StatusCode >= 500:
-		// TODO: parse response body to give more infos in log
-		return nil, fmt.Errorf("unexpected HTTP status code in response: %d", resp.StatusCode)
+	default:
+		// TODO: check if t is not nil to give more infos in log
+		return nil, err
 	}
-
-	t := &nbmpv2.Task{}
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(t)
-	return t, err
 }
 
 func (c *taskCtrl) eventEmitterLoop(ctx context.Context, data *enginev1.WorkflowManagerHelperData) error {
@@ -522,33 +490,17 @@ func (c *taskCtrl) updateTask(ctx context.Context, data *enginev1.WorkflowManage
 	}
 	t.General.ID = c.tskInstanceID
 
-	buf := strings.Builder{}
-	enc := json.NewEncoder(&buf)
-	if err := enc.Encode(t); err != nil {
-		l.Error(err, "failed to encode NBMP Task as JSON")
-		return err
-	}
-
 	op := func() error {
 		l.Info("update task")
 
 		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.UpdateRequestTimeout.Duration)
 		defer cancel()
 
-		url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPatch, url, strings.NewReader(buf.String()))
+		t, err = c.client.Update(ctx, t)
 		if err != nil {
+			// TODO: check if t is not nil to give more infos in log
+			l.Error(err, "failed to update NBMP Task")
 			return err
-		}
-
-		resp, err := c.http.Do(req)
-		if err != nil {
-			return err
-		}
-
-		if resp.StatusCode > 299 {
-			// TODO: parse response body to give more infos in log
-			return fmt.Errorf("unexpected HTTP status code in response: %d", resp.StatusCode)
 		}
 
 		if c.tskInstanceID != t.General.ID {
@@ -584,23 +536,11 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.DeleteRequestTimeout.Duration)
 		defer cancel()
 
-		url := fmt.Sprintf("%s/%s", c.cfg.TaskController.TaskAPI, c.tskInstanceID)
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
+		_, err := c.client.Delete(ctx, c.tskInstanceID)
 		if err != nil {
+			l.Error(err, "failed to delete NBMP Task")
 			return err
 		}
-
-		resp, err := c.http.Do(req)
-		if err != nil {
-			return err
-		}
-
-		if resp.StatusCode > 299 {
-			// TODO: parse response body to give more infos in log
-			return fmt.Errorf("unexpected HTTP status code in response: %d", resp.StatusCode)
-		}
-
-		// TODO: should we assume task is deleted if connection cannot be established?
 
 		return nil
 	}
