@@ -25,6 +25,7 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/nagare-media/engine/internal/pkg/mime"
 )
 
 type Client interface {
@@ -64,8 +65,7 @@ func (c *HTTPClient) SendAsyncAck(ctx context.Context, e cloudevents.Event) erro
 func (c *HTTPClient) doSend(ctx context.Context, e cloudevents.Event, async bool) error {
 	buf := &bytes.Buffer{}
 	enc := json.NewEncoder(buf)
-	err := enc.Encode(e)
-	if err != nil {
+	if err := enc.Encode(e); err != nil {
 		return err
 	}
 
@@ -79,6 +79,8 @@ func (c *HTTPClient) doSend(ctx context.Context, e cloudevents.Event, async bool
 		q.Add("async", "true")
 		req.URL.RawQuery = q.Encode()
 	}
+
+	req.Header.Set("Content-Type", mime.ApplicationCloudEventsJSON)
 
 	if c.Client == nil {
 		c.Client = http.DefaultClient
