@@ -49,6 +49,7 @@ func (api *workflowAPI) MountTo(r fiber.Router) {
 		// middlewares
 		Use(ValidateHeadersMiddleware(mime.ApplicationMPEG_NBMP_WDD_JSON)).
 		// API
+		// note: PUT is not specified in the standard, but we implement it to be the same as PATCH.
 		Post("", api.handleRequest(api.svc.Create)).
 		Patch("/:id", api.handleRequest(api.svc.Update)).
 		Put("/:id", api.handleRequest(api.svc.Update)).
@@ -89,7 +90,7 @@ func (api *workflowAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Work
 			return fiber.ErrInternalServerError
 		}
 
-		// TODO: the NBMP standard requires (SHOULD) a link object in the WDD response. The JSON schema definition does not
+		// note: the NBMP standard requires (SHOULD) a link object in the WDD response. The JSON schema definition does not
 		//       specify a link object.
 		var selfURL string
 		if api.cfg.PublicBaseURL == nil {
@@ -104,20 +105,18 @@ func (api *workflowAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Work
 
 		switch c.Method() {
 		case fiber.MethodPost:
-			// TODO: fiber.StatusAccepted may be more appropriate
 			c.Status(fiber.StatusCreated)
 			c.Set("Location", selfURL)
 
 		case fiber.MethodPatch, fiber.MethodPut:
-			// TODO: the NBMP standard specifies 201 as status code. This is probably a mistake as no new resource is created.
-			// TODO: fiber.StatusAccepted may be more appropriate
+			// note: the NBMP standard specifies 201 as status code. This is probably a mistake as no new resource is created.
 			c.Status(fiber.StatusOK)
 
 		case fiber.MethodDelete:
 			c.Status(fiber.StatusOK)
 
 		case fiber.MethodGet, fiber.MethodHead:
-			// TODO: the NBMP standard specifies 201 as status code. This is probably a mistake as no new resource is created.
+			// note: the NBMP standard specifies 201 as status code. This is probably a mistake as no new resource is created.
 			c.Status(fiber.StatusOK)
 		}
 
