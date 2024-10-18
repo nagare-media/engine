@@ -158,8 +158,8 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		httpCtxCancel()
 	}
 
-	httpServer := taskshim.New(ctx, terminateCliFn, cfg)
-	if err = httpServer.Start(httpCtx); err != nil {
+	taskShimCtrl := taskshim.New(ctx, terminateCliFn, cfg)
+	if err = taskShimCtrl.Start(httpCtx); err != nil {
 		setupLog.Error(err, "problem running webserver")
 		return err
 	}

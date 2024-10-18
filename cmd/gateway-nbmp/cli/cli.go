@@ -192,7 +192,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 
 	// create components
 
-	httpServer := gatewaynbmp.New(cfg, k8sClient)
+	gatewayNBMPCtrl := gatewaynbmp.New(cfg, k8sClient)
 
 	// start components
 
@@ -211,11 +211,11 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return k8sCacheErr
 	}
 
-	var httpServerErr error
-	httpServerDone := make(chan struct{})
+	var gatewayNBMPCtrlErr error
+	gatewayNBMPCtrlDone := make(chan struct{})
 	go func() {
-		httpServerErr = httpServer.Start(ctx)
-		close(httpServerDone)
+		gatewayNBMPCtrlErr = gatewayNBMPCtrl.Start(ctx)
+		close(gatewayNBMPCtrlDone)
 	}()
 
 	// termination handling
@@ -223,15 +223,15 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	select {
 	case <-k8sCacheDone:
 		cancel()
-	case <-httpServerDone:
+	case <-gatewayNBMPCtrlDone:
 		cancel()
 	case <-ctx.Done():
 	}
 	<-k8sCacheDone
-	<-httpServerDone
+	<-gatewayNBMPCtrlDone
 
-	if httpServerErr != nil {
-		setupLog.Error(httpServerErr, "problem running webserver")
+	if gatewayNBMPCtrlErr != nil {
+		setupLog.Error(gatewayNBMPCtrlErr, "problem running webserver")
 	}
-	return httpServerErr
+	return gatewayNBMPCtrlErr
 }
