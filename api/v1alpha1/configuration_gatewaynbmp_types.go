@@ -18,29 +18,10 @@ package v1alpha1
 
 import (
 	"errors"
-	"strings"
-	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/ptr"
 )
-
-type GatewayNBMPConfigurationSpec struct {
-	Webserver       WebserverConfiguration                  `json:"webserver"`
-	WorkflowService GatewayNBMPWorkflowServiceConfiguration `json:"workflows"`
-}
-
-type GatewayNBMPWorkflowServiceConfiguration struct {
-	// Limit gateway-nbmp to a specific Kubernetes namespace.
-	// +optional
-	// TODO: make really optional
-	KubernetesNamespace string `json:"kubernetesNamespace,omitempty"`
-
-	// Name of the GPU resource used in the Kubernetes cluster (e.g. "nvidia.com/gpu").
-	// +optional
-	DefaultKubernetesGPUResource corev1.ResourceName `json:"defaultKubernetesGPUResource,omitempty"`
-}
 
 const (
 	// AMD GPU resource name.
@@ -56,78 +37,77 @@ const (
 	NVIDIA_GPUShared corev1.ResourceName = "nvidia.com/gpu.shared"
 )
 
+var (
+	DefaultGatewayNBMPConfig = GatewayNBMPConfig{
+		GatewayNBMPConfigSpec: GatewayNBMPConfigSpec{
+			WorkflowService: GatewayNBMPWorkflowServiceConfig{
+				Kubernetes: GatewayNBMPWorkflowServiceKubernetesConfig{
+					GPUResourceName: NVIDIA_GPU,
+				},
+			},
+			Webserver: DefaultWebserverConfig,
+		},
+	}
+)
+
+type GatewayNBMPConfigSpec struct {
+	WorkflowService GatewayNBMPWorkflowServiceConfig `json:"workflow"`
+	Webserver       WebserverConfig                  `json:"webserver"`
+}
+
+type GatewayNBMPWorkflowServiceConfig struct {
+	// Kubernetes related configuration.
+	Kubernetes GatewayNBMPWorkflowServiceKubernetesConfig `json:"kubernetes"`
+}
+
+type GatewayNBMPWorkflowServiceKubernetesConfig struct {
+	// Namespace to use for nagare media engine Kubernetes resources.
+	Namespace string `json:"namespace"`
+
+	// Name of the GPU resource used in the Kubernetes cluster. Defaults to "nvidia.com/gpu".
+	// +kubebuilder:default="nvidia.com/gpu"
+	// +optional
+	GPUResourceName corev1.ResourceName `json:"gpuResourceName,omitempty"`
+}
+
 // +kubebuilder:object:root=true
 
-// GatewayNBMPConfiguration defines the configuration for nagare media engine gateway-nbmp.
-type GatewayNBMPConfiguration struct {
+// GatewayNBMPConfig defines the configuration for nagare media engine gateway-nbmp.
+type GatewayNBMPConfig struct {
 	metav1.TypeMeta `json:",inline"`
 
-	GatewayNBMPConfigurationSpec `json:",inline"`
+	GatewayNBMPConfigSpec `json:",inline"`
+}
+
+func (c *GatewayNBMPConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultGatewayNBMPConfig)
+}
+
+func (c *GatewayNBMPConfig) DefaultWithValuesFrom(d GatewayNBMPConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultGatewayNBMPConfig)
+}
+
+func (c *GatewayNBMPConfig) doDefaultWithValuesFrom(d GatewayNBMPConfig) {
+	if c.WorkflowService.Kubernetes.GPUResourceName == "" {
+		c.WorkflowService.Kubernetes.GPUResourceName = d.WorkflowService.Kubernetes.GPUResourceName
+	}
+	c.Webserver.DefaultWithValuesFrom(d.Webserver)
+}
+
+func (c *GatewayNBMPConfig) Validate() error {
+	if c.WorkflowService.Kubernetes.Namespace == "" {
+		return errors.New("missing workflow.kubernetes.namespace")
+	}
+	if c.WorkflowService.Kubernetes.GPUResourceName == "" {
+		return errors.New("missing workflow.kubernetes.gpuResourceName")
+	}
+	if err := c.Webserver.Validate("webserver"); err != nil {
+		return err
+	}
+	return nil
 }
 
 func init() {
-	SchemeBuilder.Register(&GatewayNBMPConfiguration{})
-}
-
-func (c *GatewayNBMPConfiguration) Default() {
-	if c.Webserver.BindAddress == nil {
-		c.Webserver.BindAddress = ptr.To(":8080")
-	}
-
-	if c.Webserver.ReadTimeout == nil {
-		c.Webserver.ReadTimeout = &metav1.Duration{Duration: time.Minute}
-	}
-
-	if c.Webserver.WriteTimeout == nil {
-		c.Webserver.WriteTimeout = &metav1.Duration{Duration: time.Minute}
-	}
-
-	if c.Webserver.IdleTimeout == nil {
-		c.Webserver.IdleTimeout = &metav1.Duration{Duration: time.Minute}
-	}
-
-	if c.Webserver.Network == nil {
-		c.Webserver.Network = ptr.To("tcp")
-	}
-
-	if c.WorkflowService.DefaultKubernetesGPUResource == "" {
-		// TODO: what should the default be?
-		c.WorkflowService.DefaultKubernetesGPUResource = NVIDIA_GPU
-	}
-}
-
-func (c *GatewayNBMPConfiguration) Validate() error {
-	if c.Webserver.BindAddress == nil {
-		return errors.New("missing webserver.bindAddress")
-	}
-
-	if c.Webserver.ReadTimeout == nil {
-		return errors.New("missing webserver.readTimeout")
-	}
-
-	if c.Webserver.WriteTimeout == nil {
-		return errors.New("missing webserver.writeTimeout")
-	}
-
-	if c.Webserver.IdleTimeout == nil {
-		return errors.New("missing webserver.idleTimeout")
-	}
-
-	if c.Webserver.Network == nil {
-		return errors.New("missing webserver.network")
-	}
-
-	if c.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.Webserver.PublicBaseURL, "/") {
-		return errors.New("trailing slash in webserver.publicBaseURL")
-	}
-
-	if c.WorkflowService.KubernetesNamespace == "" {
-		return errors.New("missing services.kubernetesNamespace")
-	}
-
-	if c.WorkflowService.DefaultKubernetesGPUResource == "" {
-		return errors.New("missing services.defaultKubernetesGPUResource")
-	}
-
-	return nil
+	SchemeBuilder.Register(&GatewayNBMPConfig{})
 }

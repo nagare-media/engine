@@ -24,15 +24,13 @@ import (
 
 const (
 	// MediaProcessingEntities with this annotation set to "true" will be used as default MPE for running tasks. This
-	// annotation can only be used once per MediaProcessingEntity in a singe namespace or once per
+	// annotation can only be used once per MediaProcessingEntity in a single namespace or once per
 	// ClusterMediaProcessingEntity in the whole Kubernetes cluster. A MediaProcessingEntity with this annotation has
 	// precedence over a ClusterMediaProcessingEntity.
-	BetaIsDefaultMediaProcessingEntityAnnotation = "beta.engine.nagare.media/is-default-media-processing-entity"
-)
+	IsDefaultMediaProcessingEntityAnnotation = "engine.nagare.media/is-default-media-processing-entity"
 
-const (
-	// Description of the location the MediaProcessingEntity is in (e.g. "de-48149").
-	BetaMediaProcessingEntityLocationLabel = "beta.engine.nagare.media/media-processing-entity-location"
+	// Description of the location the MediaProcessingEntity is in (e.g. "DE-muenster").
+	MediaProcessingEntityLocationLabel = "engine.nagare.media/media-processing-entity-location"
 )
 
 const (

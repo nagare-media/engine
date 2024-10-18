@@ -126,7 +126,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	// parse config
-	cfg := &enginev1.GatewayNBMPConfiguration{}
+	cfg := &enginev1.GatewayNBMPConfig{}
 
 	if cfgFile != "" {
 		cfgStr, err := os.ReadFile(cfgFile)
@@ -169,7 +169,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		Scheme: scheme,
 		Mapper: mapper,
 		DefaultNamespaces: map[string]cache.Config{
-			cfg.WorkflowService.KubernetesNamespace: {},
+			cfg.WorkflowService.Kubernetes.Namespace: {},
 		},
 	})
 	if err != nil {
@@ -188,7 +188,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		setupLog.Error(err, "unable to create Kubernetes API client")
 		return err
 	}
-	k8sClient = client.NewNamespacedClient(k8sClient, cfg.WorkflowService.KubernetesNamespace)
+	k8sClient = client.NewNamespacedClient(k8sClient, cfg.WorkflowService.Kubernetes.Namespace)
 
 	// create components
 

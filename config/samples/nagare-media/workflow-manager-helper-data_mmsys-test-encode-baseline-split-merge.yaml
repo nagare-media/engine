@@ -5,7 +5,6 @@ workflow:
   id: 6f078f5d-1889-4bcd-9bb7-3c3c00f6f0c6
   humanReadable:
     name: baseline-split-merge
-  config: ~
 
 task:
   id: 55fba1c5-6d88-446b-8cbf-654f1645265f

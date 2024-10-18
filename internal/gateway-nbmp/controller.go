@@ -28,7 +28,7 @@ import (
 	"github.com/nagare-media/engine/pkg/starter"
 )
 
-func New(cfg *enginev1.GatewayNBMPConfiguration, k8sClient client.Client) starter.Starter {
+func New(cfg *enginev1.GatewayNBMPConfig, k8sClient client.Client) starter.Starter {
 	s := enginehttp.NewServer(&cfg.Webserver)
 
 	// Health API

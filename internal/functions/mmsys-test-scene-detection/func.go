@@ -361,7 +361,7 @@ func (f *function) syncSceneDetectionEvents(ctx context.Context) []float64 {
 func (f *function) execEventAPIServer(ctx context.Context, sceneDetectionEventsCh chan<- cloudevents.Event, synceDone chan struct{}) {
 	l := log.FromContext(ctx)
 
-	srv := enginehttp.NewServer(&enginev1.WebserverConfiguration{
+	srv := enginehttp.NewServer(&enginev1.WebserverConfig{
 		BindAddress:   ptr.To(":8080"),
 		ReadTimeout:   &metav1.Duration{Duration: 1 * time.Minute},
 		WriteTimeout:  &metav1.Duration{Duration: 1 * time.Minute},

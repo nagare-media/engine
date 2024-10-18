@@ -118,7 +118,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	// parse config
-	cfg := &enginev1.TaskShimConfiguration{}
+	cfg := &enginev1.TaskShimConfig{}
 
 	if cfgFile != "" {
 		cfgStr, err := os.ReadFile(cfgFile)

@@ -5,7 +5,6 @@ workflow:
   id: 41f7a443-8fa5-4e08-9def-252826832f2c
   humanReadable:
     name: test-no-recovery-split-merge
-  config: ~
 
 task:
   id: fb747f6c-aa92-42b3-a112-e4674b3c67ce

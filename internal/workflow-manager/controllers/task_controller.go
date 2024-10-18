@@ -58,7 +58,7 @@ type TaskReconciler struct {
 	APIReader         client.Reader
 	readOnlyAPIClient client.Client
 
-	Config                          *enginev1.WorkflowManagerConfiguration
+	Config                          *enginev1.WorkflowManagerConfig
 	Scheme                          *runtime.Scheme
 	JobEventChannel                 <-chan event.GenericEvent
 	MediaProcessingEntityReconciler *MediaProcessingEntityReconciler
@@ -445,7 +445,7 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 
 	// 4. default MediaProcessingEntity
 	mpeObj, err := utils.GetAnnotatedObject(ctx, r.Client, &enginev1.MediaProcessingEntity{},
-		enginev1.BetaIsDefaultMediaProcessingEntityAnnotation, "true", client.InNamespace(task.Namespace))
+		enginev1.IsDefaultMediaProcessingEntityAnnotation, "true", client.InNamespace(task.Namespace))
 	if !apierrors.IsNotFound(err) {
 		if err != nil {
 			return ctrl.Result{}, err
@@ -459,7 +459,7 @@ func (r *TaskReconciler) reconcileMediaProcessingEntity(ctx context.Context, tas
 
 	// 5. default ClusterMediaProcessingEntity
 	cmpeObj, err := utils.GetAnnotatedObject(ctx, r.Client, &enginev1.ClusterMediaProcessingEntity{},
-		enginev1.BetaIsDefaultMediaProcessingEntityAnnotation, "true")
+		enginev1.IsDefaultMediaProcessingEntityAnnotation, "true")
 	if !apierrors.IsNotFound(err) {
 		if err != nil {
 			return ctrl.Result{}, err
@@ -651,7 +651,6 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 			Workflow: enginev1.WorkflowManagerHelperDataWorkflow{
 				ID:            wf.Name,
 				HumanReadable: wf.Spec.HumanReadable,
-				Config:        wf.Spec.Config,
 			},
 			Task: enginev1.WorkflowManagerHelperDataTask{
 				ID:            task.Name,

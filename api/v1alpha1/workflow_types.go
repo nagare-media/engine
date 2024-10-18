@@ -18,8 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	meta "github.com/nagare-media/engine/pkg/apis/meta"
 )
 
 const (
@@ -33,7 +31,8 @@ const (
 )
 
 const (
-	WorkflowkProtectionFinalizer = "engine.nagare.media/workflow-protection"
+	// Protects Workflows from deletion before cleanup.
+	WorkflowProtectionFinalizer = "engine.nagare.media/workflow-protection"
 )
 
 // Specification of a Workflow.
@@ -42,14 +41,6 @@ type WorkflowSpec struct {
 	// +optional
 	HumanReadable *HumanReadableWorkflowDescription `json:"humanReadable,omitempty"`
 
-	// Named references to MediaLocations.
-	// +listMapKey=name
-	// +listType=map
-	// +patchMergeKey=name
-	// +patchStrategy=merge,retainKeys
-	// +optional
-	MediaLocations []NamedMediaLocationReference `json:"mediaLocations,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
-
 	// Inputs of this workflow.
 	// +optional
 	Inputs []Media `json:"inputs"`
@@ -57,10 +48,6 @@ type WorkflowSpec struct {
 	// Outputs of this workflow.
 	// +optional
 	Outputs []Media `json:"outputs"`
-
-	// Workflow configuration values.
-	// +optional
-	Config map[string]string `json:"config,omitempty"`
 }
 
 type HumanReadableWorkflowDescription struct {
@@ -71,16 +58,6 @@ type HumanReadableWorkflowDescription struct {
 	// Human readable description of this Workflow.
 	// +optional
 	Description *string `json:"description,omitempty"`
-}
-
-type NamedMediaLocationReference struct {
-	// Name of the MediaLocation as used in the Workflow.
-	// +kubebuilder:validation:Pattern="[a-zA-Z0-9-]+"
-	Name string `json:"name"`
-
-	// Reference to a MediaLocation of ClusterMediaLocation. Only references to these two kinds are allowed. A Workflow
-	// can only reference MediaLocations from its own Namespace.
-	Ref meta.LocalObjectReference `json:"ref"`
 }
 
 // Status of a Workflow.

@@ -59,7 +59,7 @@ var (
 )
 
 type taskCtrl struct {
-	cfg  *enginev1.WorkflowManagerHelperConfiguration
+	cfg  *enginev1.WorkflowManagerHelperConfig
 	data updatable.Updatable[*enginev1.WorkflowManagerHelperData]
 
 	// NBMP Task ID returned by the Task API
@@ -70,7 +70,7 @@ type taskCtrl struct {
 
 var _ starter.Starter = &taskCtrl{}
 
-func NewTaskController(cfg *enginev1.WorkflowManagerHelperConfiguration, data updatable.Updatable[*enginev1.WorkflowManagerHelperData]) starter.Starter {
+func NewTaskController(cfg *enginev1.WorkflowManagerHelperConfig, data updatable.Updatable[*enginev1.WorkflowManagerHelperData]) starter.Starter {
 	return &taskCtrl{
 		cfg:    cfg,
 		data:   data,

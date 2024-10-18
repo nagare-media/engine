@@ -20,25 +20,30 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	configv1alpha1 "k8s.io/component-base/config/v1alpha1"
-
-	"github.com/nagare-media/models.go/base"
+	"k8s.io/utils/ptr"
 )
 
-// +kubebuilder:object:root=true
+var (
+	DefaultWorkflowManagerConfig = WorkflowManagerConfig{
+		WorkflowManagerConfigSpec: WorkflowManagerConfigSpec{
+			CacheConfig: DefaultKubernetesCacheConfig,
+			LeaderElection: LeaderElectionConfig{
+				LeaderElect:  ptr.To(false),
+				ResourceName: "a3df9e9e.engine.nagare.media",
+			},
+			WorkflowTerminationWaitingDuration:             &metav1.Duration{Duration: 20 * time.Second},
+			RemoteMediaProcessingEntityStabilizingDuration: &metav1.Duration{Duration: 5 * time.Second},
+		},
+	}
+)
 
-// WorkflowManagerConfiguration defines the configuration for nagare media engine controller manager.
-type WorkflowManagerConfiguration struct {
-	metav1.TypeMeta `json:",inline"`
-
+type WorkflowManagerConfigSpec struct {
 	// Kubernetes cache configuration.
-	// +optional
-	CacheConfiguration *KubernetesCacheConfiguration `json:"cacheConfiguration,omitempty"`
+	CacheConfig KubernetesCacheConfig `json:"cache"`
 
 	// LeaderElection is the LeaderElection config to be used when configuring
 	// the manager.Manager leader election
-	// +optional
-	LeaderElection *configv1alpha1.LeaderElectionConfiguration `json:"leaderElection,omitempty"`
+	LeaderElection LeaderElectionConfig `json:"leaderElection,omitempty"`
 
 	// GracefulShutdownTimeout is the duration given to runnable to stop before the manager actually returns on stop.
 	// To disable graceful shutdown, set to time.Duration(0)
@@ -50,7 +55,7 @@ type WorkflowManagerConfiguration struct {
 	// Controller contains global configuration options for controllers
 	// registered within this manager.
 	// +optional
-	Controller *ControllerConfigurationSpec `json:"controller,omitempty"`
+	Controller *ControllerConfigSpec `json:"controller,omitempty"`
 
 	// Metrics contains the controller metrics configuration
 	// +optional
@@ -78,34 +83,39 @@ type WorkflowManagerConfiguration struct {
 	NATS NATSConfig `json:"nats"`
 }
 
-type NATSConfig struct {
-	// TODO: add auth methods
-	URL base.URI `json:"url"`
+// +kubebuilder:object:root=true
+
+// WorkflowManagerConfig defines the configuration for nagare media engine controller manager.
+type WorkflowManagerConfig struct {
+	metav1.TypeMeta `json:",inline"`
+
+	WorkflowManagerConfigSpec `json:",inline"`
 }
 
-func (c *WorkflowManagerConfiguration) Default() {
-	if c.CacheConfiguration == nil {
-		c.CacheConfiguration = &KubernetesCacheConfiguration{}
-	}
-	c.CacheConfiguration.Default()
+func (c *WorkflowManagerConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultWorkflowManagerConfig)
+}
 
-	if c.LeaderElection == nil {
-		c.LeaderElection = &configv1alpha1.LeaderElectionConfiguration{}
-	}
-	DefaultLeaderElection(c.LeaderElection)
+func (c *WorkflowManagerConfig) DefaultWithValuesFrom(d WorkflowManagerConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultWorkflowManagerConfig)
+}
 
+func (c *WorkflowManagerConfig) doDefaultWithValuesFrom(d WorkflowManagerConfig) {
 	if c.WorkflowTerminationWaitingDuration == nil {
-		c.WorkflowTerminationWaitingDuration = &metav1.Duration{Duration: 20 * time.Second}
+		c.WorkflowTerminationWaitingDuration = d.WorkflowTerminationWaitingDuration
 	}
 	if c.RemoteMediaProcessingEntityStabilizingDuration == nil {
-		c.RemoteMediaProcessingEntityStabilizingDuration = &metav1.Duration{Duration: 5 * time.Second}
+		c.RemoteMediaProcessingEntityStabilizingDuration = d.RemoteMediaProcessingEntityStabilizingDuration
 	}
+	c.CacheConfig.DefaultWithValuesFrom(d.CacheConfig)
+	c.LeaderElection.DefaultWithValuesFrom(d.LeaderElection)
 }
 
-func (c *WorkflowManagerConfiguration) Validate() error {
+func (c *WorkflowManagerConfig) Validate() error {
 	return nil
 }
 
 func init() {
-	SchemeBuilder.Register(&WorkflowManagerConfiguration{})
+	SchemeBuilder.Register(&WorkflowManagerConfig{})
 }

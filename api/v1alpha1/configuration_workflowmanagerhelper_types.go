@@ -19,22 +19,42 @@ package v1alpha1
 import (
 	"errors"
 	"net/url"
-	"strings"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 )
 
-type WorkflowManagerHelperConfigurationSpec struct {
+var (
+	DefaultWorkflowManagerHelperConfig = WorkflowManagerHelperConfig{
+		WorkflowManagerHelperConfigSpec: WorkflowManagerHelperConfigSpec{
+			TaskController: WorkflowManagerHelperTaskControllerConfig{
+				CreateRequestTimeout:   &metav1.Duration{Duration: 3 * time.Minute},
+				RetrieveRequestTimeout: &metav1.Duration{Duration: 10 * time.Second},
+				UpdateRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
+				DeleteRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
+				ObservePeriode:         &metav1.Duration{Duration: 2 * time.Second},
+				MaxFailedProbes:        ptr.To(10),
+			},
+			ReportsController: WorkflowManagerHelperReportsControllerConfig{
+				Webserver: WebserverConfig{
+					BindAddress:   ptr.To(":8181"),
+					PublicBaseURL: ptr.To("http://127.0.0.1:8181"),
+				},
+			},
+		},
+	}
+)
+
+type WorkflowManagerHelperConfigSpec struct {
 	// Task controller configuration.
-	TaskController WorkflowManagerHelperTaskControllerConfiguration `json:"task"`
+	TaskController WorkflowManagerHelperTaskControllerConfig `json:"task"`
 
 	// Reports controller configuration.
-	ReportsController WorkflowManagerHelperReportsControllerConfiguration `json:"reports"`
+	ReportsController WorkflowManagerHelperReportsControllerConfig `json:"reports"`
 }
 
-type WorkflowManagerHelperTaskControllerConfiguration struct {
+type WorkflowManagerHelperTaskControllerConfig struct {
 	// TaskAPI HTTP URL.
 	TaskAPI string `json:"taskAPI"`
 
@@ -64,135 +84,86 @@ type WorkflowManagerHelperTaskControllerConfiguration struct {
 	MaxFailedProbes *int `json:"maxFailedProbes,omitempty"`
 }
 
-type WorkflowManagerHelperReportsControllerConfiguration struct {
+type WorkflowManagerHelperReportsControllerConfig struct {
 	// Webserver configuration.
-	Webserver WebserverConfiguration `json:"webserver"`
+	Webserver WebserverConfig `json:"webserver"`
 }
 
 // +kubebuilder:object:root=true
 
-// WorkflowManagerHelperConfiguration defines the configuration for nagare media engine workflow-manager-helper.
-type WorkflowManagerHelperConfiguration struct {
+// WorkflowManagerHelperConfig defines the configuration for nagare media engine workflow-manager-helper.
+type WorkflowManagerHelperConfig struct {
 	metav1.TypeMeta `json:",inline"`
 
-	WorkflowManagerHelperConfigurationSpec `json:",inline"`
+	WorkflowManagerHelperConfigSpec `json:",inline"`
 }
 
-func init() {
-	SchemeBuilder.Register(&WorkflowManagerHelperConfiguration{})
+func (c *WorkflowManagerHelperConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultWorkflowManagerHelperConfig)
 }
 
-func (c *WorkflowManagerHelperConfiguration) Default() {
+func (c *WorkflowManagerHelperConfig) DefaultWithValuesFrom(d WorkflowManagerHelperConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultWorkflowManagerHelperConfig)
+}
+
+func (c *WorkflowManagerHelperConfig) doDefaultWithValuesFrom(d WorkflowManagerHelperConfig) {
 	if c.TaskController.CreateRequestTimeout == nil {
-		c.TaskController.CreateRequestTimeout = &metav1.Duration{Duration: 3 * time.Minute}
+		c.TaskController.CreateRequestTimeout = d.TaskController.CreateRequestTimeout
 	}
-
 	if c.TaskController.RetrieveRequestTimeout == nil {
-		c.TaskController.RetrieveRequestTimeout = &metav1.Duration{Duration: 10 * time.Second}
+		c.TaskController.RetrieveRequestTimeout = d.TaskController.RetrieveRequestTimeout
 	}
-
 	if c.TaskController.UpdateRequestTimeout == nil {
-		c.TaskController.UpdateRequestTimeout = &metav1.Duration{Duration: 10 * time.Minute}
+		c.TaskController.UpdateRequestTimeout = d.TaskController.UpdateRequestTimeout
 	}
-
 	if c.TaskController.DeleteRequestTimeout == nil {
-		c.TaskController.DeleteRequestTimeout = &metav1.Duration{Duration: 10 * time.Minute}
+		c.TaskController.DeleteRequestTimeout = d.TaskController.DeleteRequestTimeout
 	}
-
 	if c.TaskController.ObservePeriode == nil {
-		c.TaskController.ObservePeriode = &metav1.Duration{Duration: 2 * time.Second}
+		c.TaskController.ObservePeriode = d.TaskController.ObservePeriode
 	}
-
 	if c.TaskController.MaxFailedProbes == nil {
-		c.TaskController.MaxFailedProbes = ptr.To(10)
+		c.TaskController.MaxFailedProbes = d.TaskController.MaxFailedProbes
 	}
-
-	if c.ReportsController.Webserver.BindAddress == nil {
-		c.ReportsController.Webserver.BindAddress = ptr.To(":8181")
-	}
-
-	if c.ReportsController.Webserver.ReadTimeout == nil {
-		c.ReportsController.Webserver.ReadTimeout = &metav1.Duration{Duration: time.Minute}
-	}
-
-	if c.ReportsController.Webserver.WriteTimeout == nil {
-		c.ReportsController.Webserver.WriteTimeout = &metav1.Duration{Duration: time.Minute}
-	}
-
-	if c.ReportsController.Webserver.IdleTimeout == nil {
-		c.ReportsController.Webserver.IdleTimeout = &metav1.Duration{Duration: time.Minute}
-	}
-
-	if c.ReportsController.Webserver.Network == nil {
-		c.ReportsController.Webserver.Network = ptr.To("tcp")
-	}
-
-	if c.ReportsController.Webserver.PublicBaseURL == nil {
-		c.ReportsController.Webserver.PublicBaseURL = ptr.To("http://127.0.0.1:8181")
-	}
+	c.ReportsController.Webserver.DefaultWithValuesFrom(d.ReportsController.Webserver)
 }
 
-func (c *WorkflowManagerHelperConfiguration) Validate() error {
+func (c *WorkflowManagerHelperConfig) Validate() error {
 	if c.TaskController.TaskAPI == "" {
 		return errors.New("missing task.taskAPI")
 	}
-
 	TaskAPIURL, err := url.Parse(c.TaskController.TaskAPI)
 	if err != nil {
 		return errors.New("task.taskAPI is not a URL")
 	}
-
 	if TaskAPIURL.Scheme != "http" && TaskAPIURL.Scheme != "https" {
 		return errors.New("task.taskAPI is not an HTTP URL")
 	}
-
 	if c.TaskController.CreateRequestTimeout == nil {
 		return errors.New("missing task.createRequestTimeout")
 	}
-
 	if c.TaskController.RetrieveRequestTimeout == nil {
 		return errors.New("missing task.retrieveRequestTimeout")
 	}
-
 	if c.TaskController.UpdateRequestTimeout == nil {
 		return errors.New("missing task.updateRequestTimeout")
 	}
-
 	if c.TaskController.DeleteRequestTimeout == nil {
 		return errors.New("missing task.deleteRequestTimeout")
 	}
-
 	if c.TaskController.ObservePeriode == nil {
 		return errors.New("missing task.observePeriode")
 	}
-
 	if c.TaskController.MaxFailedProbes == nil {
 		return errors.New("missing task.maxFailedProbes")
 	}
-
-	if c.ReportsController.Webserver.BindAddress == nil {
-		return errors.New("missing reports.webserver.bindAddress")
+	if err := c.ReportsController.Webserver.Validate("reports.webserver."); err != nil {
+		return err
 	}
-
-	if c.ReportsController.Webserver.ReadTimeout == nil {
-		return errors.New("missing reports.webserver.readTimeout")
-	}
-
-	if c.ReportsController.Webserver.WriteTimeout == nil {
-		return errors.New("missing reports.webserver.writeTimeout")
-	}
-
-	if c.ReportsController.Webserver.IdleTimeout == nil {
-		return errors.New("missing reports.webserver.idleTimeout")
-	}
-
-	if c.ReportsController.Webserver.Network == nil {
-		return errors.New("missing reports.webserver.network")
-	}
-
-	if c.ReportsController.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.ReportsController.Webserver.PublicBaseURL, "/") {
-		return errors.New("trailing slash in webserver.publicBaseURL")
-	}
-
 	return nil
+}
+
+func init() {
+	SchemeBuilder.Register(&WorkflowManagerHelperConfig{})
 }

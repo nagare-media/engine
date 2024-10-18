@@ -4,17 +4,14 @@ kind: WorkflowManagerHelperData
 workflow:
   id: d08b10de-ea8e-422f-be57-9d32e3082765
   humanReadable:
-    name: sleep-workflow
-    description: A dummy workflow that creates jobs that sleep for some time.
-  config: ~
+    name: sleep
+    description: A dummy workflow that creates a task that sleeps for some time.
 
 task:
   id: 0bf0de1d-7d8a-45e1-8770-b12e0eefdf49
   humanReadable:
     name: sleep
     description: A task that sleeps.
-  inputs: []
-  outputs: []
   config:
     sleep.engine.nagare.media/duration: 10s
 

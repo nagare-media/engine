@@ -17,19 +17,34 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
+	"github.com/nagare-media/models.go/base"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	configv1alpha1 "k8s.io/component-base/config/v1alpha1"
 	"k8s.io/utils/ptr"
 )
 
-const (
-	DefaultLeaderElectionID = "a3df9e9e.engine.nagare.media"
+type NATSConfig struct {
+	// TODO: add auth methods
+	URL base.URI `json:"url"`
+}
+
+var (
+	DefaultWebserverConfig = WebserverConfig{
+		BindAddress:   ptr.To(":8080"),
+		ReadTimeout:   &metav1.Duration{Duration: time.Minute},
+		WriteTimeout:  &metav1.Duration{Duration: time.Minute},
+		IdleTimeout:   &metav1.Duration{Duration: time.Minute},
+		Network:       ptr.To("tcp"),
+		PublicBaseURL: ptr.To("http://127.0.0.1:8080"),
+	}
 )
 
-type WebserverConfiguration struct {
+type WebserverConfig struct {
 	// +optional
 	BindAddress *string `json:"bindAddress,omitempty"`
 
@@ -50,7 +65,65 @@ type WebserverConfiguration struct {
 	PublicBaseURL *string `json:"publicBaseURL,omitempty"`
 }
 
-type KubernetesCacheConfiguration struct {
+func (c *WebserverConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultWebserverConfig)
+}
+
+func (c *WebserverConfig) DefaultWithValuesFrom(d WebserverConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultWebserverConfig)
+}
+
+func (c *WebserverConfig) doDefaultWithValuesFrom(d WebserverConfig) {
+	if c.BindAddress == nil {
+		c.BindAddress = d.BindAddress
+	}
+	if c.ReadTimeout == nil {
+		c.ReadTimeout = d.ReadTimeout
+	}
+	if c.WriteTimeout == nil {
+		c.WriteTimeout = d.WriteTimeout
+	}
+	if c.IdleTimeout == nil {
+		c.IdleTimeout = d.IdleTimeout
+	}
+	if c.Network == nil {
+		c.Network = d.Network
+	}
+	if c.PublicBaseURL == nil {
+		c.PublicBaseURL = d.PublicBaseURL
+	}
+}
+
+func (c *WebserverConfig) Validate(cfgPrefix string) error {
+	if c.BindAddress == nil {
+		return fmt.Errorf("missing %sbindAddress", cfgPrefix)
+	}
+	if c.ReadTimeout == nil {
+		return fmt.Errorf("missing %sreadTimeout", cfgPrefix)
+	}
+	if c.WriteTimeout == nil {
+		return fmt.Errorf("missing %swriteTimeout", cfgPrefix)
+	}
+	if c.IdleTimeout == nil {
+		return fmt.Errorf("missing %sidleTimeout", cfgPrefix)
+	}
+	if c.Network == nil {
+		return fmt.Errorf("missing %snetwork", cfgPrefix)
+	}
+	if c.PublicBaseURL != nil && strings.HasSuffix(*c.PublicBaseURL, "/") {
+		return fmt.Errorf("trailing slash in %spublicBaseURL", cfgPrefix)
+	}
+	return nil
+}
+
+var (
+	DefaultKubernetesCacheConfig = KubernetesCacheConfig{
+		SyncPeriod: &metav1.Duration{Duration: 10 * time.Hour},
+	}
+)
+
+type KubernetesCacheConfig struct {
 	// SyncPeriod determines the minimum frequency at which watched resources are
 	// reconciled. A lower period will correct entropy more quickly, but reduce
 	// responsiveness to change if there are many watched resources. Change this
@@ -70,15 +143,24 @@ type KubernetesCacheConfiguration struct {
 	Namespace *string `json:"Namespace,omitempty"`
 }
 
-func (c *KubernetesCacheConfiguration) Default() {
+func (c *KubernetesCacheConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultKubernetesCacheConfig)
+}
+
+func (c *KubernetesCacheConfig) DefaultWithValuesFrom(d KubernetesCacheConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultKubernetesCacheConfig)
+}
+
+func (c *KubernetesCacheConfig) doDefaultWithValuesFrom(d KubernetesCacheConfig) {
 	if c.SyncPeriod == nil {
-		c.SyncPeriod = &metav1.Duration{Duration: 10 * time.Hour}
+		c.SyncPeriod = d.SyncPeriod
 	}
 }
 
-// ControllerConfigurationSpec defines the global configuration for
+// ControllerConfigSpec defines the global configuration for
 // controllers registered with the manager.
-type ControllerConfigurationSpec struct {
+type ControllerConfigSpec struct {
 	// GroupKindConcurrency is a map from a Kind to the number of concurrent reconciliation
 	// allowed for that controller.
 	//
@@ -158,23 +240,45 @@ type ControllerWebhook struct {
 	CertDir string `json:"certDir,omitempty"`
 }
 
-func DefaultLeaderElection(l *configv1alpha1.LeaderElectionConfiguration) {
-	if l.LeaderElect == nil {
-		l.LeaderElect = ptr.To(false)
+var (
+	DefaultLeaderElectionConfig = LeaderElectionConfig{
+		LeaderElect:   ptr.To(false),
+		LeaseDuration: metav1.Duration{Duration: 15 * time.Second},
+		RenewDeadline: metav1.Duration{Duration: 10 * time.Second},
+		RetryPeriod:   metav1.Duration{Duration: 2 * time.Second},
+		ResourceLock:  resourcelock.LeasesResourceLock,
+		ResourceName:  "a3df9e9e.engine.nagare.media",
 	}
-	if l.LeaseDuration.Duration == 0 {
-		l.LeaseDuration.Duration = 15 * time.Second
+)
+
+type LeaderElectionConfig configv1alpha1.LeaderElectionConfiguration
+
+func (c *LeaderElectionConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultLeaderElectionConfig)
+}
+
+func (c *LeaderElectionConfig) DefaultWithValuesFrom(d LeaderElectionConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultLeaderElectionConfig)
+}
+
+func (c *LeaderElectionConfig) doDefaultWithValuesFrom(d LeaderElectionConfig) {
+	if c.LeaderElect == nil {
+		c.LeaderElect = d.LeaderElect
 	}
-	if l.RenewDeadline.Duration == 0 {
-		l.RenewDeadline.Duration = 10 * time.Second
+	if c.LeaseDuration.Duration == 0 {
+		c.LeaseDuration = d.LeaseDuration
 	}
-	if l.RetryPeriod.Duration == 0 {
-		l.RetryPeriod.Duration = 2 * time.Second
+	if c.RenewDeadline.Duration == 0 {
+		c.RenewDeadline = d.RenewDeadline
 	}
-	if l.ResourceLock == "" {
-		l.ResourceLock = resourcelock.LeasesResourceLock
+	if c.RetryPeriod.Duration == 0 {
+		c.RetryPeriod = d.RetryPeriod
 	}
-	if l.ResourceName == "" {
-		l.ResourceName = DefaultLeaderElectionID
+	if c.ResourceLock == "" {
+		c.ResourceLock = d.ResourceLock
+	}
+	if c.ResourceName == "" {
+		c.ResourceName = d.ResourceName
 	}
 }

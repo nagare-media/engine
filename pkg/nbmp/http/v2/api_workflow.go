@@ -31,13 +31,13 @@ import (
 )
 
 type workflowAPI struct {
-	cfg *enginev1.WebserverConfiguration
+	cfg *enginev1.WebserverConfig
 	svc nbmpsvcv2.WorkflowService
 }
 
 var _ http.API = &workflowAPI{}
 
-func WorkflowAPI(cfg *enginev1.WebserverConfiguration, svc nbmpsvcv2.WorkflowService) *workflowAPI {
+func WorkflowAPI(cfg *enginev1.WebserverConfig, svc nbmpsvcv2.WorkflowService) *workflowAPI {
 	return &workflowAPI{
 		cfg: cfg,
 		svc: svc,

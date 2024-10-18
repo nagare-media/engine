@@ -31,13 +31,13 @@ import (
 )
 
 type taskAPI struct {
-	cfg *enginev1.WebserverConfiguration
+	cfg *enginev1.WebserverConfig
 	svc nbmpsvcv2.TaskService
 }
 
 var _ http.API = &taskAPI{}
 
-func TaskAPI(cfg *enginev1.WebserverConfiguration, svc nbmpsvcv2.TaskService) *taskAPI {
+func TaskAPI(cfg *enginev1.WebserverConfig, svc nbmpsvcv2.TaskService) *taskAPI {
 	return &taskAPI{
 		cfg: cfg,
 		svc: svc,

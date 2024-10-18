@@ -5,7 +5,6 @@ workflow:
   id: 6d0b3b44-af0f-47f3-a1fe-548794c1cee4
   humanReadable:
     name: test-no-recovery
-  config: ~
 
 task:
   id: bdbfbb12-d14b-444e-8801-076b3ae162c6

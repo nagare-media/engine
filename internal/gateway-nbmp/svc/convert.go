@@ -382,9 +382,9 @@ func (s *workflowService) functionRestrictionToMediaProcessingEntitySelector(fr 
 	}
 
 	if fr.Requirements != nil && fr.Requirements.Hardware != nil && fr.Requirements.Hardware.Placement != nil {
-		sel.MatchLabels[enginev1.BetaMediaProcessingEntityLocationLabel] = string(*fr.Requirements.Hardware.Placement)
+		sel.MatchLabels[enginev1.MediaProcessingEntityLocationLabel] = string(*fr.Requirements.Hardware.Placement)
 	} else {
-		sel.MatchLabels[enginev1.BetaIsDefaultMediaProcessingEntityAnnotation] = "true"
+		sel.MatchLabels[enginev1.IsDefaultMediaProcessingEntityAnnotation] = "true"
 	}
 
 	return sel, nil
@@ -408,7 +408,7 @@ func (s *workflowService) functionRestrictionToJobTemplateSpec(fr *nbmpv2.Functi
 		if fr.Requirements.Hardware.VGPU != nil {
 			n := *fr.Requirements.Hardware.VGPU
 			// TODO: make this configurable per Task.
-			rl[s.cfg.DefaultKubernetesGPUResource] = *resource.NewQuantity(int64(n), resource.DecimalSI)
+			rl[s.cfg.Kubernetes.GPUResourceName] = *resource.NewQuantity(int64(n), resource.DecimalSI)
 		}
 
 		// RAM in megabytes

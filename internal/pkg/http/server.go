@@ -30,11 +30,11 @@ import (
 type server struct {
 	App *fiber.App
 
-	cfg *enginev1.WebserverConfiguration
+	cfg *enginev1.WebserverConfig
 	ctx context.Context
 }
 
-func NewServer(cfg *enginev1.WebserverConfiguration) *server {
+func NewServer(cfg *enginev1.WebserverConfig) *server {
 	s := &server{
 		cfg: cfg,
 		App: fiber.New(fiber.Config{

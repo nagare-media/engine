@@ -103,13 +103,13 @@ type MediaMetadata struct {
 	Streams []MediaStream `json:"streams,omitempty"`
 }
 
-type BitRate int64
-
-type Size int64
-
 type MimeType string
 
 type CodecType string
+
+type BitRate int64
+
+type Size int64
 
 type Checksum struct {
 	Alg string `json:"alg"`

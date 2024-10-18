@@ -22,20 +22,6 @@ import (
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
 )
 
-const (
-	// MediaLocations with this annotation set to "true" will be used as default location between tasks that use the
-	// "step" NBMP execution mode. This annotation can only be used once per MediaLocation in a singe namespace or once
-	// per ClusterMediaLocation in the whole Kubernetes cluster. A MediaLocation with this annotation has precedence over
-	// a ClusterMediaLocation.
-	BetaIsDefaultStepMediaLocationAnnotation = "beta.engine.nagare.media/is-default-step-media-location"
-
-	// MediaLocations with this annotation set to "true" will be used as default location between tasks that use the
-	// "streaming" NBMP execution mode. This annotation can only be used once per MediaLocation in a singe namespace or
-	// once per ClusterMediaLocation in the whole Kubernetes cluster. A MediaLocation with this annotation has precedence
-	// over a ClusterMediaLocation.
-	BetaIsDefaultStreamingMediaLocationAnnotation = "beta.engine.nagare.media/is-default-streaming-media-location"
-)
-
 var (
 	// Media location types that support NBMP "step" execution mode between tasks.
 	NBMPStepExecutionModeMediaLocations = []string{
@@ -55,8 +41,6 @@ var (
 // Specification of a media location.
 type MediaLocationSpec struct {
 	MediaLocationConfig `json:",inline"`
-
-	// TODO(mtneug): do we need multiple endpoints? Internal/external of the cluster / between clusters?
 
 	// Timeout of the connection.
 	// TODO(mtneug): is this a universal option?

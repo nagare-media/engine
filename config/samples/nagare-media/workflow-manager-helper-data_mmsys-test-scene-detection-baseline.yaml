@@ -5,7 +5,6 @@ workflow:
   id: 38280525-1831-4f4d-b38b-de7e5e58e35b
   humanReadable:
     name: baseline
-  config: ~
 
 task:
   id: c774949a-6785-4d60-9add-98af8b161cd8

@@ -34,8 +34,10 @@ const (
 )
 
 const (
+	// Protects Tasks from deletion before cleanup.
 	TaskProtectionFinalizer = "engine.nagare.media/task-protection"
 
+	// Protects Jobs from deletion before cleanup.
 	JobProtectionFinalizer = "engine.nagare.media/job-protection"
 )
 

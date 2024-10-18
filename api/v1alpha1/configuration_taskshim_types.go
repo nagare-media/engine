@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	"errors"
-	"strings"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,15 +27,53 @@ import (
 	"github.com/nagare-media/engine/pkg/strobj"
 )
 
-type TaskShimConfigurationSpec struct {
+var (
+	DefaultTaskShimConfig = TaskShimConfig{
+		TaskShimConfigSpec: TaskShimConfigSpec{
+			TaskService: TaskShimTaskServiceConfig{
+				OnCreateActions: []TaskServiceAction{{
+					Action: metaaction.Name,
+					Config: &strobj.StringOrObject{
+						Type:   strobj.String,
+						StrVal: string(metaaction.ConfigTypeStartTask),
+					},
+				}},
+				OnUpdateActions: []TaskServiceAction{{
+					Action: metaaction.Name,
+					Config: &strobj.StringOrObject{
+						Type:   strobj.String,
+						StrVal: string(metaaction.ConfigTypeRestartTask),
+					},
+				}},
+				OnDeleteActions: []TaskServiceAction{{
+					Action: metaaction.Name,
+					Config: &strobj.StringOrObject{
+						Type:   strobj.String,
+						StrVal: string(metaaction.ConfigTypeStopTask),
+					},
+				}},
+				CreateTimeout: &metav1.Duration{Duration: 1 * time.Minute},
+				DeleteTimeout: &metav1.Duration{Duration: 1 * time.Minute},
+			},
+			Webserver: WebserverConfig{
+				BindAddress:   ptr.To(":8888"),
+				WriteTimeout:  &metav1.Duration{}, // = unlimited
+				IdleTimeout:   &metav1.Duration{}, // = unlimited
+				PublicBaseURL: ptr.To("http://127.0.0.1:8888"),
+			},
+		},
+	}
+)
+
+type TaskShimConfigSpec struct {
 	// TaskService configuration.
-	TaskService TaskShimTaskServiceConfiguration `json:"task"`
+	TaskService TaskShimTaskServiceConfig `json:"task"`
 
 	// Webserver configuration.
-	Webserver WebserverConfiguration `json:"webserver"`
+	Webserver WebserverConfig `json:"webserver"`
 }
 
-type TaskShimTaskServiceConfiguration struct {
+type TaskShimTaskServiceConfig struct {
 	// Actions that define the task execution.
 	Actions []TaskServiceAction `json:"actions"`
 
@@ -77,121 +114,66 @@ type TaskServiceAction struct {
 
 // +kubebuilder:object:root=true
 
-// TaskShimConfiguration defines the configuration for nagare media engine task-shim.
-type TaskShimConfiguration struct {
+// TaskShimConfig defines the configuration for nagare media engine task-shim.
+type TaskShimConfig struct {
 	metav1.TypeMeta `json:",inline"`
 
-	TaskShimConfigurationSpec `json:",inline"`
+	TaskShimConfigSpec `json:",inline"`
 }
 
-func init() {
-	SchemeBuilder.Register(&TaskShimConfiguration{})
+func (c *TaskShimConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultTaskShimConfig)
 }
 
-func (c *TaskShimConfiguration) Default() {
+func (c *TaskShimConfig) DefaultWithValuesFrom(d TaskShimConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultTaskShimConfig)
+}
+
+func (c *TaskShimConfig) doDefaultWithValuesFrom(d TaskShimConfig) {
 	if len(c.TaskService.OnCreateActions) == 0 {
-		c.TaskService.OnCreateActions = append(c.TaskService.OnCreateActions, TaskServiceAction{
-			Action: metaaction.Name,
-			Config: &strobj.StringOrObject{
-				Type:   strobj.String,
-				StrVal: string(metaaction.ConfigTypeStartTask),
-			},
-		})
+		c.TaskService.OnCreateActions = d.TaskService.OnCreateActions
 	}
-
 	if len(c.TaskService.OnUpdateActions) == 0 {
-		c.TaskService.OnUpdateActions = append(c.TaskService.OnUpdateActions, TaskServiceAction{
-			Action: metaaction.Name,
-			Config: &strobj.StringOrObject{
-				Type:   strobj.String,
-				StrVal: string(metaaction.ConfigTypeRestartTask),
-			},
-		})
+		c.TaskService.OnUpdateActions = d.TaskService.OnUpdateActions
 	}
-
 	if len(c.TaskService.OnDeleteActions) == 0 {
-		c.TaskService.OnDeleteActions = append(c.TaskService.OnDeleteActions, TaskServiceAction{
-			Action: metaaction.Name,
-			Config: &strobj.StringOrObject{
-				Type:   strobj.String,
-				StrVal: string(metaaction.ConfigTypeStopTask),
-			},
-		})
+		c.TaskService.OnDeleteActions = d.TaskService.OnDeleteActions
 	}
-
 	if c.TaskService.CreateTimeout == nil {
-		c.TaskService.CreateTimeout = &metav1.Duration{Duration: 1 * time.Minute}
+		c.TaskService.CreateTimeout = d.TaskService.CreateTimeout
 	}
-
 	if c.TaskService.DeleteTimeout == nil {
-		c.TaskService.DeleteTimeout = &metav1.Duration{Duration: 1 * time.Minute}
+		c.TaskService.DeleteTimeout = d.TaskService.DeleteTimeout
 	}
-
-	if c.Webserver.BindAddress == nil {
-		c.Webserver.BindAddress = ptr.To(":8888")
-	}
-
-	if c.Webserver.ReadTimeout == nil {
-		c.Webserver.ReadTimeout = &metav1.Duration{Duration: time.Minute}
-	}
-
-	if c.Webserver.WriteTimeout == nil {
-		c.Webserver.WriteTimeout = &metav1.Duration{} // = unlimited
-	}
-
-	if c.Webserver.IdleTimeout == nil {
-		c.Webserver.IdleTimeout = &metav1.Duration{} // = unlimited
-	}
-
-	if c.Webserver.Network == nil {
-		c.Webserver.Network = ptr.To("tcp")
-	}
-
-	if c.Webserver.PublicBaseURL == nil {
-		c.Webserver.PublicBaseURL = ptr.To("http://127.0.0.1:8888")
-	}
+	c.Webserver.DefaultWithValuesFrom(d.Webserver)
 }
 
-func (c *TaskShimConfiguration) Validate() error {
+func (c *TaskShimConfig) Validate() error {
 	if len(c.TaskService.Actions) == 0 {
 		return errors.New("missing task.actions")
 	}
-
 	if len(c.TaskService.OnCreateActions) == 0 {
 		return errors.New("missing task.onCreateActions")
 	}
-
 	if len(c.TaskService.OnUpdateActions) == 0 {
 		return errors.New("missing task.onUpdateActions")
 	}
-
 	if len(c.TaskService.OnDeleteActions) == 0 {
 		return errors.New("missing task.onDeleteActions")
 	}
-
 	if c.TaskService.CreateTimeout == nil {
 		return errors.New("missing task.createTimeout")
 	}
-
 	if c.TaskService.DeleteTimeout == nil {
 		return errors.New("missing task.deleteTimeout")
 	}
-
-	if c.Webserver.BindAddress == nil {
-		return errors.New("missing webserver.bindAddress")
+	if err := c.Webserver.Validate("webserver"); err != nil {
+		return err
 	}
-
-	if c.Webserver.ReadTimeout == nil {
-		return errors.New("missing webserver.readTimeout")
-	}
-
-	if c.Webserver.Network == nil {
-		return errors.New("missing webserver.network")
-	}
-
-	if c.Webserver.PublicBaseURL != nil && strings.HasSuffix(*c.Webserver.PublicBaseURL, "/") {
-		return errors.New("trailing slash in webserver.publicBaseURL")
-	}
-
 	return nil
+}
+
+func init() {
+	SchemeBuilder.Register(&TaskShimConfig{})
 }

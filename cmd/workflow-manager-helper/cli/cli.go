@@ -141,7 +141,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	defer data.Close()
 
 	// parse config
-	cfg := &enginev1.WorkflowManagerHelperConfiguration{}
+	cfg := &enginev1.WorkflowManagerHelperConfig{}
 
 	if cfgFile != "" {
 		cfgStr, err := os.ReadFile(cfgFile)

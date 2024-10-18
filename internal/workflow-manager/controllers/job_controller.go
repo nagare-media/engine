@@ -44,7 +44,7 @@ type JobReconciler struct {
 	client.Client
 	APIReader client.Reader
 
-	Config                   *enginev1.WorkflowManagerConfiguration
+	Config                   *enginev1.WorkflowManagerConfig
 	Scheme                   *runtime.Scheme
 	EventChannel             chan<- event.GenericEvent
 	MediaProcessingEntityRef *meta.ObjectReference

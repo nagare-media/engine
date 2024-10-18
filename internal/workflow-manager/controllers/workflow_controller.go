@@ -44,7 +44,7 @@ type WorkflowReconciler struct {
 	client.Client
 	APIReader client.Reader
 
-	Config *enginev1.WorkflowManagerConfiguration
+	Config *enginev1.WorkflowManagerConfig
 	Scheme *runtime.Scheme
 }
 
@@ -80,8 +80,8 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_
 	}()
 
 	// add finalizers
-	if !controllerutil.ContainsFinalizer(wf, enginev1.WorkflowkProtectionFinalizer) {
-		controllerutil.AddFinalizer(wf, enginev1.WorkflowkProtectionFinalizer)
+	if !controllerutil.ContainsFinalizer(wf, enginev1.WorkflowProtectionFinalizer) {
+		controllerutil.AddFinalizer(wf, enginev1.WorkflowProtectionFinalizer)
 		return ctrl.Result{}, nil
 	}
 
@@ -140,7 +140,7 @@ func (r *WorkflowReconciler) reconcileDelete(ctx context.Context, wf *enginev1.W
 	}
 
 	// remove finalizer
-	controllerutil.RemoveFinalizer(wf, enginev1.WorkflowkProtectionFinalizer)
+	controllerutil.RemoveFinalizer(wf, enginev1.WorkflowProtectionFinalizer)
 
 	return ctrl.Result{}, nil
 }

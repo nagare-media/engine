@@ -573,7 +573,7 @@ func (f *function) syncMediaEncodedEvents(ctx context.Context) map[string]string
 func (f *function) execEventAPIServer(ctx context.Context, mediaEventsCh chan<- cloudevents.Event, synceDone chan struct{}) {
 	l := log.FromContext(ctx)
 
-	srv := enginehttp.NewServer(&enginev1.WebserverConfiguration{
+	srv := enginehttp.NewServer(&enginev1.WebserverConfig{
 		BindAddress:   ptr.To(":8080"),
 		ReadTimeout:   &metav1.Duration{Duration: 1 * time.Minute},
 		WriteTimeout:  &metav1.Duration{Duration: 1 * time.Minute},

@@ -128,7 +128,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	klog.SetLogger(l) // see https://github.com/kubernetes-sigs/controller-runtime/issues/1420
 
 	// parse config
-	cfg := &enginev1.WorkflowManagerConfiguration{}
+	cfg := &enginev1.WorkflowManagerConfig{}
 
 	if cfgFile != "" {
 		cfgStr, err := os.ReadFile(cfgFile)
@@ -152,8 +152,8 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	}
 
 	nsCacheConfigMap := map[string]cache.Config{}
-	if cfg.CacheConfiguration.Namespace != nil {
-		nsCacheConfigMap[*cfg.CacheConfiguration.Namespace] = cache.Config{}
+	if cfg.CacheConfig.Namespace != nil {
+		nsCacheConfigMap[*cfg.CacheConfig.Namespace] = cache.Config{}
 	}
 
 	// TODO: make more options configurable
@@ -173,7 +173,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		LivenessEndpointName:   "/healthz",
 
 		Cache: cache.Options{
-			SyncPeriod:        &cfg.CacheConfiguration.SyncPeriod.Duration,
+			SyncPeriod:        &cfg.CacheConfig.SyncPeriod.Duration,
 			DefaultNamespaces: nsCacheConfigMap,
 		},
 

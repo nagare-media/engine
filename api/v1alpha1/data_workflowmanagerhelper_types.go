@@ -32,9 +32,6 @@ type WorkflowManagerHelperDataWorkflow struct {
 
 	// +optional
 	HumanReadable *HumanReadableWorkflowDescription `json:"humanReadable,omitempty"`
-
-	// +optional
-	Config map[string]string `json:"config,omitempty"`
 }
 
 type WorkflowManagerHelperDataTask struct {
