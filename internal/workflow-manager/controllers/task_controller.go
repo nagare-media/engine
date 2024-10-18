@@ -683,88 +683,87 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 	}
 	data.Task.Config = taskCfg
 
-	// add MediaLocations
-	// TODO: add default MLs
-	data.MediaLocations = make(map[string]enginev1.MediaLocationSpec, len(wf.Spec.MediaLocations))
-	for _, mlRef := range wf.Spec.MediaLocations {
-		mlObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, &mlRef.Ref)
-		if err != nil {
-			return ctrl.Result{}, err
-		}
-
-		var mlSpec *enginev1.MediaLocationSpec
-		switch ml := mlObj.(type) {
-		case *enginev1.ClusterMediaLocation:
-			mlSpec = &ml.Spec
-		case *enginev1.MediaLocation:
-			mlSpec = &ml.Spec
-		default:
-			return ctrl.Result{}, errors.New("mediaProcessingEntityRef does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
-		}
-
-		// resolve MediaLocation secrets
-		switch {
-		case mlSpec.HTTP != nil:
-			if mlSpec.HTTP.Auth != nil {
-				if mlSpec.HTTP.Auth.Basic != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Basic.SecretRef, task); err != nil {
-						return ctrl.Result{}, err
-					}
-				}
-				if mlSpec.HTTP.Auth.Digest != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Digest.SecretRef, task); err != nil {
-						return ctrl.Result{}, err
-					}
-				}
-				if mlSpec.HTTP.Auth.Token != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Token.SecretRef, task); err != nil {
-						return ctrl.Result{}, err
-					}
-				}
-			}
-		case mlSpec.S3 != nil:
-			if mlSpec.S3.Auth.AWS != nil {
-				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.S3.Auth.AWS.SecretRef, task); err != nil {
-					return ctrl.Result{}, err
-				}
-			}
-		case mlSpec.Opencast != nil:
-			if mlSpec.Opencast.Auth.Basic != nil {
-				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.Opencast.Auth.Basic.SecretRef, task); err != nil {
-					return ctrl.Result{}, err
-				}
-			}
-		case mlSpec.RTMP != nil:
-			if mlSpec.RTMP.Auth != nil {
-				if mlSpec.RTMP.Auth.Basic != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTMP.Auth.Basic.SecretRef, task); err != nil {
-						return ctrl.Result{}, err
-					}
-				}
-				if mlSpec.RTMP.Auth.StreamingKey != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTMP.Auth.StreamingKey.SecretRef, task); err != nil {
-						return ctrl.Result{}, err
-					}
-				}
-			}
-		case mlSpec.RTSP != nil:
-			if mlSpec.RTSP.Auth != nil {
-				if mlSpec.RTSP.Auth.Basic != nil {
-					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTSP.Auth.Basic.SecretRef, task); err != nil {
-						return ctrl.Result{}, err
-					}
-				}
-			}
-		case mlSpec.RIST != nil:
-			if mlSpec.RIST.Encryption != nil {
-				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RIST.Encryption.SecretRef, task); err != nil {
-					return ctrl.Result{}, err
-				}
-			}
-		}
-
-		data.MediaLocations[mlRef.Name] = *mlSpec
-	}
+	// TODO: resolve MediaLocations
+	//	data.MediaLocations = make(map[string]enginev1.MediaLocationSpec, len(wf.Spec.MediaLocations))
+	//	for _, mlRef := range wf.Spec.MediaLocations {
+	//		mlObj, err := utils.ResolveLocalRef(ctx, r.Client, task.Namespace, &mlRef.Ref)
+	//		if err != nil {
+	//			return ctrl.Result{}, err
+	//		}
+	//
+	//		var mlSpec *enginev1.MediaLocationSpec
+	//		switch ml := mlObj.(type) {
+	//		case *enginev1.ClusterMediaLocation:
+	//			mlSpec = &ml.Spec
+	//		case *enginev1.MediaLocation:
+	//			mlSpec = &ml.Spec
+	//		default:
+	//			return ctrl.Result{}, errors.New("mediaProcessingEntityRef does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
+	//		}
+	//
+	//		// resolve MediaLocation secrets
+	//		switch {
+	//		case mlSpec.HTTP != nil:
+	//			if mlSpec.HTTP.Auth != nil {
+	//				if mlSpec.HTTP.Auth.Basic != nil {
+	//					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Basic.SecretRef, task); err != nil {
+	//						return ctrl.Result{}, err
+	//					}
+	//				}
+	//				if mlSpec.HTTP.Auth.Digest != nil {
+	//					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Digest.SecretRef, task); err != nil {
+	//						return ctrl.Result{}, err
+	//					}
+	//				}
+	//				if mlSpec.HTTP.Auth.Token != nil {
+	//					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.HTTP.Auth.Token.SecretRef, task); err != nil {
+	//						return ctrl.Result{}, err
+	//					}
+	//				}
+	//			}
+	//		case mlSpec.S3 != nil:
+	//			if mlSpec.S3.Auth.AWS != nil {
+	//				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.S3.Auth.AWS.SecretRef, task); err != nil {
+	//					return ctrl.Result{}, err
+	//				}
+	//			}
+	//		case mlSpec.Opencast != nil:
+	//			if mlSpec.Opencast.Auth.Basic != nil {
+	//				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.Opencast.Auth.Basic.SecretRef, task); err != nil {
+	//					return ctrl.Result{}, err
+	//				}
+	//			}
+	//		case mlSpec.RTMP != nil:
+	//			if mlSpec.RTMP.Auth != nil {
+	//				if mlSpec.RTMP.Auth.Basic != nil {
+	//					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTMP.Auth.Basic.SecretRef, task); err != nil {
+	//						return ctrl.Result{}, err
+	//					}
+	//				}
+	//				if mlSpec.RTMP.Auth.StreamingKey != nil {
+	//					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTMP.Auth.StreamingKey.SecretRef, task); err != nil {
+	//						return ctrl.Result{}, err
+	//					}
+	//				}
+	//			}
+	//		case mlSpec.RTSP != nil:
+	//			if mlSpec.RTSP.Auth != nil {
+	//				if mlSpec.RTSP.Auth.Basic != nil {
+	//					if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RTSP.Auth.Basic.SecretRef, task); err != nil {
+	//						return ctrl.Result{}, err
+	//					}
+	//				}
+	//			}
+	//		case mlSpec.RIST != nil:
+	//			if mlSpec.RIST.Encryption != nil {
+	//				if err = r.prepareSecretRefForSecretData(ctx, &mlSpec.RIST.Encryption.SecretRef, task); err != nil {
+	//					return ctrl.Result{}, err
+	//				}
+	//			}
+	//		}
+	//
+	//		data.MediaLocations[mlRef.Name] = *mlSpec
+	//	}
 
 	// create Secret
 	buf := &bytes.Buffer{}

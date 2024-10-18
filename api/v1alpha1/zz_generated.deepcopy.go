@@ -2576,13 +2576,6 @@ func (in *WorkflowManagerHelperDataSpec) DeepCopyInto(out *WorkflowManagerHelper
 	*out = *in
 	in.Workflow.DeepCopyInto(&out.Workflow)
 	in.Task.DeepCopyInto(&out.Task)
-	if in.MediaLocations != nil {
-		in, out := &in.MediaLocations, &out.MediaLocations
-		*out = make(map[string]MediaLocationSpec, len(*in))
-		for key, val := range *in {
-			(*out)[key] = *val.DeepCopy()
-		}
-	}
 	out.System = in.System
 }
 

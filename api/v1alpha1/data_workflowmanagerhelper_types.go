@@ -21,10 +21,9 @@ import (
 )
 
 type WorkflowManagerHelperDataSpec struct {
-	Workflow       WorkflowManagerHelperDataWorkflow `json:"workflow"`
-	Task           WorkflowManagerHelperDataTask     `json:"task"`
-	MediaLocations map[string]MediaLocationSpec      `json:"mediaLocations"`
-	System         WorkflowManagerHelperDataSystem   `json:"system"`
+	Workflow WorkflowManagerHelperDataWorkflow `json:"workflow"`
+	Task     WorkflowManagerHelperDataTask     `json:"task"`
+	System   WorkflowManagerHelperDataSystem   `json:"system"`
 }
 
 type WorkflowManagerHelperDataWorkflow struct {
