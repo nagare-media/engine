@@ -24,21 +24,21 @@ import (
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-type taskDefaulterMiddleware struct {
+type taskDefaulterSpecMiddleware struct {
 	next TaskService
 }
 
-// TaskDefaulterMiddleware sets default values for given task.
-func TaskDefaulterMiddleware(next TaskService) TaskService {
-	return &taskDefaulterMiddleware{
+// TaskDefaulterSpecMiddleware sets default values for given task.
+func TaskDefaulterSpecMiddleware(next TaskService) TaskService {
+	return &taskDefaulterSpecMiddleware{
 		next: next,
 	}
 }
 
-var _ TaskServiceMiddleware = TaskDefaulterMiddleware
-var _ TaskService = &taskDefaulterMiddleware{}
+var _ TaskServiceMiddleware = TaskDefaulterSpecMiddleware
+var _ TaskService = &taskDefaulterSpecMiddleware{}
 
-func (m *taskDefaulterMiddleware) Create(ctx context.Context, t *nbmpv2.Task) error {
+func (m *taskDefaulterSpecMiddleware) Create(ctx context.Context, t *nbmpv2.Task) error {
 	if err := m.common(t); err != nil {
 		return err
 	}
@@ -51,27 +51,27 @@ func (m *taskDefaulterMiddleware) Create(ctx context.Context, t *nbmpv2.Task) er
 	return m.next.Create(ctx, t)
 }
 
-func (m *taskDefaulterMiddleware) Update(ctx context.Context, t *nbmpv2.Task) error {
+func (m *taskDefaulterSpecMiddleware) Update(ctx context.Context, t *nbmpv2.Task) error {
 	if err := m.common(t); err != nil {
 		return err
 	}
 	return m.next.Update(ctx, t)
 }
 
-func (m *taskDefaulterMiddleware) Delete(ctx context.Context, t *nbmpv2.Task) error {
+func (m *taskDefaulterSpecMiddleware) Delete(ctx context.Context, t *nbmpv2.Task) error {
 	if err := m.common(t); err != nil {
 		return err
 	}
 	return m.next.Delete(ctx, t)
 }
 
-func (m *taskDefaulterMiddleware) Retrieve(ctx context.Context, t *nbmpv2.Task) error {
+func (m *taskDefaulterSpecMiddleware) Retrieve(ctx context.Context, t *nbmpv2.Task) error {
 	if err := m.common(t); err != nil {
 		return err
 	}
 	return m.next.Retrieve(ctx, t)
 }
 
-func (m *taskDefaulterMiddleware) common(t *nbmpv2.Task) error {
+func (m *taskDefaulterSpecMiddleware) common(t *nbmpv2.Task) error {
 	return DefaultTask(t)
 }

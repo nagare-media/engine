@@ -24,21 +24,21 @@ import (
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-type workflowDefaulterMiddleware struct {
+type workflowDefaulterSpecMiddleware struct {
 	next WorkflowService
 }
 
-// WorkflowDefaulterMiddleware sets default values for given workflow.
-func WorkflowDefaulterMiddleware(next WorkflowService) WorkflowService {
-	return &workflowDefaulterMiddleware{
+// WorkflowDefaulterSpecMiddleware sets default values for given workflow.
+func WorkflowDefaulterSpecMiddleware(next WorkflowService) WorkflowService {
+	return &workflowDefaulterSpecMiddleware{
 		next: next,
 	}
 }
 
-var _ WorkflowServiceMiddleware = WorkflowDefaulterMiddleware
-var _ WorkflowService = &workflowDefaulterMiddleware{}
+var _ WorkflowServiceMiddleware = WorkflowDefaulterSpecMiddleware
+var _ WorkflowService = &workflowDefaulterSpecMiddleware{}
 
-func (m *workflowDefaulterMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
+func (m *workflowDefaulterSpecMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
 	if err := m.common(w); err != nil {
 		return err
 	}
@@ -51,27 +51,27 @@ func (m *workflowDefaulterMiddleware) Create(ctx context.Context, w *nbmpv2.Work
 	return m.next.Create(ctx, w)
 }
 
-func (m *workflowDefaulterMiddleware) Update(ctx context.Context, w *nbmpv2.Workflow) error {
+func (m *workflowDefaulterSpecMiddleware) Update(ctx context.Context, w *nbmpv2.Workflow) error {
 	if err := m.common(w); err != nil {
 		return err
 	}
 	return m.next.Update(ctx, w)
 }
 
-func (m *workflowDefaulterMiddleware) Delete(ctx context.Context, w *nbmpv2.Workflow) error {
+func (m *workflowDefaulterSpecMiddleware) Delete(ctx context.Context, w *nbmpv2.Workflow) error {
 	if err := m.common(w); err != nil {
 		return err
 	}
 	return m.next.Delete(ctx, w)
 }
 
-func (m *workflowDefaulterMiddleware) Retrieve(ctx context.Context, w *nbmpv2.Workflow) error {
+func (m *workflowDefaulterSpecMiddleware) Retrieve(ctx context.Context, w *nbmpv2.Workflow) error {
 	if err := m.common(w); err != nil {
 		return err
 	}
 	return m.next.Retrieve(ctx, w)
 }
 
-func (m *workflowDefaulterMiddleware) common(w *nbmpv2.Workflow) error {
+func (m *workflowDefaulterSpecMiddleware) common(w *nbmpv2.Workflow) error {
 	return DefaultWorkflow(w)
 }
