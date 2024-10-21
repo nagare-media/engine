@@ -39,66 +39,39 @@ var _ WorkflowServiceMiddleware = WorkflowDefaulterMiddleware
 var _ WorkflowService = &workflowDefaulterMiddleware{}
 
 func (m *workflowDefaulterMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
-	if err := m.common(ctx, w); err != nil {
+	if err := m.common(w); err != nil {
 		return err
 	}
-
-	//// General
 
 	if w.General.ID == "" {
 		w.General.ID = uuid.UUIDv4()
 	}
-
 	w.General.State = &nbmpv2.InstantiatedState
 
 	return m.next.Create(ctx, w)
 }
 
 func (m *workflowDefaulterMiddleware) Update(ctx context.Context, w *nbmpv2.Workflow) error {
-	if err := m.common(ctx, w); err != nil {
+	if err := m.common(w); err != nil {
 		return err
 	}
 	return m.next.Update(ctx, w)
 }
 
 func (m *workflowDefaulterMiddleware) Delete(ctx context.Context, w *nbmpv2.Workflow) error {
-	if err := m.common(ctx, w); err != nil {
+	if err := m.common(w); err != nil {
 		return err
 	}
 	return m.next.Delete(ctx, w)
 }
 
 func (m *workflowDefaulterMiddleware) Retrieve(ctx context.Context, w *nbmpv2.Workflow) error {
-	if err := m.common(ctx, w); err != nil {
+	if err := m.common(w); err != nil {
 		return err
 	}
 	return m.next.Retrieve(ctx, w)
 }
 
-func (m *workflowDefaulterMiddleware) common(ctx context.Context, w *nbmpv2.Workflow) error {
-	//// Scheme
-
-	if w.Scheme == nil {
-		w.Scheme = &nbmpv2.Scheme{
-			URI: nbmpv2.SchemaURI,
-		}
-	}
-
-	//// Acknowledge
-
-	// reset Acknowledge for response
-	w.Acknowledge = &nbmpv2.Acknowledge{}
-	if w.Acknowledge.Unsupported == nil {
-		w.Acknowledge.Unsupported = make([]string, 0)
-	}
-	if w.Acknowledge.Failed == nil {
-		w.Acknowledge.Failed = make([]string, 0)
-	}
-	if w.Acknowledge.Partial == nil {
-		w.Acknowledge.Partial = make([]string, 0)
-	}
-
-	// TODO: implement workflow defaulter
-
-	return nil
+func (m *workflowDefaulterMiddleware) common(w *nbmpv2.Workflow) error {
+	return DefaultWorkflow(w)
 }

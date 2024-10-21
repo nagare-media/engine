@@ -39,66 +39,39 @@ var _ TaskServiceMiddleware = TaskDefaulterMiddleware
 var _ TaskService = &taskDefaulterMiddleware{}
 
 func (m *taskDefaulterMiddleware) Create(ctx context.Context, t *nbmpv2.Task) error {
-	if err := m.common(ctx, t); err != nil {
+	if err := m.common(t); err != nil {
 		return err
 	}
-
-	//// General
 
 	if t.General.ID == "" {
 		t.General.ID = uuid.UUIDv4()
 	}
-
 	t.General.State = &nbmpv2.InstantiatedState
 
 	return m.next.Create(ctx, t)
 }
 
 func (m *taskDefaulterMiddleware) Update(ctx context.Context, t *nbmpv2.Task) error {
-	if err := m.common(ctx, t); err != nil {
+	if err := m.common(t); err != nil {
 		return err
 	}
 	return m.next.Update(ctx, t)
 }
 
 func (m *taskDefaulterMiddleware) Delete(ctx context.Context, t *nbmpv2.Task) error {
-	if err := m.common(ctx, t); err != nil {
+	if err := m.common(t); err != nil {
 		return err
 	}
 	return m.next.Delete(ctx, t)
 }
 
 func (m *taskDefaulterMiddleware) Retrieve(ctx context.Context, t *nbmpv2.Task) error {
-	if err := m.common(ctx, t); err != nil {
+	if err := m.common(t); err != nil {
 		return err
 	}
 	return m.next.Retrieve(ctx, t)
 }
 
-func (m *taskDefaulterMiddleware) common(ctx context.Context, t *nbmpv2.Task) error {
-	//// Scheme
-
-	if t.Scheme == nil {
-		t.Scheme = &nbmpv2.Scheme{
-			URI: nbmpv2.SchemaURI,
-		}
-	}
-
-	//// Acknowledge
-
-	// reset Acknowledge for response
-	t.Acknowledge = &nbmpv2.Acknowledge{}
-	if t.Acknowledge.Unsupported == nil {
-		t.Acknowledge.Unsupported = make([]string, 0)
-	}
-	if t.Acknowledge.Failed == nil {
-		t.Acknowledge.Failed = make([]string, 0)
-	}
-	if t.Acknowledge.Partial == nil {
-		t.Acknowledge.Partial = make([]string, 0)
-	}
-
-	// TODO: implement task defaulter
-
-	return nil
+func (m *taskDefaulterMiddleware) common(t *nbmpv2.Task) error {
+	return DefaultTask(t)
 }
