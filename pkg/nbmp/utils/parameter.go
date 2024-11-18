@@ -20,6 +20,21 @@ import (
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
+func ExtractStringParameterValue(p nbmpv2.Parameter) (string, bool) {
+	if len(p.Values) != 1 {
+		return "", false
+	}
+
+	if pVal, ok := p.Values[0].(*nbmpv2.StringParameterValue); ok {
+		if len(pVal.Restrictions) != 1 {
+			return "", false
+		}
+		return pVal.Restrictions[0], true
+	}
+
+	return "", false
+}
+
 // GetStringParameterValue returns the value of given key and a bool indicating if the value could be retrieved
 // successfully. This assumes there is exactly one string value with exactly one restriction.
 func GetStringParameterValue(parameters []nbmpv2.Parameter, key string) (string, bool) {
@@ -28,16 +43,7 @@ func GetStringParameterValue(parameters []nbmpv2.Parameter, key string) (string,
 			continue
 		}
 
-		if len(p.Values) != 1 {
-			return "", false
-		}
-
-		if pVal, ok := p.Values[0].(*nbmpv2.StringParameterValue); ok {
-			if len(pVal.Restrictions) != 1 {
-				return "", false
-			}
-			return pVal.Restrictions[0], true
-		}
+		return ExtractStringParameterValue(p)
 	}
 
 	return "", false
