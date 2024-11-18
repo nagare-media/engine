@@ -35,21 +35,21 @@ var (
 					Action: metaaction.Name,
 					Config: &strobj.StringOrObject{
 						Type:   strobj.String,
-						StrVal: string(metaaction.ConfigTypeStartTask),
+						StrVal: string(metaaction.StartTaskConfigType),
 					},
 				}},
 				OnUpdateActions: []TaskServiceAction{{
 					Action: metaaction.Name,
 					Config: &strobj.StringOrObject{
 						Type:   strobj.String,
-						StrVal: string(metaaction.ConfigTypeRestartTask),
+						StrVal: string(metaaction.RestartTaskConfigType),
 					},
 				}},
 				OnDeleteActions: []TaskServiceAction{{
 					Action: metaaction.Name,
 					Config: &strobj.StringOrObject{
 						Type:   strobj.String,
-						StrVal: string(metaaction.ConfigTypeStopTask),
+						StrVal: string(metaaction.StopTaskConfigType),
 					},
 				}},
 				CreateTimeout: &metav1.Duration{Duration: 1 * time.Minute},

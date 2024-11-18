@@ -27,6 +27,7 @@ import (
 	"os"
 	"time"
 
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	backoff "github.com/cenkalti/backoff/v4"
@@ -316,7 +317,7 @@ func (c *taskCtrl) observerLoop(ctx context.Context) error {
 			if tsk.General.State == nil {
 				// this is unexpected and should be fixed by the Task API implementation
 				l.Info("empty .general.state is assumed to be 'running'; fix Task API implementation")
-				tsk.General.State = &nbmpv2.RunningState
+				tsk.General.State = ptr.To(nbmpv2.RunningState)
 			}
 
 			switch *tsk.General.State {

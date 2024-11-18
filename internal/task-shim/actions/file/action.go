@@ -32,7 +32,7 @@ const (
 
 var (
 	// TODO: make this configurable
-	DefaultMode os.FileMode = 0640
+	DefaultMode = os.FileMode(0640)
 )
 
 // action file manipulates a file on the filesystem.

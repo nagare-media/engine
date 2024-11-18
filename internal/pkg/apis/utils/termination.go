@@ -30,8 +30,8 @@ func WorkflowHasTerminated(wf *enginev1.Workflow) bool {
 func WorkflowIsActive(wf *enginev1.Workflow) bool {
 	return wf != nil &&
 		// we consider any other status as active, i.e. also "" before reconciliation
-		wf.Status.Phase != enginev1.WorkflowPhaseSucceeded &&
-		wf.Status.Phase != enginev1.WorkflowPhaseFailed
+		wf.Status.Phase != enginev1.SucceededWorkflowPhase &&
+		wf.Status.Phase != enginev1.FailedWorkflowPhase
 }
 
 func TaskHasTerminated(task *enginev1.Task) bool {
@@ -41,8 +41,8 @@ func TaskHasTerminated(task *enginev1.Task) bool {
 func TaskIsActive(task *enginev1.Task) bool {
 	return task != nil &&
 		// we consider any other status as active, i.e. also "" before reconciliation
-		task.Status.Phase != enginev1.TaskPhaseSucceeded &&
-		task.Status.Phase != enginev1.TaskPhaseFailed
+		task.Status.Phase != enginev1.SucceededTaskPhase &&
+		task.Status.Phase != enginev1.FailedTaskPhase
 }
 
 func JobHasTerminated(job *batchv1.Job) bool {

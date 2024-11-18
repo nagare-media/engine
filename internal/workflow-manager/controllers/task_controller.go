@@ -147,22 +147,22 @@ func (r *TaskReconciler) reconcileCondition(ctx context.Context, err error, task
 	default:
 		task.Status.Conditions = []enginev1.Condition{}
 
-	case enginev1.TaskPhaseInitializing:
+	case enginev1.InitializingTaskPhase:
 		task.Status.Conditions = utils.MarkConditionFalse(task.Status.Conditions, enginev1.TaskInitializedConditionType)
 
-	case enginev1.TaskPhaseJobPending:
+	case enginev1.JobPendingTaskPhase:
 		task.Status.Conditions = utils.MarkCondition(task.Status.Conditions, enginev1.TaskInitializedConditionType, phaseConditionStatus)
 
-	case enginev1.TaskPhaseRunning:
+	case enginev1.RunningTaskPhase:
 		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskInitializedConditionType)
 		task.Status.Conditions = utils.MarkCondition(task.Status.Conditions, enginev1.TaskReadyConditionType, phaseConditionStatus)
 
-	case enginev1.TaskPhaseSucceeded:
+	case enginev1.SucceededTaskPhase:
 		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskInitializedConditionType)
 		task.Status.Conditions = utils.MarkConditionFalse(task.Status.Conditions, enginev1.TaskReadyConditionType)
 		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskCompleteConditionType)
 
-	case enginev1.TaskPhaseFailed:
+	case enginev1.FailedTaskPhase:
 		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskInitializedConditionType)
 		task.Status.Conditions = utils.MarkConditionFalse(task.Status.Conditions, enginev1.TaskReadyConditionType)
 		task.Status.Conditions = utils.MarkConditionTrue(task.Status.Conditions, enginev1.TaskFailedConditionType)
@@ -200,30 +200,30 @@ func (r *TaskReconciler) reconcile(ctx context.Context, task *enginev1.Task) (ct
 	switch task.Status.Phase {
 	default:
 		// empty or unknown phase -> move to initializing
-		task.Status.Phase = enginev1.TaskPhaseInitializing
+		task.Status.Phase = enginev1.InitializingTaskPhase
 
-	case enginev1.TaskPhaseInitializing:
+	case enginev1.InitializingTaskPhase:
 		if res, err := r.reconcileMediaProcessingEntity(ctx, task); err != nil {
 			return res, err
 		}
 		if res, err := r.reconcileFunction(ctx, task); err != nil {
 			return res, err
 		}
-		task.Status.Phase = enginev1.TaskPhaseJobPending
+		task.Status.Phase = enginev1.JobPendingTaskPhase
 
-	case enginev1.TaskPhaseJobPending:
+	case enginev1.JobPendingTaskPhase:
 		if res, err := r.reconcilePendingJob(ctx, task); err != nil {
 			return res, err
 		}
 		task.Status.StartTime = &metav1.Time{Time: time.Now()}
-		task.Status.Phase = enginev1.TaskPhaseRunning
+		task.Status.Phase = enginev1.RunningTaskPhase
 
-	case enginev1.TaskPhaseRunning:
+	case enginev1.RunningTaskPhase:
 		if res, err := r.reconcileRunningJob(ctx, task); err != nil {
 			return res, err
 		}
 
-	case enginev1.TaskPhaseSucceeded, enginev1.TaskPhaseFailed:
+	case enginev1.SucceededTaskPhase, enginev1.FailedTaskPhase:
 		if res, err := r.reconcileTerminatedTask(ctx, task, false); err != nil {
 			return res, err
 		}
@@ -337,7 +337,7 @@ func (r *TaskReconciler) reconcileWorkflow(ctx context.Context, task *enginev1.T
 	if utils.WorkflowHasTerminated(wf) && utils.TaskIsActive(task) {
 		// fail this Task since Workflow has already terminated
 		// TODO: set reason
-		task.Status.Phase = enginev1.TaskPhaseFailed
+		task.Status.Phase = enginev1.FailedTaskPhase
 	}
 
 	return ctrl.Result{}, nil
@@ -584,7 +584,7 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 
 	if task.Status.MediaProcessingEntityRef == nil || task.Status.FunctionRef == nil {
 		// wrong phase: go back
-		task.Status.Phase = enginev1.TaskPhaseInitializing
+		task.Status.Phase = enginev1.InitializingTaskPhase
 		return ctrl.Result{}, nil
 	}
 
@@ -592,7 +592,7 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 
 	if task.Status.JobRef != nil {
 		// wrong phase: go forward
-		task.Status.Phase = enginev1.TaskPhaseRunning
+		task.Status.Phase = enginev1.RunningTaskPhase
 		return ctrl.Result{}, nil
 	}
 
@@ -891,7 +891,7 @@ func (r *TaskReconciler) reconcileRunningJob(ctx context.Context, task *enginev1
 
 	if task.Status.JobRef == nil {
 		// wrong phase: go back
-		task.Status.Phase = enginev1.TaskPhaseJobPending
+		task.Status.Phase = enginev1.JobPendingTaskPhase
 		return ctrl.Result{}, nil
 	}
 
@@ -901,7 +901,7 @@ func (r *TaskReconciler) reconcileRunningJob(ctx context.Context, task *enginev1
 		switch {
 		case apierrors.IsNotFound(err):
 			// job no longer exists: go back
-			task.Status.Phase = enginev1.TaskPhaseJobPending
+			task.Status.Phase = enginev1.JobPendingTaskPhase
 			task.Status.JobRef = nil
 			return ctrl.Result{}, nil
 		case apierrors.IsConflict(err):
@@ -921,9 +921,9 @@ func (r *TaskReconciler) reconcileRunningJob(ctx context.Context, task *enginev1
 
 	// job has terminated
 	if utils.JobWasSuccessful(job) {
-		task.Status.Phase = enginev1.TaskPhaseSucceeded
+		task.Status.Phase = enginev1.SucceededTaskPhase
 	} else {
-		task.Status.Phase = enginev1.TaskPhaseFailed
+		task.Status.Phase = enginev1.FailedTaskPhase
 	}
 
 	if task.Status.EndTime == nil {

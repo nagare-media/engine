@@ -278,10 +278,10 @@ func DefaultGeneral(g *nbmpv2.General) error {
 
 func DefaultTaskGroupItem(tgi *nbmpv2.TaskGroupItem) error {
 	if tgi.GroupType == nil {
-		tgi.GroupType = &nbmpv2.DistanceGroupType
+		tgi.GroupType = ptr.To(nbmpv2.DistanceGroupType)
 	}
 	if tgi.GroupMode == nil {
-		tgi.GroupMode = &nbmpv2.SynchronousGroupMode
+		tgi.GroupMode = ptr.To(nbmpv2.SynchronousGroupMode)
 	}
 	if tgi.NetZero == nil {
 		tgi.NetZero = ptr.To(false)
@@ -319,14 +319,14 @@ func DefaultOutput(o *nbmpv2.Output) error {
 
 func DefaultMediaParameter(mp *nbmpv2.MediaParameter) error {
 	if mp.Mode == nil {
-		mp.Mode = &nbmpv2.PushMediaAccessMode
+		mp.Mode = ptr.To(nbmpv2.PushMediaAccessMode)
 	}
 	return nil
 }
 
 func DefaultMetadataParameter(mp *nbmpv2.MetadataParameter) error {
 	if mp.Mode == nil {
-		mp.Mode = &nbmpv2.PushMediaAccessMode
+		mp.Mode = ptr.To(nbmpv2.PushMediaAccessMode)
 	}
 	return nil
 }
@@ -491,7 +491,7 @@ func DefaultWorkflowTaskRequirement(wtr *nbmpv2.WorkflowTaskRequirement) error {
 		wtr.FunctionEnhancable = ptr.To(false)
 	}
 	if wtr.ExecutionMode == nil {
-		wtr.ExecutionMode = &nbmpv2.StreamingExecutionMode
+		wtr.ExecutionMode = ptr.To(nbmpv2.StreamingExecutionMode)
 	}
 	if wtr.SplitEfficiency != nil {
 		if err := DefaultTaskSplitEfficiency(wtr.SplitEfficiency); err != nil {
@@ -503,7 +503,7 @@ func DefaultWorkflowTaskRequirement(wtr *nbmpv2.WorkflowTaskRequirement) error {
 
 func DefaultTaskSplitEfficiency(tse *nbmpv2.TaskSplitEfficiency) error {
 	if tse.SplitNorm == nil {
-		tse.SplitNorm = &nbmpv2.PnormTaskSplitEfficiencyNorm
+		tse.SplitNorm = ptr.To(nbmpv2.PnormTaskSplitEfficiencyNorm)
 	}
 	if tse.SplitEquation == nil {
 		tse.SplitEquation = ptr.To("2")
@@ -559,14 +559,14 @@ func DefaultAcknowledge(a *nbmpv2.Acknowledge) error {
 
 func DefaultRepository(r *nbmpv2.Repository) error {
 	if r.Mode == nil {
-		r.Mode = &nbmpv2.AvailableRepositoryMode
+		r.Mode = ptr.To(nbmpv2.AvailableRepositoryMode)
 	}
 	return nil
 }
 
 func DefaultSecurity(s *nbmpv2.Security) error {
 	if s.Scope == nil {
-		s.Scope = &nbmpv2.DataSecurityScope
+		s.Scope = ptr.To(nbmpv2.DataSecurityScope)
 	}
 	if s.AuthTokenRotation == nil {
 		s.AuthTokenRotation = ptr.To(false)
@@ -576,7 +576,7 @@ func DefaultSecurity(s *nbmpv2.Security) error {
 
 func DefaultStep(s *nbmpv2.Step) error {
 	if s.StepMode == nil {
-		s.StepMode = &nbmpv2.StreamStepMode
+		s.StepMode = ptr.To(nbmpv2.StreamStepMode)
 	}
 	if s.VariableDuration == nil {
 		s.VariableDuration = ptr.To(false)
@@ -622,7 +622,7 @@ func DefaultScale(s *nbmpv2.Scale) error {
 
 func DefaultSchedule(s *nbmpv2.Schedule) error {
 	if s.ScheduleType == nil {
-		s.ScheduleType = &nbmpv2.DurationScheduleType
+		s.ScheduleType = ptr.To(nbmpv2.DurationScheduleType)
 	}
 	for i := range s.ScheduleTable {
 		if err := DefaultScheduleTableItem(&s.ScheduleTable[i]); err != nil {

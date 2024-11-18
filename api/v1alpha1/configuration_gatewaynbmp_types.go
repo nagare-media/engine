@@ -25,16 +25,16 @@ import (
 
 const (
 	// AMD GPU resource name.
-	AMD_GPU corev1.ResourceName = "amd.com/gpu"
+	AMD_GPU = corev1.ResourceName("amd.com/gpu")
 
 	// Intel GPU prefix resource name.
-	IntelGPUPrefix string = "gpu.intel.com/"
+	IntelGPUPrefix = "gpu.intel.com/"
 
 	// NVIDIA GPU resource name.
-	NVIDIA_GPU corev1.ResourceName = "nvidia.com/gpu"
+	NVIDIA_GPU = corev1.ResourceName("nvidia.com/gpu")
 
 	// Shared NVIDIA GPU resource name.
-	NVIDIA_GPUShared corev1.ResourceName = "nvidia.com/gpu.shared"
+	NVIDIA_GPUShared = corev1.ResourceName("nvidia.com/gpu.shared")
 )
 
 var (

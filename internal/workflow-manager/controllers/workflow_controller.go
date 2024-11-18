@@ -111,17 +111,17 @@ func (r *WorkflowReconciler) reconcileCondition(ctx context.Context, err error, 
 	default:
 		wf.Status.Conditions = []enginev1.Condition{}
 
-	case enginev1.WorkflowPhaseInitializing:
+	case enginev1.InitializingWorkflowPhase:
 		wf.Status.Conditions = utils.MarkConditionFalse(wf.Status.Conditions, enginev1.WorkflowReadyConditionType)
 
-	case enginev1.WorkflowPhaseRunning, enginev1.WorkflowPhaseAwaitingCompletion:
+	case enginev1.RunningWorkflowPhase, enginev1.AwaitingCompletionWorkflowPhase:
 		wf.Status.Conditions = utils.MarkCondition(wf.Status.Conditions, enginev1.WorkflowReadyConditionType, phaseConditionStatus)
 
-	case enginev1.WorkflowPhaseSucceeded:
+	case enginev1.SucceededWorkflowPhase:
 		wf.Status.Conditions = utils.MarkConditionFalse(wf.Status.Conditions, enginev1.WorkflowReadyConditionType)
 		wf.Status.Conditions = utils.MarkConditionTrue(wf.Status.Conditions, enginev1.WorkflowCompleteConditionType)
 
-	case enginev1.WorkflowPhaseFailed:
+	case enginev1.FailedWorkflowPhase:
 		wf.Status.Conditions = utils.MarkConditionFalse(wf.Status.Conditions, enginev1.WorkflowReadyConditionType)
 		wf.Status.Conditions = utils.MarkConditionTrue(wf.Status.Conditions, enginev1.WorkflowFailedConditionType)
 	}
@@ -163,24 +163,24 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 	switch wf.Status.Phase {
 	default:
 		// empty or unknown phase -> move to initializing
-		wf.Status.Phase = enginev1.WorkflowPhaseInitializing
+		wf.Status.Phase = enginev1.InitializingWorkflowPhase
 		wf.Status.Total = nil
 		wf.Status.Active = nil
 		wf.Status.Succeeded = nil
 		wf.Status.Failed = nil
 
-	case enginev1.WorkflowPhaseInitializing:
+	case enginev1.InitializingWorkflowPhase:
 		if res, err := r.reconcileTasks(ctx, wf); err != nil {
 			return res, err
 		}
 
 		// as soon as we see Tasks belonging to this Workflow transition to running phase
 		if wf.Status.Total != nil && *wf.Status.Total > 0 {
-			wf.Status.Phase = enginev1.WorkflowPhaseRunning
+			wf.Status.Phase = enginev1.RunningWorkflowPhase
 			wf.Status.StartTime = &metav1.Time{Time: time.Now()}
 		}
 
-	case enginev1.WorkflowPhaseRunning:
+	case enginev1.RunningWorkflowPhase:
 		if res, err := r.reconcileTasks(ctx, wf); err != nil {
 			return res, err
 		}
@@ -196,25 +196,25 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 		//   Workflow w is marked as successful
 		//   Task t2 is created and fails because w has already terminated
 		if wf.Status.Active != nil && *wf.Status.Active == 0 {
-			wf.Status.Phase = enginev1.WorkflowPhaseAwaitingCompletion
+			wf.Status.Phase = enginev1.AwaitingCompletionWorkflowPhase
 			wf.Status.EndTime = &metav1.Time{Time: time.Now()}
 		}
 
-	case enginev1.WorkflowPhaseAwaitingCompletion:
+	case enginev1.AwaitingCompletionWorkflowPhase:
 		if res, err := r.reconcileTasks(ctx, wf); err != nil {
 			return res, err
 		}
 
 		// check if indeed new Tasks have been created and are active
 		if wf.Status.Active != nil && *wf.Status.Active > 0 {
-			wf.Status.Phase = enginev1.WorkflowPhaseRunning
+			wf.Status.Phase = enginev1.RunningWorkflowPhase
 			return ctrl.Result{}, nil
 		}
 
 		// check if we waited enough
 		if wf.Status.EndTime == nil {
 			// this state should not happen: move back to running to set end time
-			wf.Status.Phase = enginev1.WorkflowPhaseRunning
+			wf.Status.Phase = enginev1.RunningWorkflowPhase
 			return ctrl.Result{}, nil
 		}
 
@@ -224,9 +224,9 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 			return ctrl.Result{RequeueAfter: remainingDuration}, nil
 		}
 
-		wf.Status.Phase = enginev1.WorkflowPhaseSucceeded
+		wf.Status.Phase = enginev1.SucceededWorkflowPhase
 
-	case enginev1.WorkflowPhaseSucceeded, enginev1.WorkflowPhaseFailed:
+	case enginev1.SucceededWorkflowPhase, enginev1.FailedWorkflowPhase:
 		// Workflow has terminated: nothing to do
 		// TODO: stop trace
 		// TODO: delete NATS stream
@@ -254,9 +254,9 @@ func (r *WorkflowReconciler) reconcileTasks(ctx context.Context, wf *enginev1.Wo
 		switch task.Status.Phase {
 		default:
 			active++
-		case enginev1.TaskPhaseSucceeded:
+		case enginev1.SucceededTaskPhase:
 			succeeded++
-		case enginev1.TaskPhaseFailed:
+		case enginev1.FailedTaskPhase:
 			failed++
 			r.reconcileFailedTask(ctx, wf, &task)
 		}
@@ -278,15 +278,15 @@ func (r *WorkflowReconciler) reconcileFailedTask(ctx context.Context, wf *engine
 
 	// TODO: this should probably be handled by the task controller?
 
-	policy := enginev1.JobFailurePolicyActionFailWorkflow
+	policy := enginev1.FailWorkflowJobFailurePolicyAction
 	if task.Spec.JobFailurePolicy != nil && task.Spec.JobFailurePolicy.DefaultAction != nil {
 		policy = *task.Spec.JobFailurePolicy.DefaultAction
 	}
 
 	switch policy {
-	case enginev1.JobFailurePolicyActionIgnore:
-	case enginev1.JobFailurePolicyActionFailWorkflow:
-		wf.Status.Phase = enginev1.WorkflowPhaseFailed
+	case enginev1.IgnoreJobFailurePolicyAction:
+	case enginev1.FailWorkflowJobFailurePolicyAction:
+		wf.Status.Phase = enginev1.FailedWorkflowPhase
 	}
 }
 

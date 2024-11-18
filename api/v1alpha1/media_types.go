@@ -58,16 +58,16 @@ type HumanReadableMediaDescription struct {
 type MediaType string
 
 const (
-	MediaMediaType    MediaType = "media"
-	MetadataMediaType MediaType = "metadata"
+	MediaMediaType    = MediaType("media")
+	MetadataMediaType = MediaType("metadata")
 )
 
 // +kubebuilder:validation:Enum=push;pull
 type MediaDirection string
 
 const (
-	PushMediaDirection MediaDirection = "push"
-	PullMediaDirection MediaDirection = "pull"
+	PushMediaDirection = MediaDirection("push")
+	PullMediaDirection = MediaDirection("pull")
 )
 
 type MediaPortBinding struct {
@@ -227,10 +227,10 @@ type FrameRate struct {
 type FieldOrder string
 
 const (
-	UnknownFieldOrder          FieldOrder = "unknown"
-	ProgressiveFieldOrder      FieldOrder = "progressive"
-	TopFieldFirstFieldOrder    FieldOrder = "top-field-first"
-	BottomFieldFirstFieldOrder FieldOrder = "bottom-field-first"
+	UnknownFieldOrder          = FieldOrder("unknown")
+	ProgressiveFieldOrder      = FieldOrder("progressive")
+	TopFieldFirstFieldOrder    = FieldOrder("top-field-first")
+	BottomFieldFirstFieldOrder = FieldOrder("bottom-field-first")
 )
 
 type VideoColor struct {
@@ -258,21 +258,21 @@ type VideoColor struct {
 type ChromaSubsampling string
 
 const (
-	ChromaSubsampling311 ChromaSubsampling = "3:1:1"
-	ChromaSubsampling410 ChromaSubsampling = "4:1:0"
-	ChromaSubsampling411 ChromaSubsampling = "4:1:1"
-	ChromaSubsampling420 ChromaSubsampling = "4:2:0"
-	ChromaSubsampling422 ChromaSubsampling = "4:2:2"
-	ChromaSubsampling440 ChromaSubsampling = "4:4:0"
-	ChromaSubsampling444 ChromaSubsampling = "4:4:4"
+	ChromaSubsampling311 = ChromaSubsampling("3:1:1")
+	ChromaSubsampling410 = ChromaSubsampling("4:1:0")
+	ChromaSubsampling411 = ChromaSubsampling("4:1:1")
+	ChromaSubsampling420 = ChromaSubsampling("4:2:0")
+	ChromaSubsampling422 = ChromaSubsampling("4:2:2")
+	ChromaSubsampling440 = ChromaSubsampling("4:4:0")
+	ChromaSubsampling444 = ChromaSubsampling("4:4:4")
 )
 
 // +kubebuilder:validation:Enum=full;limited
 type ColorRange string
 
 const (
-	FullColorRange    ColorRange = "full"
-	LimitedColorRange ColorRange = "limited"
+	FullColorRange    = ColorRange("full")
+	LimitedColorRange = ColorRange("limited")
 )
 
 type SubtitleMediaStream struct {

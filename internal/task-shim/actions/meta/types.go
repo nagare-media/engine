@@ -32,9 +32,9 @@ const (
 type ConfigType string
 
 const (
-	ConfigTypeStartTask   ConfigType = "start-task"
-	ConfigTypeRestartTask ConfigType = "restart-task"
-	ConfigTypeStopTask    ConfigType = "stop-task"
+	StartTaskConfigType   = ConfigType("start-task")
+	RestartTaskConfigType = ConfigType("restart-task")
+	StopTaskConfigType    = ConfigType("stop-task")
 )
 
 func (ct *ConfigType) UnmarshalJSON(data []byte) error {
@@ -44,9 +44,9 @@ func (ct *ConfigType) UnmarshalJSON(data []byte) error {
 	}
 
 	switch c := ConfigType(s); c {
-	case ConfigTypeStartTask,
-		ConfigTypeRestartTask,
-		ConfigTypeStopTask:
+	case StartTaskConfigType,
+		RestartTaskConfigType,
+		StopTaskConfigType:
 		*ct = c
 		return nil
 	}

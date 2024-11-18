@@ -99,13 +99,13 @@ type MediaProcessingEntityStatus struct {
 	Message string `json:"message,omitempty"`
 }
 
-var (
+const (
 	// MediaProcessingEntityReadyConditionType means the a connection to the MediaProcessingEntity could be established.
-	MediaProcessingEntityReadyConditionType ConditionType = "Ready"
+	MediaProcessingEntityReadyConditionType = ConditionType("Ready")
 
 	// MediaProcessingEntityFailedConditionType means the a connection to the MediaProcessingEntity could not be
 	// established.
-	MediaProcessingEntityFailedConditionType ConditionType = "Failed"
+	MediaProcessingEntityFailedConditionType = ConditionType("Failed")
 )
 
 // +kubebuilder:object:root=true

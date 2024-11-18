@@ -27,6 +27,7 @@ import (
 	"text/template"
 	"time"
 
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/yaml"
 
@@ -303,15 +304,15 @@ func (s *taskService) execEventActions(ctx context.Context, al []enginev1.TaskSe
 			l.Info("execute action")
 
 			switch metaaction.ConfigType(cfg) {
-			case metaaction.ConfigTypeStartTask:
+			case metaaction.StartTaskConfigType:
 				s.startTask(currentTask)
 				continue
 
-			case metaaction.ConfigTypeRestartTask:
+			case metaaction.RestartTaskConfigType:
 				s.restartTask(currentTask)
 				continue
 
-			case metaaction.ConfigTypeStopTask:
+			case metaaction.StopTaskConfigType:
 				s.stopTask()
 				continue
 			}
@@ -343,7 +344,7 @@ func (s *taskService) startTask(currentTask *nbmpv2.Task) {
 
 	// start task
 	l.Info("starting task")
-	s.tsk.General.State = &nbmpv2.RunningState
+	s.tsk.General.State = ptr.To(nbmpv2.RunningState)
 	s.observeEvent(events.TaskStarted)
 	go func() {
 		s.tskErr = s.execTask(s.tskCtx, currentTask)
@@ -353,10 +354,10 @@ func (s *taskService) startTask(currentTask *nbmpv2.Task) {
 		// which will set the correct s.tsk.General.State.
 		if s.tskErr != nil {
 			l.Error(s.tskErr, "task failed")
-			s.tsk.General.State = &nbmpv2.InErrorState
+			s.tsk.General.State = ptr.To(nbmpv2.InErrorState)
 			s.observeEvent(events.TaskFailed)
 		} else {
-			s.tsk.General.State = &nbmpv2.DestroyedState
+			s.tsk.General.State = ptr.To(nbmpv2.DestroyedState)
 			s.observeEvent(events.TaskSucceeded)
 		}
 		l.Info("task finished")
@@ -446,11 +447,11 @@ func (s *taskService) execTask(ctx context.Context, currentTask *nbmpv2.Task) er
 			l.Info("execute action")
 
 			switch metaaction.ConfigType(cfg) {
-			case metaaction.ConfigTypeStartTask:
+			case metaaction.StartTaskConfigType:
 				return errors.New("svc: failed to start task: cannot start task from running task")
-			case metaaction.ConfigTypeRestartTask:
+			case metaaction.RestartTaskConfigType:
 				return errors.New("svc: failed to restart task: cannot restart task from running task")
-			case metaaction.ConfigTypeStopTask:
+			case metaaction.StopTaskConfigType:
 				return errors.New("svc: failed to stop task: cannot stop task from running task")
 			}
 		}

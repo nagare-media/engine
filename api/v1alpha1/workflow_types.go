@@ -114,22 +114,22 @@ type WorkflowStatus struct {
 type WorkflowPhase string
 
 const (
-	WorkflowPhaseInitializing       WorkflowPhase = "Initializing"
-	WorkflowPhaseRunning            WorkflowPhase = "Running"
-	WorkflowPhaseAwaitingCompletion WorkflowPhase = "AwaitingCompletion"
-	WorkflowPhaseSucceeded          WorkflowPhase = "Succeeded"
-	WorkflowPhaseFailed             WorkflowPhase = "Failed"
+	InitializingWorkflowPhase       = WorkflowPhase("Initializing")
+	RunningWorkflowPhase            = WorkflowPhase("Running")
+	AwaitingCompletionWorkflowPhase = WorkflowPhase("AwaitingCompletion")
+	SucceededWorkflowPhase          = WorkflowPhase("Succeeded")
+	FailedWorkflowPhase             = WorkflowPhase("Failed")
 )
 
 const (
 	// WorkflowReadyConditionType means the Workflow has been processed by the Workflow controller.
-	WorkflowReadyConditionType ConditionType = "Ready"
+	WorkflowReadyConditionType = ConditionType("Ready")
 
 	// WorkflowCompleteConditionType means the Workflow has completed its execution.
-	WorkflowCompleteConditionType ConditionType = "Complete"
+	WorkflowCompleteConditionType = ConditionType("Complete")
 
 	// WorkflowFailedConditionType means the Workflow has failed its execution.
-	WorkflowFailedConditionType ConditionType = "Failed"
+	WorkflowFailedConditionType = ConditionType("Failed")
 )
 
 // +kubebuilder:object:root=true

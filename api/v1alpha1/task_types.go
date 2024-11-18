@@ -137,14 +137,14 @@ type JobFailurePolicy struct {
 // +kubebuilder:validation:Enum=FailWorkflow;Ignore
 type JobFailurePolicyAction string
 
-var (
+const (
 	// This is an action which might be taken on a Job failure - mark the Task and Workflow as Failed and terminate all
 	// running Tasks.
-	JobFailurePolicyActionFailWorkflow JobFailurePolicyAction = "FailWorkflow"
+	FailWorkflowJobFailurePolicyAction = JobFailurePolicyAction("FailWorkflow")
 
 	// This is an action which might be taken on a Job failure - mark the Task as Failed but do not terminate other Tasks.
 	// Dependent Tasks have to deal with this fail-state.
-	JobFailurePolicyActionIgnore JobFailurePolicyAction = "Ignore"
+	IgnoreJobFailurePolicyAction = JobFailurePolicyAction("Ignore")
 )
 
 // Status of a Task.
@@ -197,25 +197,25 @@ type TaskStatus struct {
 type TaskPhase string
 
 const (
-	TaskPhaseInitializing TaskPhase = "Initializing"
-	TaskPhaseJobPending   TaskPhase = "JobPending"
-	TaskPhaseRunning      TaskPhase = "Running"
-	TaskPhaseSucceeded    TaskPhase = "Succeeded"
-	TaskPhaseFailed       TaskPhase = "Failed"
+	InitializingTaskPhase = TaskPhase("Initializing")
+	JobPendingTaskPhase   = TaskPhase("JobPending")
+	RunningTaskPhase      = TaskPhase("Running")
+	SucceededTaskPhase    = TaskPhase("Succeeded")
+	FailedTaskPhase       = TaskPhase("Failed")
 )
 
-var (
+const (
 	// TaskInitializedConditionType means the Task has been processed by the Task controller and a Job was created.
-	TaskInitializedConditionType ConditionType = "Initialized"
+	TaskInitializedConditionType = ConditionType("Initialized")
 
 	// TaskReadyConditionType means the Task has been processed by the Task controller and a Job was created.
-	TaskReadyConditionType ConditionType = "Ready"
+	TaskReadyConditionType = ConditionType("Ready")
 
 	// TaskCompleteConditionType means the Task has completed its execution.
-	TaskCompleteConditionType ConditionType = "Complete"
+	TaskCompleteConditionType = ConditionType("Complete")
 
 	// TaskFailedConditionType means the Task has failed its execution.
-	TaskFailedConditionType ConditionType = "Failed"
+	TaskFailedConditionType = ConditionType("Failed")
 )
 
 // +kubebuilder:object:root=true
