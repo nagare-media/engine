@@ -34,14 +34,14 @@ The following table gives an overview of currently supported NBMP descriptors as
 | 🟢 |   `input-ports:` | - | logical input ports |
 | 🟢 |    `- port-name: string` | **Task**<br>`.spec.inputs[].portBindings[].id` | |
 | 🟢 |     `bind:` | - | |
-| 🟢 |      `stream-id: string` | **Task**<br>`.spec.inputs[].id` | mapping to correct input task |
+| 🟢 |      `stream-id: string` | **Task**<br>`.spec.inputs[].id` | mapping to correct input for tasks |
 | 🔴 |      `name: string` | | now optional |
 | 🔴 |      `keywords:` | | |
 | 🔴 |       `- string` | | |
 | 🟢 |   `output-ports:` | - | logical output ports |
 | 🟢 |    `- port-name: string` | **Task**<br>`.spec.outputs[].portBindings[].id` | |
 | 🟢 |     `bind:` | - | |
-| 🟢 |      `stream-id: string` | **Task**<br>`.spec.outputs[].id` | mapping to correct output for task |
+| 🟢 |      `stream-id: string` | **Task**<br>`.spec.outputs[].id` | mapping to correct output for tasks |
 | 🔴 |      `name: string` | | now optional |
 | 🔴 |      `keywords:` | | |
 | 🔴 |       `- string` | | |
@@ -49,7 +49,7 @@ The following table gives an overview of currently supported NBMP descriptors as
 | 🔴 |   `nonessential: bool` | | |
 | 🟢 |   `state: \|` | - | |
 | 🟢 |    `\|instantiated` | **Workflow**<br>`.status.phase == Initializing`<br><br>**Task**<br>`.status.phase == Initializing \|\| JobPending` | |
-| 🔴 |    `\|idle` | | |
+| 🟠 |    `\|idle` | **Workflow**<br>`.status.phase == Succeeded \|\| AwaitingCompletion`<br><br>**Task**<br>`.status.phase == Succeeded` | |
 | 🟢 |    `\|running` | **Workflow**<br>`.status.phase == Running \|\| AwaitingCompletion`<br><br>**Task**<br>`.status.phase == Running` | |
 | 🟢 |    `\|in-error` | **Workflow**<br>`.status.phase == Failed`<br><br>**Task**<br>`.status.phase == Failed` | |
 | 🟠 |    `\|destroyed` | **Workflow**<br>`.metadata.deletionTimestamp != nil`<br><br>**Task**<br>`.metadata.deletionTimestamp != nil` | |
@@ -64,15 +64,15 @@ The following table gives an overview of currently supported NBMP descriptors as
 | 🔴 |     `description: string` | | |
 | 🟢 | `input: &input` | - | |
 | 🟢 |   `media-parameters: &media-parameters` | - | |
-| 🟢 |    `stream-id: string` | **Workflow**<br>`.spec.inputs[].id`<br><br>**Task**<br>`.spec.inputs[].id` | |
-| 🟢 |    `name: string` | **Workflow**<br>`.spec.inputs[].humanReadable.name`<br><br>**Task**<br>`.spec.inputs[].humanReadable.name` | |
+| 🟢 |    `stream-id: string` | **Task**<br>`.spec.inputs[].id` | |
+| 🟢 |    `name: string` | **Task**<br>`.spec.inputs[].humanReadable.name` | |
 | 🟢 |    `keywords:` | - | |
-| 🟢 |     `- string1=string2` | **Workflow**<br>`.spec.inputs[].labels[string1] = string2`<br><br>**Task**<br>`.spec.inputs[].labels[string1] = string2` | |
-| 🟢 |     `- string` | **Workflow**<br>`.spec.inputs[].labels[string] = ""`<br><br>**Task**<br>`.spec.inputs[].labels[string] = ""` | |
-| 🟢 |    `mime-type: string` | **Workflow**<br>`.spec.inputs[].metadata.mimeType`<br><br>**Task**<br>`.spec.inputs[].metadata.mimeType` | |
+| 🟢 |     `- string1=string2` | **Task**<br>`.spec.inputs[].labels[string1] = string2` | |
+| 🟢 |     `- string` | **Task**<br>`.spec.inputs[].labels[string] = ""` | |
+| 🟢 |    `mime-type: string` | **Task**<br>`.spec.inputs[].metadata.mimeType` | |
 | 🟢 |    `video-format:` | - | |
 | 🟢 |     `- &parameter` | - | |
-| 🟢 |      `name: string` | **Workflow**<br>`.spec.inputs[].metadata.streams[].properties[].name`<br><br>**Task**<br>`.spec.inputs[].metadata.streams[].properties[].name` | |
+| 🟢 |      `name: string` | **Task**<br>`.spec.inputs[].metadata.streams[].properties[].name` | |
 | 🔴 |      `id: number` | | |
 | 🔴 |      `discription: string` | | |
 | 🟢 |      `datatype: \|` | - | |
@@ -93,41 +93,41 @@ The following table gives an overview of currently supported NBMP descriptors as
 | 🔴 |         `\|min-value: number` | | |
 | 🔴 |          `max-value: number` | | |
 | 🔴 |          `increment: number` | | |
-| 🟠 |         `\|- string` | **Workflow**<br>`.spec.inputs[].metadata.streams[].properties[].value`<br><br>**Task**<br>`.spec.inputs[].metadata.streams[].properties[].value` | only support one value |
+| 🟠 |         `\|- string` | **Task**<br>`.spec.inputs[].metadata.streams[].properties[].value` | only support one value |
 | 🔴 |      `schema:` | | |
 | 🔴 |       `<string>: object` | | |
 | 🟢 |    `audio-format:` | - | |
 | 🟢 |     `- *parameter` | - | |
 | 🟢 |    `image-format:` | - | |
 | 🟢 |     `- *parameter` | - | |
-| 🟢 |    `codec-type: string` | **Workflow**<br>`.spec.inputs[].metadata.codecType`<br><br>**Task**<br>`.spec.inputs[].metadata.codecType` | |
+| 🟢 |    `codec-type: string` | **Task**<br>`.spec.inputs[].metadata.codecType` | |
 | 🔴 |    `protocol: string` | | |
-| 🟢 |    `mode: \|` | **Workflow**<br>`.spec.inputs[].direction`<br><br>**Task**<br>`.spec.inputs[].direction` | |
+| 🟢 |    `mode: \|` | **Task**<br>`.spec.inputs[].direction` | |
 | 🟢 |     `\|push` | - | |
 | 🟢 |     `\|pull` | - | |
 | 🔴 |    `throughput: number` | | |
 | 🔴 |    `buffersize: number` | | |
 | 🔴 |    `availability-duration: number` | | |
 | 🔴 |    `timeout: number` | | |
-| 🟢 |    `caching-server-url: URI` | **Workflow**<br>`.spec.inputs[].url`<br><br>**Task**<br>`.spec.inputs[].url` | |
+| 🟢 |    `caching-server-url: URI` | **Task**<br>`.spec.inputs[].url` | |
 | 🔴 |    `completion-timeout: number` | | |
 | 🟢 |   `metadata-parameters: &metadata-parameters` | - | |
-| 🟢 |    `stream-id: string` | **Workflow**<br>`.spec.inputs[].id`<br><br>**Task**<br>`.spec.inputs[].id` | |
-| 🟢 |    `name: string` | **Workflow**<br>`.spec.inputs[].humanReadable.name`<br><br>**Task**<br>`.spec.inputs[].humanReadable.name` | |
+| 🟢 |    `stream-id: string` | **Task**<br>`.spec.inputs[].id` | |
+| 🟢 |    `name: string` | **Task**<br>`.spec.inputs[].humanReadable.name` | |
 | 🟢 |    `keywords:` | - | |
-| 🟢 |     `- string1=string2` | **Workflow**<br>`.spec.inputs[].labels[string1] = string2`<br><br>**Task**<br>`.spec.inputs[].labels[string1] = string2` | |
-| 🟢 |     `- string` | **Workflow**<br>`.spec.inputs[].labels[string] = ""`<br><br>**Task**<br>`.spec.inputs[].labels[string] = ""` | |
-| 🟢 |    `mime-type: string` | **Workflow**<br>`.spec.inputs[].metadata.mimeType`<br><br>**Task**<br>`.spec.inputs[].metadata.mimeType` | |
-| 🟢 |    `codec-type: string` | **Workflow**<br>`.spec.inputs[].metadata.codecType`<br><br>**Task**<br>`.spec.inputs[].metadata.codecType` | |
+| 🟢 |     `- string1=string2` | **Task**<br>`.spec.inputs[].labels[string1] = string2` | |
+| 🟢 |     `- string` | **Task**<br>`.spec.inputs[].labels[string] = ""` | |
+| 🟢 |    `mime-type: string` | **Task**<br>`.spec.inputs[].metadata.mimeType` | |
+| 🟢 |    `codec-type: string` | **Task**<br>`.spec.inputs[].metadata.codecType` | |
 | 🔴 |    `protocol: string` | | |
-| 🟢 |    `mode: \|` | **Workflow**<br>`.spec.inputs[].direction`<br><br>**Task**<br>`.spec.inputs[].direction` | |
+| 🟢 |    `mode: \|` | **Task**<br>`.spec.inputs[].direction` | |
 | 🟢 |     `\|push` | - | |
 | 🟢 |     `\|pull` | - | |
 | 🔴 |    `max-size: number` | | |
 | 🔴 |    `min-interval: number` | | |
 | 🔴 |    `availability-duration: number` | | |
 | 🔴 |    `timeout: number` | | |
-| 🟢 |    `caching-server-url: URI` | **Workflow**<br>`.spec.inputs[].url`<br><br>**Task**<br>`.spec.inputs[].url` | |
+| 🟢 |    `caching-server-url: URI` | **Task**<br>`.spec.inputs[].url` | |
 | 🔴 |    `scheme-uri: URI` | | |
 | 🔴 |    `completion-timeout: number` | | |
 | 🟢 | `output: &output` | - | |
@@ -135,7 +135,7 @@ The following table gives an overview of currently supported NBMP descriptors as
 | 🟢 |   `metadata-parameters: *metadata-parameters` | - | |
 | 🟢 | `processing: &processing` | - | |
 | 🟢 |   `keywords:` | - | |
-| 🟢 |    `- string1=string2` | **Task**<br>`.spec.functionSelector.matchExpressions.key = string1`<br>`.spec.functionSelector.matchExpressions.operator = In`<br>`.spec.functionSelector.matchExpressions.key = [string2]` | |
+| 🟢 |    `- string1=string2` | **Task**<br>`.spec.functionSelector.matchExpressions.key = string1`<br>`.spec.functionSelector.matchExpressions.operator = In`<br>`.spec.functionSelector.matchExpressions.values = [string2]` | |
 | 🟢 |    `- string` | **Task**<br>`.spec.functionSelector.matchExpressions.key = string`<br>`.spec.functionSelector.matchExpressions.operator = Exists` | |
 | 🔴 |   `image:` | | |
 | 🔴 |    `- is-dynamic: bool` | | |
@@ -173,7 +173,7 @@ The following table gives an overview of currently supported NBMP descriptors as
 | 🔴 |     `processing: *processing` | | |
 | 🟠 |     `requirements: *requirements` | - | |
 | 🟢 |     `configuration:` | - | |
-| 🟢 |      `- *parameter` | **Workflow**<br>`.spec.config`<br><br>**Task**<br>`.spec.config`<br><br><br>**TaskTemplate**<br>`.spec.config`<br><br><br>**Function**<br>`.spec.defaultConfig` | |
+| 🟢 |      `- *parameter` | **Task**<br>`.spec.config`<br><br><br>**TaskTemplate**<br>`.spec.config`<br><br><br>**Function**<br>`.spec.defaultConfig` | |
 | 🔴 |     `client-assistant: *client-assistant` | | |
 | 🟢 |     `failover: *failover` | - | |
 | 🔴 |     `monitoring: *monitoring` | | |
