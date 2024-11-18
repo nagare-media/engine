@@ -98,17 +98,35 @@ type TaskSpec struct {
 	// +optional
 	JobFailurePolicy *JobFailurePolicy `json:"jobFailurePolicy,omitempty"`
 
-	// Inputs of this task.
+	// Input ports of this task.
 	// +optional
-	Inputs []Media `json:"inputs"`
+	InputPorts []InputPortBinding `json:"input-ports,omitempty"`
 
-	// Outputs of this task.
+	// Output ports of this task.
 	// +optional
-	Outputs []Media `json:"outputs"`
+	OutputPorts []OutputPortBindings `json:"output-ports,omitempty"`
 
 	// Configuration values.
 	// +optional
 	Config map[string]string `json:"config,omitempty"`
+}
+
+type InputPortBinding struct {
+	// ID of the port.
+	ID string `json:"id"`
+
+	// Input binding.
+	// +optional
+	Input *Media `json:"input,omitempty"`
+}
+
+type OutputPortBindings struct {
+	// ID of the port.
+	ID string `json:"id"`
+
+	// Output binding.
+	// +optional
+	Output *Media `json:"output,omitempty"`
 }
 
 type HumanReadableTaskDescription struct {

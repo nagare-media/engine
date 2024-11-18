@@ -16,7 +16,11 @@ limitations under the License.
 
 package v1alpha1
 
-import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/nagare-media/models.go/base"
+)
 
 // Media describes an input or output.
 type Media struct {
@@ -34,11 +38,9 @@ type Media struct {
 	// +optional
 	Direction *MediaDirection `json:"direction,omitempty"`
 
-	PortBindings []MediaPortBinding `json:"portBindings"`
-
 	// URL of this media.
 	// +optional
-	URL *string `json:"url,omitempty"`
+	URL *base.URI `json:"url,omitempty"`
 
 	// Labels of this media.
 	// +optional
@@ -69,11 +71,6 @@ const (
 	PushMediaDirection = MediaDirection("push")
 	PullMediaDirection = MediaDirection("pull")
 )
-
-type MediaPortBinding struct {
-	// ID of the port.
-	ID string `json:"id"`
-}
 
 type MediaMetadata struct {
 	// +optional

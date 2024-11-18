@@ -655,8 +655,8 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 			Task: enginev1.WorkflowManagerHelperDataTask{
 				ID:            task.Name,
 				HumanReadable: task.Spec.HumanReadable,
-				Inputs:        task.Spec.Inputs,
-				Outputs:       task.Spec.Outputs,
+				InputPorts:    task.Spec.InputPorts,
+				OutputPorts:   task.Spec.OutputPorts,
 			},
 			System: enginev1.WorkflowManagerHelperDataSystem{
 				NATS: r.Config.NATS,

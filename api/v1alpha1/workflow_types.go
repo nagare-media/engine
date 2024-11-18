@@ -40,14 +40,6 @@ type WorkflowSpec struct {
 	// Human readable description of this Workflow.
 	// +optional
 	HumanReadable *HumanReadableWorkflowDescription `json:"humanReadable,omitempty"`
-
-	// Inputs of this workflow.
-	// +optional
-	Inputs []Media `json:"inputs"`
-
-	// Outputs of this workflow.
-	// +optional
-	Outputs []Media `json:"outputs"`
 }
 
 type HumanReadableWorkflowDescription struct {

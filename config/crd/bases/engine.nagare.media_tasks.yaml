@@ -157,216 +157,213 @@ spec:
                     description: Human readable name of this Task.
                     type: string
                 type: object
-              inputs:
-                description: Inputs of this task.
+              input-ports:
+                description: Input ports of this task.
                 items:
-                  description: Media describes an input or output.
                   properties:
-                    direction:
-                      description: Direction this media is streamed in.
-                      enum:
-                      - push
-                      - pull
-                      type: string
-                    humanReadable:
-                      description: Human readable description of this media.
-                      properties:
-                        name:
-                          description: Human readable name of this media.
-                          type: string
-                      type: object
                     id:
-                      description: ID of this media.
+                      description: ID of the port.
                       type: string
-                    labels:
-                      additionalProperties:
-                        type: string
-                      description: Labels of this media.
-                      type: object
-                    metadata:
-                      description: Metadata of this media.
+                    input:
+                      description: Input binding.
                       properties:
-                        bitRate:
-                          description: BitRate in bit/s
-                          format: int64
-                          type: integer
-                        checksums:
-                          items:
-                            properties:
-                              alg:
-                                type: string
-                              sum:
-                                type: string
-                            required:
-                            - alg
-                            - sum
-                            type: object
-                          type: array
-                        codecType:
+                        direction:
+                          description: Direction this media is streamed in.
+                          enum:
+                          - push
+                          - pull
                           type: string
-                        container:
+                        humanReadable:
+                          description: Human readable description of this media.
                           properties:
                             name:
+                              description: Human readable name of this media.
                               type: string
-                          required:
-                          - name
                           type: object
-                        duration:
+                        id:
+                          description: ID of this media.
                           type: string
-                        mimeType:
-                          type: string
-                        size:
-                          description: Size in bytes.
-                          format: int64
-                          type: integer
-                        streams:
-                          items:
-                            maxProperties: 1
-                            minProperties: 1
-                            properties:
-                              audio:
+                        labels:
+                          additionalProperties:
+                            type: string
+                          description: Labels of this media.
+                          type: object
+                        metadata:
+                          description: Metadata of this media.
+                          properties:
+                            bitRate:
+                              description: BitRate in bit/s
+                              format: int64
+                              type: integer
+                            checksums:
+                              items:
                                 properties:
-                                  bitDepth:
-                                    type: integer
-                                  channelLayout:
+                                  alg:
                                     type: string
-                                  channels:
-                                    type: integer
-                                  samplingRate:
-                                    format: int32
-                                    type: integer
-                                type: object
-                              bitRate:
-                                description: BitRate in bit/s
-                                format: int64
-                                type: integer
-                              codec:
-                                properties:
-                                  level:
-                                    type: string
-                                  name:
-                                    type: string
-                                  profile:
+                                  sum:
                                     type: string
                                 required:
-                                - name
+                                - alg
+                                - sum
                                 type: object
-                              data:
-                                type: object
-                              duration:
-                                type: string
-                              id:
-                                type: string
+                              type: array
+                            codecType:
+                              type: string
+                            container:
                               properties:
-                                description: Properties additionally associated with
-                                  this stream.
-                                items:
-                                  properties:
-                                    name:
-                                      type: string
-                                    value:
-                                      type: string
-                                  required:
-                                  - name
-                                  - value
-                                  type: object
-                                type: array
-                              subtitle:
+                                name:
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            duration:
+                              type: string
+                            mimeType:
+                              type: string
+                            size:
+                              description: Size in bytes.
+                              format: int64
+                              type: integer
+                            streams:
+                              items:
+                                maxProperties: 1
+                                minProperties: 1
                                 properties:
-                                  language:
-                                    type: string
-                                type: object
-                              video:
-                                properties:
-                                  bitDepth:
+                                  audio:
+                                    properties:
+                                      bitDepth:
+                                        type: integer
+                                      channelLayout:
+                                        type: string
+                                      channels:
+                                        type: integer
+                                      samplingRate:
+                                        format: int32
+                                        type: integer
+                                    type: object
+                                  bitRate:
+                                    description: BitRate in bit/s
+                                    format: int64
                                     type: integer
-                                  color:
+                                  codec:
                                     properties:
-                                      chromaSubsampling:
-                                        enum:
-                                        - "3:1:1"
-                                        - "4:1:0"
-                                        - "4:1:1"
-                                        - "4:2:0"
-                                        - "4:2:2"
-                                        - "4:4:0"
-                                        - "4:4:4"
+                                      level:
                                         type: string
-                                      model:
+                                      name:
                                         type: string
-                                      primaries:
+                                      profile:
                                         type: string
-                                      range:
-                                        default: limited
-                                        enum:
-                                        - full
-                                        - limited
-                                        type: string
-                                      space:
-                                        type: string
-                                      transfer:
-                                        type: string
-                                    type: object
-                                  fieldOrder:
-                                    default: unknown
-                                    enum:
-                                    - unknown
-                                    - progressive
-                                    - top-field-first
-                                    - bottom-field-first
-                                    type: string
-                                  frameRate:
-                                    properties:
-                                      average:
-                                        type: string
-                                      lowestCommon:
-                                        type: string
-                                    type: object
-                                  resolution:
-                                    properties:
-                                      hight:
-                                        format: int32
-                                        type: integer
-                                      sar:
-                                        default: "1.0"
-                                        type: string
-                                      width:
-                                        format: int32
-                                        type: integer
                                     required:
-                                    - hight
-                                    - width
+                                    - name
                                     type: object
+                                  data:
+                                    type: object
+                                  duration:
+                                    type: string
+                                  id:
+                                    type: string
+                                  properties:
+                                    description: Properties additionally associated
+                                      with this stream.
+                                    items:
+                                      properties:
+                                        name:
+                                          type: string
+                                        value:
+                                          type: string
+                                      required:
+                                      - name
+                                      - value
+                                      type: object
+                                    type: array
+                                  subtitle:
+                                    properties:
+                                      language:
+                                        type: string
+                                    type: object
+                                  video:
+                                    properties:
+                                      bitDepth:
+                                        type: integer
+                                      color:
+                                        properties:
+                                          chromaSubsampling:
+                                            enum:
+                                            - "3:1:1"
+                                            - "4:1:0"
+                                            - "4:1:1"
+                                            - "4:2:0"
+                                            - "4:2:2"
+                                            - "4:4:0"
+                                            - "4:4:4"
+                                            type: string
+                                          model:
+                                            type: string
+                                          primaries:
+                                            type: string
+                                          range:
+                                            default: limited
+                                            enum:
+                                            - full
+                                            - limited
+                                            type: string
+                                          space:
+                                            type: string
+                                          transfer:
+                                            type: string
+                                        type: object
+                                      fieldOrder:
+                                        default: unknown
+                                        enum:
+                                        - unknown
+                                        - progressive
+                                        - top-field-first
+                                        - bottom-field-first
+                                        type: string
+                                      frameRate:
+                                        properties:
+                                          average:
+                                            type: string
+                                          lowestCommon:
+                                            type: string
+                                        type: object
+                                      resolution:
+                                        properties:
+                                          hight:
+                                            format: int32
+                                            type: integer
+                                          sar:
+                                            default: "1.0"
+                                            type: string
+                                          width:
+                                            format: int32
+                                            type: integer
+                                        required:
+                                        - hight
+                                        - width
+                                        type: object
+                                    type: object
+                                required:
+                                - id
                                 type: object
-                            required:
-                            - id
-                            type: object
-                          type: array
-                      type: object
-                    portBindings:
-                      items:
-                        properties:
-                          id:
-                            description: ID of the port.
-                            type: string
-                        required:
-                        - id
-                        type: object
-                      type: array
-                    type:
-                      description: Type of this media.
-                      enum:
-                      - media
+                              type: array
+                          type: object
+                        type:
+                          description: Type of this media.
+                          enum:
+                          - media
+                          - metadata
+                          type: string
+                        url:
+                          description: URL of this media.
+                          type: string
+                      required:
+                      - id
                       - metadata
-                      type: string
-                    url:
-                      description: URL of this media.
-                      type: string
+                      - type
+                      type: object
                   required:
                   - id
-                  - metadata
-                  - portBindings
-                  - type
                   type: object
                 type: array
               jobFailurePolicy:
@@ -452,216 +449,213 @@ spec:
                     type: object
                 type: object
                 x-kubernetes-map-type: atomic
-              outputs:
-                description: Outputs of this task.
+              output-ports:
+                description: Output ports of this task.
                 items:
-                  description: Media describes an input or output.
                   properties:
-                    direction:
-                      description: Direction this media is streamed in.
-                      enum:
-                      - push
-                      - pull
-                      type: string
-                    humanReadable:
-                      description: Human readable description of this media.
-                      properties:
-                        name:
-                          description: Human readable name of this media.
-                          type: string
-                      type: object
                     id:
-                      description: ID of this media.
+                      description: ID of the port.
                       type: string
-                    labels:
-                      additionalProperties:
-                        type: string
-                      description: Labels of this media.
-                      type: object
-                    metadata:
-                      description: Metadata of this media.
+                    output:
+                      description: Output binding.
                       properties:
-                        bitRate:
-                          description: BitRate in bit/s
-                          format: int64
-                          type: integer
-                        checksums:
-                          items:
-                            properties:
-                              alg:
-                                type: string
-                              sum:
-                                type: string
-                            required:
-                            - alg
-                            - sum
-                            type: object
-                          type: array
-                        codecType:
+                        direction:
+                          description: Direction this media is streamed in.
+                          enum:
+                          - push
+                          - pull
                           type: string
-                        container:
+                        humanReadable:
+                          description: Human readable description of this media.
                           properties:
                             name:
+                              description: Human readable name of this media.
                               type: string
-                          required:
-                          - name
                           type: object
-                        duration:
+                        id:
+                          description: ID of this media.
                           type: string
-                        mimeType:
-                          type: string
-                        size:
-                          description: Size in bytes.
-                          format: int64
-                          type: integer
-                        streams:
-                          items:
-                            maxProperties: 1
-                            minProperties: 1
-                            properties:
-                              audio:
+                        labels:
+                          additionalProperties:
+                            type: string
+                          description: Labels of this media.
+                          type: object
+                        metadata:
+                          description: Metadata of this media.
+                          properties:
+                            bitRate:
+                              description: BitRate in bit/s
+                              format: int64
+                              type: integer
+                            checksums:
+                              items:
                                 properties:
-                                  bitDepth:
-                                    type: integer
-                                  channelLayout:
+                                  alg:
                                     type: string
-                                  channels:
-                                    type: integer
-                                  samplingRate:
-                                    format: int32
-                                    type: integer
-                                type: object
-                              bitRate:
-                                description: BitRate in bit/s
-                                format: int64
-                                type: integer
-                              codec:
-                                properties:
-                                  level:
-                                    type: string
-                                  name:
-                                    type: string
-                                  profile:
+                                  sum:
                                     type: string
                                 required:
-                                - name
+                                - alg
+                                - sum
                                 type: object
-                              data:
-                                type: object
-                              duration:
-                                type: string
-                              id:
-                                type: string
+                              type: array
+                            codecType:
+                              type: string
+                            container:
                               properties:
-                                description: Properties additionally associated with
-                                  this stream.
-                                items:
-                                  properties:
-                                    name:
-                                      type: string
-                                    value:
-                                      type: string
-                                  required:
-                                  - name
-                                  - value
-                                  type: object
-                                type: array
-                              subtitle:
+                                name:
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            duration:
+                              type: string
+                            mimeType:
+                              type: string
+                            size:
+                              description: Size in bytes.
+                              format: int64
+                              type: integer
+                            streams:
+                              items:
+                                maxProperties: 1
+                                minProperties: 1
                                 properties:
-                                  language:
-                                    type: string
-                                type: object
-                              video:
-                                properties:
-                                  bitDepth:
+                                  audio:
+                                    properties:
+                                      bitDepth:
+                                        type: integer
+                                      channelLayout:
+                                        type: string
+                                      channels:
+                                        type: integer
+                                      samplingRate:
+                                        format: int32
+                                        type: integer
+                                    type: object
+                                  bitRate:
+                                    description: BitRate in bit/s
+                                    format: int64
                                     type: integer
-                                  color:
+                                  codec:
                                     properties:
-                                      chromaSubsampling:
-                                        enum:
-                                        - "3:1:1"
-                                        - "4:1:0"
-                                        - "4:1:1"
-                                        - "4:2:0"
-                                        - "4:2:2"
-                                        - "4:4:0"
-                                        - "4:4:4"
+                                      level:
                                         type: string
-                                      model:
+                                      name:
                                         type: string
-                                      primaries:
+                                      profile:
                                         type: string
-                                      range:
-                                        default: limited
-                                        enum:
-                                        - full
-                                        - limited
-                                        type: string
-                                      space:
-                                        type: string
-                                      transfer:
-                                        type: string
-                                    type: object
-                                  fieldOrder:
-                                    default: unknown
-                                    enum:
-                                    - unknown
-                                    - progressive
-                                    - top-field-first
-                                    - bottom-field-first
-                                    type: string
-                                  frameRate:
-                                    properties:
-                                      average:
-                                        type: string
-                                      lowestCommon:
-                                        type: string
-                                    type: object
-                                  resolution:
-                                    properties:
-                                      hight:
-                                        format: int32
-                                        type: integer
-                                      sar:
-                                        default: "1.0"
-                                        type: string
-                                      width:
-                                        format: int32
-                                        type: integer
                                     required:
-                                    - hight
-                                    - width
+                                    - name
                                     type: object
+                                  data:
+                                    type: object
+                                  duration:
+                                    type: string
+                                  id:
+                                    type: string
+                                  properties:
+                                    description: Properties additionally associated
+                                      with this stream.
+                                    items:
+                                      properties:
+                                        name:
+                                          type: string
+                                        value:
+                                          type: string
+                                      required:
+                                      - name
+                                      - value
+                                      type: object
+                                    type: array
+                                  subtitle:
+                                    properties:
+                                      language:
+                                        type: string
+                                    type: object
+                                  video:
+                                    properties:
+                                      bitDepth:
+                                        type: integer
+                                      color:
+                                        properties:
+                                          chromaSubsampling:
+                                            enum:
+                                            - "3:1:1"
+                                            - "4:1:0"
+                                            - "4:1:1"
+                                            - "4:2:0"
+                                            - "4:2:2"
+                                            - "4:4:0"
+                                            - "4:4:4"
+                                            type: string
+                                          model:
+                                            type: string
+                                          primaries:
+                                            type: string
+                                          range:
+                                            default: limited
+                                            enum:
+                                            - full
+                                            - limited
+                                            type: string
+                                          space:
+                                            type: string
+                                          transfer:
+                                            type: string
+                                        type: object
+                                      fieldOrder:
+                                        default: unknown
+                                        enum:
+                                        - unknown
+                                        - progressive
+                                        - top-field-first
+                                        - bottom-field-first
+                                        type: string
+                                      frameRate:
+                                        properties:
+                                          average:
+                                            type: string
+                                          lowestCommon:
+                                            type: string
+                                        type: object
+                                      resolution:
+                                        properties:
+                                          hight:
+                                            format: int32
+                                            type: integer
+                                          sar:
+                                            default: "1.0"
+                                            type: string
+                                          width:
+                                            format: int32
+                                            type: integer
+                                        required:
+                                        - hight
+                                        - width
+                                        type: object
+                                    type: object
+                                required:
+                                - id
                                 type: object
-                            required:
-                            - id
-                            type: object
-                          type: array
-                      type: object
-                    portBindings:
-                      items:
-                        properties:
-                          id:
-                            description: ID of the port.
-                            type: string
-                        required:
-                        - id
-                        type: object
-                      type: array
-                    type:
-                      description: Type of this media.
-                      enum:
-                      - media
+                              type: array
+                          type: object
+                        type:
+                          description: Type of this media.
+                          enum:
+                          - media
+                          - metadata
+                          type: string
+                        url:
+                          description: URL of this media.
+                          type: string
+                      required:
+                      - id
                       - metadata
-                      type: string
-                    url:
-                      description: URL of this media.
-                      type: string
+                      - type
+                      type: object
                   required:
                   - id
-                  - metadata
-                  - portBindings
-                  - type
                   type: object
                 type: array
               taskTemplateRef:

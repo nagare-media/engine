@@ -380,25 +380,28 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context, data *enginev1.Workflow
 
 	// check for task event inputs
 	eventClients := make(map[string]events.Client)
-	for _, in := range data.Task.Inputs {
-		if in.Type != enginev1.MetadataMediaType {
+	for _, p := range data.Task.InputPorts {
+		if p.Input == nil {
 			continue
 		}
-		if in.Metadata.MimeType != nil && *in.Metadata.MimeType != mime.ApplicationCloudEventsJSON {
+		if p.Input.Type != enginev1.MetadataMediaType {
 			continue
 		}
-		if in.Direction != nil && *in.Direction != enginev1.PushMediaDirection {
-			l.Info(fmt.Sprintf("skipping task event input '%s' with no push direction", in.ID))
+		if p.Input.Metadata.MimeType != nil && *p.Input.Metadata.MimeType != mime.ApplicationCloudEventsJSON {
 			continue
 		}
-		if in.URL == nil {
-			l.Info(fmt.Sprintf("skipping task event input '%s' with missing URL", in.ID))
+		if p.Input.Direction != nil && *p.Input.Direction != enginev1.PushMediaDirection {
+			l.Info(fmt.Sprintf("skipping task event input '%s' with no push direction", p.Input.ID))
+			continue
+		}
+		if p.Input.URL == nil {
+			l.Info(fmt.Sprintf("skipping task event input '%s' with missing URL", p.Input.ID))
 			continue
 		}
 
 		// TODO: implement event filters
 		ec := &events.HTTPClient{
-			URL:    *in.URL,
+			URL:    string(*p.Input.URL),
 			Client: http.DefaultClient,
 		}
 		expBackOff := &backoff.ExponentialBackOff{
@@ -410,7 +413,7 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context, data *enginev1.Workflow
 			Stop:                backoff.Stop,
 			Clock:               backoff.SystemClock,
 		}
-		eventClients[in.ID] = events.ClientWithBackoff(ec, expBackOff)
+		eventClients[p.Input.ID] = events.ClientWithBackoff(ec, expBackOff)
 	}
 
 	if len(eventClients) == 0 {

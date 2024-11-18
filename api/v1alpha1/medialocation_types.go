@@ -22,22 +22,6 @@ import (
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
 )
 
-var (
-	// Media location types that support NBMP "step" execution mode between tasks.
-	NBMPStepExecutionModeMediaLocations = []string{
-		"http",
-		"s3",
-		"opencast",
-	}
-
-	// Media location types that support NBMP "streaming" execution mode between tasks.
-	NBMPStreamingExecutionModeMediaLocations = []string{
-		"rtmp",
-		"rtsp",
-		"rist",
-	}
-)
-
 // Specification of a media location.
 type MediaLocationSpec struct {
 	MediaLocationConfig `json:",inline"`

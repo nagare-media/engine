@@ -40,10 +40,10 @@ type WorkflowManagerHelperDataTask struct {
 	HumanReadable *HumanReadableTaskDescription `json:"humanReadable,omitempty"`
 
 	// +optional
-	Inputs []Media `json:"inputs"`
+	InputPorts []InputPortBinding `json:"input-ports,omitempty"`
 
 	// +optional
-	Outputs []Media `json:"outputs"`
+	OutputPorts []OutputPortBindings `json:"output-ports,omitempty"`
 
 	// +optional
 	Config map[string]string `json:"config,omitempty"`
