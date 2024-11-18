@@ -20,18 +20,14 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
-	"github.com/imdario/mergo"
+	"github.com/nagare-media/engine/pkg/maps"
 )
 
 var defaultFuncMap = template.FuncMap{}
 
 func init() {
-	if err := mergo.Map(&defaultFuncMap, sprig.FuncMap()); err != nil {
-		panic(err.Error())
-	}
-	if err := mergo.Map(&defaultFuncMap, nagareFuncMap); err != nil {
-		panic(err.Error())
-	}
+	defaultFuncMap = maps.DeepMerge(defaultFuncMap, sprig.FuncMap())
+	defaultFuncMap = maps.DeepMerge(defaultFuncMap, nagareFuncMap)
 }
 
 func DefaultFuncMap() template.FuncMap {

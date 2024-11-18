@@ -23,8 +23,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/imdario/mergo"
-
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -46,6 +44,7 @@ import (
 	"github.com/nagare-media/engine/internal/pkg/apis/utils"
 	apiclient "github.com/nagare-media/engine/internal/workflow-manager/client"
 	"github.com/nagare-media/engine/pkg/apis/meta"
+	"github.com/nagare-media/engine/pkg/maps"
 )
 
 const (
@@ -665,23 +664,14 @@ func (r *TaskReconciler) reconcilePendingJob(ctx context.Context, task *enginev1
 	}
 
 	// add Task configuration (merge of Function, TaskTemplate and Task configuration)
-	taskCfg := funcSpec.DefaultConfig
-	if taskCfg == nil {
-		taskCfg = make(map[string]string)
+	cfgs := []map[string]string{
+		funcSpec.DefaultConfig,
 	}
-	if ttSpec != nil && ttSpec.Config != nil {
-		err = mergo.Map(&taskCfg, ttSpec.Config)
-		if err != nil {
-			return ctrl.Result{}, err
-		}
+	if ttSpec != nil {
+		cfgs = append(cfgs, ttSpec.Config)
 	}
-	if task.Spec.Config != nil {
-		err = mergo.Map(&taskCfg, task.Spec.Config)
-		if err != nil {
-			return ctrl.Result{}, err
-		}
-	}
-	data.Task.Config = taskCfg
+	cfgs = append(cfgs, task.Spec.Config)
+	data.Task.Config = maps.Merge(cfgs...)
 
 	// TODO: resolve MediaLocations
 	//	data.MediaLocations = make(map[string]enginev1.MediaLocationSpec, len(wf.Spec.MediaLocations))

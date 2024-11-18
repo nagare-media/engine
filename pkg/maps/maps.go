@@ -17,7 +17,7 @@ limitations under the License.
 package maps
 
 // Copied from https://github.com/helm/helm/blob/44ec1c1575d405675272ee2d8131130a5decee7c/pkg/cli/values/options.go#L100-L117
-func Merge(a, b map[string]any) map[string]any {
+func DeepMerge(a, b map[string]any) map[string]any {
 	out := make(map[string]any, len(a))
 	for k, v := range a {
 		out[k] = v
@@ -26,12 +26,25 @@ func Merge(a, b map[string]any) map[string]any {
 		if v, ok := v.(map[string]any); ok {
 			if bv, ok := out[k]; ok {
 				if bv, ok := bv.(map[string]any); ok {
-					out[k] = Merge(bv, v)
+					out[k] = DeepMerge(bv, v)
 					continue
 				}
 			}
 		}
 		out[k] = v
+	}
+	return out
+}
+
+func Merge(maps ...map[string]string) map[string]string {
+	if len(maps) == 0 {
+		return nil
+	}
+	out := make(map[string]string, len(maps[0]))
+	for _, m := range maps {
+		for k, v := range m {
+			out[k] = v
+		}
 	}
 	return out
 }
