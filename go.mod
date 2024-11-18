@@ -2,9 +2,10 @@ module github.com/nagare-media/engine
 
 go 1.23
 
-toolchain go1.23.0
+toolchain go1.23.3
 
 // Client-go does not handle different versions of mergo due to some breaking changes - use the matching version
+// https://github.com/kubernetes/kubernetes/pull/126764
 replace github.com/imdario/mergo => github.com/imdario/mergo v0.3.6
 
 require (
@@ -14,11 +15,9 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/google/uuid v1.6.0
-	github.com/imdario/mergo v1.0.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/minio/minio-go/v7 v7.0.80
-	github.com/mitchellh/mapstructure v1.5.0
-	github.com/nagare-media/models.go v0.0.0-20241021101242-241c282333b8
+	github.com/nagare-media/models.go v0.0.0-20241028103833-42e87c3ea1d7
 	github.com/nats-io/nats.go v1.37.0
 	github.com/onsi/ginkgo/v2 v2.21.0
 	github.com/onsi/gomega v1.35.1
@@ -65,6 +64,7 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/pprof v0.0.0-20241029153458-d1b30febd7db // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
+	github.com/imdario/mergo v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
