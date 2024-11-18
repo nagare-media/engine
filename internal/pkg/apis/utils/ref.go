@@ -275,8 +275,7 @@ func NormalizeFunctionRef(s *runtime.Scheme, ref *meta.ObjectReference) error {
 	default:
 		return errors.New("Function reference does not reference a Function or ClusterFunction")
 	}
-	NormalizeRef(s, ref, obj)
-	return nil
+	return NormalizeRef(s, ref, obj)
 }
 
 func NormalizeLocalFunctionRef(s *runtime.Scheme, ref *meta.LocalObjectReference) error {
@@ -289,8 +288,7 @@ func NormalizeLocalFunctionRef(s *runtime.Scheme, ref *meta.LocalObjectReference
 	default:
 		return errors.New("Function reference does not reference a Function or ClusterFunction")
 	}
-	NormalizeLocalRef(s, ref, obj)
-	return nil
+	return NormalizeLocalRef(s, ref, obj)
 }
 
 func NormalizeMediaProcessingEntityRef(s *runtime.Scheme, ref *meta.ObjectReference) error {
@@ -303,8 +301,7 @@ func NormalizeMediaProcessingEntityRef(s *runtime.Scheme, ref *meta.ObjectRefere
 	default:
 		return errors.New("MediaProcessingEntity reference does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
 	}
-	NormalizeRef(s, ref, obj)
-	return nil
+	return NormalizeRef(s, ref, obj)
 }
 
 func NormalizeLocalMediaProcessingEntityRef(s *runtime.Scheme, ref *meta.LocalObjectReference) error {
@@ -317,8 +314,7 @@ func NormalizeLocalMediaProcessingEntityRef(s *runtime.Scheme, ref *meta.LocalOb
 	default:
 		return errors.New("MediaProcessingEntity reference does not reference a MediaProcessingEntity or ClusterMediaProcessingEntity")
 	}
-	NormalizeLocalRef(s, ref, obj)
-	return nil
+	return NormalizeLocalRef(s, ref, obj)
 }
 
 func NormalizeTaskTemplateRef(s *runtime.Scheme, ref *meta.ObjectReference) error {
@@ -331,8 +327,7 @@ func NormalizeTaskTemplateRef(s *runtime.Scheme, ref *meta.ObjectReference) erro
 	default:
 		return errors.New("TaskTemplate reference does not reference a TaskTemplate or ClusterTaskTemplate")
 	}
-	NormalizeRef(s, ref, obj)
-	return nil
+	return NormalizeRef(s, ref, obj)
 }
 
 func NormalizeLocalTaskTemplateRef(s *runtime.Scheme, ref *meta.LocalObjectReference) error {
@@ -345,8 +340,7 @@ func NormalizeLocalTaskTemplateRef(s *runtime.Scheme, ref *meta.LocalObjectRefer
 	default:
 		return errors.New("TaskTemplate reference does not reference a TaskTemplate or ClusterTaskTemplate")
 	}
-	NormalizeLocalRef(s, ref, obj)
-	return nil
+	return NormalizeLocalRef(s, ref, obj)
 }
 
 func LocalFunctionToObjectRef(lref *meta.LocalObjectReference, namespace string) (*meta.ObjectReference, error) {
