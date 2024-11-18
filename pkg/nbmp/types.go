@@ -23,7 +23,7 @@ import (
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-var (
+const (
 	// NBMP brand v1 for nagare media engine.
 	BrandNagareMediaEngineV1 = base.URI("urn:nagare-media:engine:schema:nbmp:v1")
 )
@@ -33,14 +33,21 @@ const (
 )
 
 const (
-	EngineWorkflowIDParameterKey = "engine.nagare.media/workflow-id"
-	EngineTaskIDParameterKey     = "engine.nagare.media/task-id"
+	EngineWorkflowIDParameterKey          = "engine.nagare.media/workflow-id"
+	EngineWorkflowNameParameterKey        = "engine.nagare.media/workflow-name"
+	EngineWorkflowDescriptionParameterKey = "engine.nagare.media/workflow-description"
+	EngineTaskIDParameterKey              = "engine.nagare.media/task-id"
+	EngineTaskNameParameterKey            = "engine.nagare.media/task-name"
+	EngineTaskDescriptionParameterKey     = "engine.nagare.media/task-description"
 )
 
 const (
-	FormatFrameDuration = "duration"
-
-	VideoFormatFrameRateAverage = "frame-rate-avg"
+	TypicalDelayFlowcontrolQueryParameterKey    = "typical-delay"
+	MinDelayFlowcontrolQueryParameterKey        = "min-delay"
+	MaxDelayFlowcontrolQueryParameterKey        = "max-delay"
+	MinThroughputFlowcontrolQueryParameterKey   = "min-throughput"
+	MaxThroughputFlowcontrolQueryParameterKey   = "max-throughput"
+	AveragingWindowFlowcontrolQueryParameterKey = "averaging-window"
 )
 
 // Function interface.

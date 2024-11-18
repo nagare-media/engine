@@ -37,6 +37,7 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/mime"
 	enginenats "github.com/nagare-media/engine/internal/pkg/nats"
+	nbmpconvv2 "github.com/nagare-media/engine/internal/pkg/nbmpconv/v2"
 	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmpclientv2 "github.com/nagare-media/engine/pkg/nbmp/client/v2"
@@ -191,7 +192,8 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context, data *enginev1.WorkflowM
 
 func (c *taskCtrl) convertToNBMPTask(data *enginev1.WorkflowManagerHelperData) (*nbmpv2.Task, error) {
 	t := &nbmpv2.Task{}
-	if err := data.ConvertToNBMPTask(t); err != nil {
+	conv := nbmpconvv2.NewWorkflowManagerHelperDataToTDDConverter(data)
+	if err := conv.Convert(t); err != nil {
 		return nil, err
 	}
 	t.Reporting = &nbmpv2.Reporting{
