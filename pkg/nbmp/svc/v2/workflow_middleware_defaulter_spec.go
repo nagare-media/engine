@@ -19,8 +19,9 @@ package v2
 import (
 	"context"
 
-	"github.com/nagare-media/engine/internal/pkg/uuid"
+	"k8s.io/utils/ptr"
 
+	"github.com/nagare-media/engine/internal/pkg/uuid"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
@@ -39,39 +40,35 @@ var _ WorkflowServiceMiddleware = WorkflowDefaulterSpecMiddleware
 var _ WorkflowService = &workflowDefaulterSpecMiddleware{}
 
 func (m *workflowDefaulterSpecMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
-	if err := m.common(w); err != nil {
+	if err := DefaultWorkflow(w); err != nil {
 		return err
 	}
 
 	if w.General.ID == "" {
 		w.General.ID = uuid.UUIDv4()
 	}
-	w.General.State = &nbmpv2.InstantiatedState
+	w.General.State = ptr.To(nbmpv2.InstantiatedState)
 
 	return m.next.Create(ctx, w)
 }
 
 func (m *workflowDefaulterSpecMiddleware) Update(ctx context.Context, w *nbmpv2.Workflow) error {
-	if err := m.common(w); err != nil {
+	if err := DefaultWorkflow(w); err != nil {
 		return err
 	}
 	return m.next.Update(ctx, w)
 }
 
 func (m *workflowDefaulterSpecMiddleware) Delete(ctx context.Context, w *nbmpv2.Workflow) error {
-	if err := m.common(w); err != nil {
+	if err := DefaultWorkflow(w); err != nil {
 		return err
 	}
 	return m.next.Delete(ctx, w)
 }
 
 func (m *workflowDefaulterSpecMiddleware) Retrieve(ctx context.Context, w *nbmpv2.Workflow) error {
-	if err := m.common(w); err != nil {
+	if err := DefaultWorkflow(w); err != nil {
 		return err
 	}
 	return m.next.Retrieve(ctx, w)
-}
-
-func (m *workflowDefaulterSpecMiddleware) common(w *nbmpv2.Workflow) error {
-	return DefaultWorkflow(w)
 }

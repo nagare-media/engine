@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"github.com/nagare-media/engine/internal/pkg/uuid"
+	"k8s.io/utils/ptr"
 
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
@@ -39,39 +40,35 @@ var _ TaskServiceMiddleware = TaskDefaulterSpecMiddleware
 var _ TaskService = &taskDefaulterSpecMiddleware{}
 
 func (m *taskDefaulterSpecMiddleware) Create(ctx context.Context, t *nbmpv2.Task) error {
-	if err := m.common(t); err != nil {
+	if err := DefaultTask(t); err != nil {
 		return err
 	}
 
 	if t.General.ID == "" {
 		t.General.ID = uuid.UUIDv4()
 	}
-	t.General.State = &nbmpv2.InstantiatedState
+	t.General.State = ptr.To(nbmpv2.InstantiatedState)
 
 	return m.next.Create(ctx, t)
 }
 
 func (m *taskDefaulterSpecMiddleware) Update(ctx context.Context, t *nbmpv2.Task) error {
-	if err := m.common(t); err != nil {
+	if err := DefaultTask(t); err != nil {
 		return err
 	}
 	return m.next.Update(ctx, t)
 }
 
 func (m *taskDefaulterSpecMiddleware) Delete(ctx context.Context, t *nbmpv2.Task) error {
-	if err := m.common(t); err != nil {
+	if err := DefaultTask(t); err != nil {
 		return err
 	}
 	return m.next.Delete(ctx, t)
 }
 
 func (m *taskDefaulterSpecMiddleware) Retrieve(ctx context.Context, t *nbmpv2.Task) error {
-	if err := m.common(t); err != nil {
+	if err := DefaultTask(t); err != nil {
 		return err
 	}
 	return m.next.Retrieve(ctx, t)
-}
-
-func (m *taskDefaulterSpecMiddleware) common(t *nbmpv2.Task) error {
-	return DefaultTask(t)
 }

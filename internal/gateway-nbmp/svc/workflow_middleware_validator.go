@@ -18,6 +18,7 @@ package svc
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
@@ -45,7 +46,7 @@ var _ nbmpsvcv2.WorkflowServiceMiddleware = WorkflowValidatorMiddleware
 var _ nbmpsvcv2.WorkflowService = &workflowValidatorMiddleware{}
 
 func (m *workflowValidatorMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
-	m.common(ctx, w)
+	m.common(w)
 
 	if err := nbmputils.AcknowledgeStatusToErr(nbmputils.UpdateAcknowledgeStatus(w.Acknowledge)); err != nil {
 		return err
@@ -55,7 +56,7 @@ func (m *workflowValidatorMiddleware) Create(ctx context.Context, w *nbmpv2.Work
 }
 
 func (m *workflowValidatorMiddleware) Update(ctx context.Context, w *nbmpv2.Workflow) error {
-	m.common(ctx, w)
+	m.common(w)
 
 	if err := nbmputils.AcknowledgeStatusToErr(nbmputils.UpdateAcknowledgeStatus(w.Acknowledge)); err != nil {
 		return err
@@ -64,9 +65,7 @@ func (m *workflowValidatorMiddleware) Update(ctx context.Context, w *nbmpv2.Work
 	return m.next.Update(ctx, w)
 }
 
-func (m *workflowValidatorMiddleware) common(ctx context.Context, w *nbmpv2.Workflow) {
-	//// Scheme
-
+func (m *workflowValidatorMiddleware) common(w *nbmpv2.Workflow) {
 	//// General
 
 	// we only support nagare media engine NBMP brand
@@ -90,13 +89,62 @@ func (m *workflowValidatorMiddleware) common(ctx context.Context, w *nbmpv2.Work
 
 	//// Processing
 
+	for i, fr := range w.Processing.FunctionRestrictions {
+		if fr.General != nil {
+			// we don't support (nested) function groups
+			if fr.General.IsGroup != nil && *fr.General.IsGroup {
+				w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported,
+					fmt.Sprintf("$.processing.function-restrictions[%d].general.is-group", i))
+			}
+
+			// NBMP brand
+			if fr.General.NBMPBrand != nil &&
+				*fr.General.NBMPBrand != "" &&
+				*fr.General.NBMPBrand != nbmp.BrandNagareMediaEngineV1 {
+				w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported,
+					fmt.Sprintf("$.processing.function-restrictions[%d].general.nbmp-brand", i))
+			}
+		}
+	}
+
+	//// Requirement
+
+	//// Step
+
+	// we don't support Step
+	if w.Step != nil {
+		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.Step")
+	}
+
 	//// ClientAssistant
+
+	// we don't support ClientAssistant
+	if w.ClientAssistant != nil {
+		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.ClientAssistant")
+	}
 
 	//// Failover
 
 	//// Monitoring
 
+	// we don't support Monitoring
+	if w.Monitoring != nil {
+		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.Monitoring")
+	}
+
 	//// Assertion
+
+	// we don't support Assertion
+	if w.Assertion != nil {
+		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.Assertion")
+	}
+
+	//// Reporting
+
+	// we don't support Reporting
+	if w.Reporting != nil {
+		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.Reporting")
+	}
 
 	//// Notification
 
@@ -104,18 +152,21 @@ func (m *workflowValidatorMiddleware) common(ctx context.Context, w *nbmpv2.Work
 	if w.Notification != nil {
 		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.Notification")
 	}
+
 	//// Security
 
 	// we don't support Security
 	if w.Security != nil {
 		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.Security")
 	}
+
 	//// Scale
 
 	// we don't support Scale
 	if w.Scale != nil {
 		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.Scale")
 	}
+
 	//// Schedule
 
 	// we don't support Schedule

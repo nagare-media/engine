@@ -38,7 +38,7 @@ var _ TaskServiceMiddleware = TaskValidatorSpecLaxMiddleware
 var _ TaskService = &taskValidatorSpecLaxMiddleware{}
 
 func (m *taskValidatorSpecLaxMiddleware) Create(ctx context.Context, t *nbmpv2.Task) error {
-	m.common(ctx, t)
+	m.common(t)
 
 	if err := nbmputils.AcknowledgeStatusToErr(nbmputils.UpdateAcknowledgeStatus(t.Acknowledge)); err != nil {
 		return err
@@ -48,7 +48,7 @@ func (m *taskValidatorSpecLaxMiddleware) Create(ctx context.Context, t *nbmpv2.T
 }
 
 func (m *taskValidatorSpecLaxMiddleware) Update(ctx context.Context, t *nbmpv2.Task) error {
-	m.common(ctx, t)
+	m.common(t)
 
 	// task must have an ID
 	if t.General.ID == "" {
@@ -92,6 +92,6 @@ func (m *taskValidatorSpecLaxMiddleware) Retrieve(ctx context.Context, t *nbmpv2
 	return m.next.Retrieve(ctx, t)
 }
 
-func (m *taskValidatorSpecLaxMiddleware) common(ctx context.Context, t *nbmpv2.Task) {
+func (m *taskValidatorSpecLaxMiddleware) common(t *nbmpv2.Task) {
 	// TODO: implement task validation
 }

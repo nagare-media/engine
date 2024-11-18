@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
-	"github.com/nagare-media/engine/pkg/nbmp"
+	nbmpconvv2 "github.com/nagare-media/engine/internal/pkg/nbmpconv/v2"
 	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
@@ -48,60 +48,118 @@ func NewWorkflowService(cfg *enginev1.GatewayNBMPWorkflowServiceConfig, k8sClien
 
 func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
-	l.V(1).Info("creating workflow")
+	l.V(1).Info("create workflow")
 
 	// convert to Kubernetes resources
-	w, err := s.wddToWorkflow(wf)
-	if err != nil {
+	w := enginev1.Workflow{}
+	convw := nbmpconvv2.NewWDDToWorkflowConverter(wf)
+	if err := convw.Convert(&w); err != nil {
 		return err
 	}
 
-	tasks, err := s.wddToTasks(wf, w)
-	if err != nil {
+	tsks := []enginev1.Task{}
+	convtsks := nbmpconvv2.NewWDDToTasksConverter(
+		s.k8s.Scheme(),
+		s.cfg.Kubernetes.GPUResourceName,
+		wf,
+	)
+	if err := convtsks.Convert(&tsks); err != nil {
 		return err
 	}
 
 	// create Kubernetes resources
-	err = s.k8s.Create(ctx, w)
-	if err != nil {
+	if err := s.k8s.Create(ctx, &w); err != nil {
 		return err
 	}
 
-	for _, t := range tasks {
-		err = s.k8s.Create(ctx, t)
-		if err != nil {
+	for _, t := range tsks {
+		if err := s.k8s.Create(ctx, &t); err != nil {
 			return err
 		}
 	}
 
-	return nil
+	// return latest version
+	return s.Retrieve(ctx, wf)
 }
 
 func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
-	l.V(1).Info("updating workflow")
+	l.V(1).Info("update workflow")
 
-	// convert to Kubernetes resources
-	w, err := s.wddToWorkflow(wf)
+	// retrieve current Kubernetes resources
+	wOld := enginev1.Workflow{}
+	err := s.k8s.Get(ctx, client.ObjectKey{Name: wf.General.ID}, &wOld)
 	if err != nil {
 		return err
 	}
 
-	tasks, err := s.wddToTasks(wf, w)
+	tsksOld := &enginev1.TaskList{}
+	err = s.k8s.List(ctx, tsksOld, client.MatchingLabels{
+		enginev1.WorkflowNameLabel: wf.General.ID,
+	})
 	if err != nil {
 		return err
+	}
+
+	// convert new to Kubernetes resources
+	wNew := enginev1.Workflow{}
+	convw := nbmpconvv2.NewWDDToWorkflowConverter(wf)
+	if err := convw.Convert(&wNew); err != nil {
+		return err
+	}
+
+	tsksNew := []enginev1.Task{}
+	convtsks := nbmpconvv2.NewWDDToTasksConverter(
+		s.k8s.Scheme(),
+		s.cfg.Kubernetes.GPUResourceName,
+		wf,
+	)
+	if err := convtsks.Convert(&tsksNew); err != nil {
+		return err
+	}
+
+	// compare old and new
+	tIDs := make(map[string]struct{}, len(tsksNew))
+	inOldTsks := make(map[string]*enginev1.Task, len(tsksOld.Items))
+	inNewTsks := make(map[string]*enginev1.Task, len(tsksNew))
+
+	for _, t := range tsksOld.Items {
+		tIDs[t.Name] = struct{}{}
+		inOldTsks[t.Name] = &t
+	}
+
+	for _, t := range tsksNew {
+		tIDs[t.Name] = struct{}{}
+		inNewTsks[t.Name] = &t
 	}
 
 	// update Kubernetes resources
-	err = s.k8s.Update(ctx, w)
-	if err != nil {
+	if err = s.k8s.Update(ctx, &wNew); err != nil {
 		return err
 	}
 
-	for _, t := range tasks {
-		err = s.k8s.Update(ctx, t)
-		if err != nil {
-			return err
+	for id := range tIDs {
+		_, isOld := inOldTsks[id]
+		_, isNew := inNewTsks[id]
+
+		switch {
+		case !isOld && isNew:
+			// create task
+			if err = s.k8s.Create(ctx, inNewTsks[id]); err != nil {
+				return err
+			}
+
+		case isOld && !isNew:
+			// delete task
+			if err = s.k8s.Delete(ctx, inOldTsks[id]); err != nil {
+				return err
+			}
+
+		case isOld && isNew:
+			// update task
+			if err = s.k8s.Update(ctx, inNewTsks[id]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -111,7 +169,7 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 
 func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
-	l.V(1).Info("deleting workflow")
+	l.V(1).Info("delete workflow")
 
 	// convert to Kubernetes resources
 	w := &enginev1.Workflow{
@@ -122,8 +180,7 @@ func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error
 
 	// delete Kubernetes resources
 	// Tasks have a owner reference and will be deleted automatically
-	err := s.k8s.Delete(ctx, w)
-	if err != nil {
+	if err := s.k8s.Delete(ctx, w); err != nil {
 		return err
 	}
 
@@ -132,30 +189,39 @@ func (s *workflowService) Delete(ctx context.Context, wf *nbmpv2.Workflow) error
 
 func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) error {
 	l := log.FromContext(ctx, "workflowID", wf.General.ID)
-	l.V(1).Info("retrieving workflow")
+	l.V(1).Info("retrieve workflow")
 
 	// retrieve Kubernetes resources
-	w := &enginev1.Workflow{}
-	err := s.k8s.Get(ctx, client.ObjectKey{Name: wf.General.ID}, w)
+	w := enginev1.Workflow{}
+	err := s.k8s.Get(ctx, client.ObjectKey{Name: wf.General.ID}, &w)
 	if err != nil {
 		return err
 	}
-	if w.Labels[IsNBMPLabel] != "true" {
-		return nbmp.ErrNotFound
-	}
 
-	tasks := &enginev1.TaskList{}
-	err = s.k8s.List(ctx, tasks, client.MatchingLabels{
-		IsNBMPLabel:                "true",
+	tsks := &enginev1.TaskList{}
+	err = s.k8s.List(ctx, tsks, client.MatchingLabels{
 		enginev1.WorkflowNameLabel: wf.General.ID,
-		// TODO: set namespace
 	})
 	if err != nil {
 		return err
 	}
 
 	// convert to NBMP workflow description document
-	// TODO: implement
+	wfNew := nbmpv2.Workflow{}
+	convw := nbmpconvv2.NewWorkflowToWDDConverter(&w)
+	if err := convw.Convert(&wfNew); err != nil {
+		return err
+	}
+
+	convtsks := nbmpconvv2.NewTasksToWDDConverter(
+		s.cfg.Kubernetes.GPUResourceName,
+		tsks.Items,
+	)
+	if err := convtsks.Convert(&wfNew); err != nil {
+		return err
+	}
+
+	*wf = wfNew
 
 	return nil
 }

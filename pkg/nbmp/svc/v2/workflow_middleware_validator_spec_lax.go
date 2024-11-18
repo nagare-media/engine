@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
@@ -40,7 +39,7 @@ var _ WorkflowServiceMiddleware = WorkflowValidatorSpecLaxMiddleware
 var _ WorkflowService = &workflowValidatorSpecLaxMiddleware{}
 
 func (m *workflowValidatorSpecLaxMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
-	m.common(ctx, w)
+	m.common(w)
 
 	if err := nbmputils.AcknowledgeStatusToErr(nbmputils.UpdateAcknowledgeStatus(w.Acknowledge)); err != nil {
 		return err
@@ -50,12 +49,7 @@ func (m *workflowValidatorSpecLaxMiddleware) Create(ctx context.Context, w *nbmp
 }
 
 func (m *workflowValidatorSpecLaxMiddleware) Update(ctx context.Context, w *nbmpv2.Workflow) error {
-	m.common(ctx, w)
-
-	// workflows must have an ID
-	if w.General.ID == "" {
-		w.Acknowledge.Failed = append(w.Acknowledge.Failed, "$.general.id")
-	}
+	m.common(w)
 
 	if err := nbmputils.AcknowledgeStatusToErr(nbmputils.UpdateAcknowledgeStatus(w.Acknowledge)); err != nil {
 		return err
@@ -94,12 +88,12 @@ func (m *workflowValidatorSpecLaxMiddleware) Retrieve(ctx context.Context, w *nb
 	return m.next.Retrieve(ctx, w)
 }
 
-func (m *workflowValidatorSpecLaxMiddleware) common(ctx context.Context, w *nbmpv2.Workflow) {
+func (m *workflowValidatorSpecLaxMiddleware) common(w *nbmpv2.Workflow) {
 	//// Scheme
 
 	// validate scheme URI
 	if w.Scheme != nil && w.Scheme.URI != nbmpv2.SchemaURI {
-		w.Acknowledge.Failed = append(w.Acknowledge.Failed, "$.scheme.uri")
+		w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.scheme.uri")
 	}
 
 	//// General
@@ -111,12 +105,12 @@ func (m *workflowValidatorSpecLaxMiddleware) common(ctx context.Context, w *nbmp
 	}
 
 	// workflows have no input-ports
-	if w.General.InputPorts != nil || len(w.General.InputPorts) != 0 {
+	if len(w.General.InputPorts) != 0 {
 		w.Acknowledge.Failed = append(w.Acknowledge.Failed, "$.general.input-ports")
 	}
 
 	// workflows have no output-ports
-	if w.General.OutputPorts != nil || len(w.General.OutputPorts) != 0 {
+	if len(w.General.OutputPorts) != 0 {
 		w.Acknowledge.Failed = append(w.Acknowledge.Failed, "$.general.output-ports")
 	}
 
@@ -125,19 +119,29 @@ func (m *workflowValidatorSpecLaxMiddleware) common(ctx context.Context, w *nbmp
 		w.Acknowledge.Failed = append(w.Acknowledge.Failed, "$.general.is-group")
 	}
 
-	//// Reporting
+	//// Repository
 
 	//// Input
 
 	// NBMP spec does not allow workflows with no input. Let's be more flexible and allow in-workflow media generation.
-	// if len(w.Input.MediaParameters) == 0 && len(w.Input.MetadataParameters) == 0 {
-	// 	w.Acknowledge.Failed = append(w.Acknowledge.Failed, "$.input.media-parameters", "$.input.metadata-parameters")
-	// }
+
+	streamIDs := make(map[string]struct{})
 
 	for i, mp := range w.Input.MediaParameters {
 		// StreamID must be set
 		if mp.StreamID == "" {
 			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.input.media-parameters[%d].stream-id", i))
+		}
+
+		// StreamID muss be unique
+		if _, dup := streamIDs[mp.StreamID]; dup {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.input.media-parameters[%d].stream-id", i))
+		}
+		streamIDs[mp.StreamID] = struct{}{}
+
+		// timeout musst be >= 1 if set
+		if mp.Timeout != nil && *mp.Timeout < 1 {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.input.media-parameters[%d].timeout", i))
 		}
 	}
 
@@ -146,19 +150,40 @@ func (m *workflowValidatorSpecLaxMiddleware) common(ctx context.Context, w *nbmp
 		if mp.StreamID == "" {
 			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.input.metadata-parameters[%d].stream-id", i))
 		}
+
+		// StreamID muss be unique
+		if _, dup := streamIDs[mp.StreamID]; dup {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.input.metadata-parameters[%d].stream-id", i))
+		}
+		streamIDs[mp.StreamID] = struct{}{}
+
+		// timeout musst be >= 1 if set
+		if mp.Timeout != nil && *mp.Timeout < 1 {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.input.metadata-parameters[%d].timeout", i))
+		}
 	}
+
+	// Timeout >= 1 || nil
 
 	//// Output
 
 	// NBMP spec does not allow workflows with no output. Let's be more flexible and allow empty outputs.
-	// if len(w.Output.MediaParameters) == 0 && len(w.Output.MetadataParameters) == 0 {
-	// 	w.Acknowledge.Failed = append(w.Acknowledge.Failed, "$.output.media-parameters", "$.output.metadata-parameters")
-	// }
 
 	for i, mp := range w.Output.MediaParameters {
 		// StreamID must be set
 		if mp.StreamID == "" {
 			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.output.media-parameters[%d].stream-id", i))
+		}
+
+		// StreamID muss be unique
+		if _, dup := streamIDs[mp.StreamID]; dup {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.output.media-parameters[%d].stream-id", i))
+		}
+		streamIDs[mp.StreamID] = struct{}{}
+
+		// timeout musst be >= 1 if set
+		if mp.Timeout != nil && *mp.Timeout < 1 {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.output.media-parameters[%d].timeout", i))
 		}
 	}
 
@@ -167,7 +192,20 @@ func (m *workflowValidatorSpecLaxMiddleware) common(ctx context.Context, w *nbmp
 		if mp.StreamID == "" {
 			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.output.metadata-parameters[%d].stream-id", i))
 		}
+
+		// StreamID muss be unique
+		if _, dup := streamIDs[mp.StreamID]; dup {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.output.metadata-parameters[%d].stream-id", i))
+		}
+		streamIDs[mp.StreamID] = struct{}{}
+
+		// timeout musst be >= 1 if set
+		if mp.Timeout != nil && *mp.Timeout < 1 {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.output.metadata-parameters[%d].timeout", i))
+		}
 	}
+
+	// Timeout >= 1 || nil
 
 	//// Processing
 
@@ -176,6 +214,25 @@ func (m *workflowValidatorSpecLaxMiddleware) common(ctx context.Context, w *nbmp
 		// URL shall not be set
 		if img.URL != "" {
 			w.Acknowledge.Failed = append(w.Acknowledge.Failed, fmt.Sprintf("$.processing.image[%d].url", i))
+		}
+	}
+
+	for i, cmi := range w.Processing.ConnectionMap {
+		if cmi.ConnectionID == "" {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed,
+				fmt.Sprintf("$.processing.connection-map[%d].connection-id", i))
+		}
+
+		// output-restrictions only allowed for "to" objects
+		if cmi.From.OutputRestrictions != nil {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed,
+				fmt.Sprintf("$.processing.connection-map[%d].from.output-restrictions", i))
+		}
+
+		// input-restrictions only allowed for "from" objects
+		if cmi.To.InputRestrictions != nil {
+			w.Acknowledge.Failed = append(w.Acknowledge.Failed,
+				fmt.Sprintf("$.processing.connection-map[%d].from.input-restrictions", i))
 		}
 	}
 
@@ -192,36 +249,22 @@ func (m *workflowValidatorSpecLaxMiddleware) common(ctx context.Context, w *nbmp
 				w.Acknowledge.Failed = append(w.Acknowledge.Failed,
 					fmt.Sprintf("$.processing.function-restrictions[%d].general.id", i))
 			}
-
-			// we don't support (nested) function groups
-			if fr.General.IsGroup != nil && *fr.General.IsGroup {
-				w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported,
-					fmt.Sprintf("$.processing.function-restrictions[%d].general.is-group", i))
-			}
-
-			// NBMP brand
-			if fr.General.NBMPBrand != nil &&
-				*fr.General.NBMPBrand != "" &&
-				*fr.General.NBMPBrand != nbmp.BrandNagareMediaEngineV1 {
-				w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported,
-					fmt.Sprintf("$.processing.function-restrictions[%d].general.nbmp-brand", i))
-			}
 		}
 	}
+
+	//// Requirement
+
+	//// Step
 
 	//// ClientAssistant
-
-	if w.ClientAssistant != nil {
-		if w.ClientAssistant.ClientAssistanceFlag {
-			w.Acknowledge.Unsupported = append(w.Acknowledge.Unsupported, "$.client-assistant.client-assistance-flag")
-		}
-	}
 
 	//// Failover
 
 	//// Monitoring
 
 	//// Assertion
+
+	//// Reporting
 
 	//// Notification
 
