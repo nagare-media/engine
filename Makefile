@@ -35,9 +35,9 @@ TESTENV_TEMPO_VERSION                 ?= 1.10.3 # Helm chart versions
 TESTENV_MINIO_VERSION                 ?= 5.2.0  # Helm chart versions
 TESTENV_NATS_VERSION                  ?= 1.2.2  # Helm chart versions
 
-CONTROLLER_TOOLS_VERSION ?= v0.16.1
-KUSTOMIZE_VERSION        ?= v5.4.3
-YQ_VERSION               ?= v4.44.3
+CONTROLLER_TOOLS_VERSION ?= v0.16.5
+KUSTOMIZE_VERSION        ?= v5.5.0
+YQ_VERSION               ?= v4.44.5
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 
 # Do not change
