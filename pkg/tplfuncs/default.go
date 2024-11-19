@@ -27,7 +27,7 @@ var defaultFuncMap = template.FuncMap{}
 
 func init() {
 	defaultFuncMap = maps.DeepMerge(defaultFuncMap, sprig.FuncMap())
-	defaultFuncMap = maps.DeepMerge(defaultFuncMap, nagareFuncMap)
+	defaultFuncMap = maps.DeepMerge(defaultFuncMap, engineFuncMap)
 }
 
 func DefaultFuncMap() template.FuncMap {

@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	nagareFuncMap = template.FuncMap{
+	engineFuncMap = template.FuncMap{
 		"toYAML": toYAML,
 	}
 )
