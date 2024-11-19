@@ -1,9 +1,9 @@
 apiVersion: engine.nagare.media/v1alpha1
-kind: GatewayNBMPConfiguration
+kind: GatewayNBMPConfig
 metadata:
   labels:
-    app.kubernetes.io/name: gatewaynbmpconfiguration
-    app.kubernetes.io/instance: gateway-nbmp-configuration
+    app.kubernetes.io/name: gatewaynbmpconfig
+    app.kubernetes.io/instance: gateway-nbmp-config
     app.kubernetes.io/component: gateway-nbmp
     app.kubernetes.io/created-by: nagare-media-engine
     app.kubernetes.io/part-of: nagare-media-engine

@@ -1,9 +1,9 @@
 apiVersion: engine.nagare.media/v1alpha1
-kind: WorkflowManagerConfiguration
+kind: WorkflowManagerConfig
 metadata:
   labels:
-    app.kubernetes.io/name: workflowmanagerconfiguration
-    app.kubernetes.io/instance: workflow-manager-configuration
+    app.kubernetes.io/name: workflowmanagerconfig
+    app.kubernetes.io/instance: workflow-manager-config
     app.kubernetes.io/component: workflow-manager
     app.kubernetes.io/created-by: nagare-media-engine
     app.kubernetes.io/part-of: nagare-media-engine

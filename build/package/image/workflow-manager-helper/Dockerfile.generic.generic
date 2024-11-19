@@ -62,7 +62,7 @@ USER 65532:65532
 
 COPY <<EOF /config/workflow-manager-helper.yaml
 apiVersion: engine.nagare.media/v1alpha1
-kind: WorkflowManagerHelperConfiguration
+kind: WorkflowManagerHelperConfig
 task:
   # assume task is a sidecar
   taskAPI: http://127.0.0.1:8888/v2/tasks

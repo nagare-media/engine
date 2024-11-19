@@ -15,7 +15,7 @@ generatorOptions:
 secretGenerator:
   - name: workflow-manager-config
     files:
-      - workflow-manager.yaml=workflow-manager_configuration.yaml
+      - workflow-manager.yaml=workflow-manager_config.yaml
 
 configurations:
   - kustomizeconfig.yaml

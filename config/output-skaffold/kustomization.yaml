@@ -15,8 +15,8 @@ secretGenerator:
   - name: gateway-nbmp-config
     behavior: replace
     files:
-      - gateway-nbmp.yaml=gateway-nbmp_configuration.yaml
+      - gateway-nbmp.yaml=gateway-nbmp_config.yaml
   - name: workflow-manager-config
     behavior: replace
     files:
-      - workflow-manager.yaml=workflow-manager_configuration.yaml
+      - workflow-manager.yaml=workflow-manager_config.yaml

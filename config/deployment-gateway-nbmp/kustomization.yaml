@@ -8,4 +8,4 @@ generatorOptions:
 secretGenerator:
   - name: gateway-nbmp-config
     files:
-      - gateway-nbmp.yaml=gateway-nbmp_configuration.yaml
+      - gateway-nbmp.yaml=gateway-nbmp_config.yaml

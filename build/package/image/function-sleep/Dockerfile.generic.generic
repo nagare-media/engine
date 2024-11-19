@@ -70,7 +70,7 @@ USER 65532:65532
 
 COPY <<EOF /config/task-shim.yaml
 apiVersion: engine.nagare.media/v1alpha1
-kind: TaskShimConfiguration
+kind: TaskShimConfig
 task:
   actions:
     - name: write task description document

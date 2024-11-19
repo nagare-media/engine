@@ -118,28 +118,28 @@ resources:
     crdVersion: v1
     namespaced: true
   domain: engine.nagare.media
-  kind: WorkflowManagerConfiguration
+  kind: WorkflowManagerConfig
   path: github.com/nagare-media/engine/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   domain: engine.nagare.media
-  kind: GatewayNBMPConfiguration
+  kind: GatewayNBMPConfig
   path: github.com/nagare-media/engine/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   domain: engine.nagare.media
-  kind: TaskShimConfiguration
+  kind: TaskShimConfig
   path: github.com/nagare-media/engine/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   domain: engine.nagare.media
-  kind: WorkflowManagerHelperConfiguration
+  kind: WorkflowManagerHelperConfig
   path: github.com/nagare-media/engine/api/v1alpha1
   version: v1alpha1
 - api:

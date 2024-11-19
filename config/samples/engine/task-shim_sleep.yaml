@@ -1,5 +1,5 @@
 apiVersion: engine.nagare.media/v1alpha1
-kind: TaskShimConfiguration
+kind: TaskShimConfig
 task:
   actions:
     - name: write task description document

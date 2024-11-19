@@ -102,7 +102,7 @@ func (c *GatewayNBMPConfig) Validate() error {
 	if c.WorkflowService.Kubernetes.GPUResourceName == "" {
 		return errors.New("missing workflow.kubernetes.gpuResourceName")
 	}
-	if err := c.Webserver.Validate("webserver"); err != nil {
+	if err := c.Webserver.Validate("webserver."); err != nil {
 		return err
 	}
 	return nil

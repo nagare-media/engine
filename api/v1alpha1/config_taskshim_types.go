@@ -168,7 +168,7 @@ func (c *TaskShimConfig) Validate() error {
 	if c.TaskService.DeleteTimeout == nil {
 		return errors.New("missing task.deleteTimeout")
 	}
-	if err := c.Webserver.Validate("webserver"); err != nil {
+	if err := c.Webserver.Validate("webserver."); err != nil {
 		return err
 	}
 	return nil
