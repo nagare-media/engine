@@ -20,7 +20,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -749,24 +748,24 @@ func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
 		return nil, errors.New("missing caching-server-url for media input")
 	}
 
-	fpsStr, ok := nbmputils.GetStringParameterValue(in.VideoFormat, nbmp.VideoFormatFrameRateAverage)
-	if !ok {
-		return nil, fmt.Errorf("missing video format %s parameter", nbmp.VideoFormatFrameRateAverage)
-	}
-	fpsFloat, err := strconv.ParseFloat(fpsStr, 64)
-	if err != nil {
-		return nil, errors.New("only integer frame rates are supported")
-	}
-	f.inVideoFPS = int(math.Round(fpsFloat))
+	// fpsStr, ok := nbmputils.GetStringParameterValue(in.VideoFormat, nbmp.VideoFormatFrameRateAverage)
+	// if !ok {
+	// 	return nil, fmt.Errorf("missing video format %s parameter", nbmp.VideoFormatFrameRateAverage)
+	// }
+	// fpsFloat, err := strconv.ParseFloat(fpsStr, 64)
+	// if err != nil {
+	// 	return nil, errors.New("only integer frame rates are supported")
+	// }
+	// f.inVideoFPS = int(math.Round(fpsFloat))
 
-	durationStr, ok := nbmputils.GetStringParameterValue(in.VideoFormat, nbmp.FormatFrameDuration)
-	if !ok {
-		return nil, fmt.Errorf("missing video format %s parameter", nbmp.FormatFrameDuration)
-	}
-	f.inVideoDur, err = time.ParseDuration(durationStr)
-	if err != nil {
-		return nil, fmt.Errorf("video format %s parameter is not a duration", nbmp.FormatFrameDuration)
-	}
+	// durationStr, ok := nbmputils.GetStringParameterValue(in.VideoFormat, nbmp.FormatFrameDuration)
+	// if !ok {
+	// 	return nil, fmt.Errorf("missing video format %s parameter", nbmp.FormatFrameDuration)
+	// }
+	// f.inVideoDur, err = time.ParseDuration(durationStr)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("video format %s parameter is not a duration", nbmp.FormatFrameDuration)
+	// }
 
 	// output
 
