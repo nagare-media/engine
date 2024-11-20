@@ -29,6 +29,7 @@ var (
 	DefaultWorkflowManagerHelperConfig = WorkflowManagerHelperConfig{
 		WorkflowManagerHelperConfigSpec: WorkflowManagerHelperConfigSpec{
 			TaskController: WorkflowManagerHelperTaskControllerConfig{
+				TaskAPI:                "http://127.0.0.1:8888/v2/tasks",
 				CreateRequestTimeout:   &metav1.Duration{Duration: 3 * time.Minute},
 				RetrieveRequestTimeout: &metav1.Duration{Duration: 10 * time.Second},
 				UpdateRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
