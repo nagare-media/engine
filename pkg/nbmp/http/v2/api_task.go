@@ -98,7 +98,7 @@ func (api *taskAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Task) er
 		} else {
 			selfURL = *api.cfg.PublicBaseURL
 		}
-		selfURL += "/" + c.Path() + "/" + t.General.ID
+		selfURL += c.Path() + "/" + t.General.ID
 
 		// set status and headers
 		c.Set(fiber.HeaderContentType, nbmpv2.TaskDescriptionDocumentMIMEType)

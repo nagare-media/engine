@@ -191,9 +191,8 @@ func (c *wddToTasksConverter) convertProcessingFunctionRestrictions() error {
 					return fmt.Errorf("convert: unexpected function requirement: unexpected general.id format: '%s'", fr.General.ID)
 				}
 				ref := &meta.LocalObjectReference{
-					APIVersion: enginev1.GroupVersion.Identifier(),
-					Kind:       fr.General.ID[:i],
-					Name:       fr.General.ID[i+1 : len(fr.General.ID)],
+					Kind: fr.General.ID[:i],
+					Name: fr.General.ID[i+1 : len(fr.General.ID)],
 				}
 				if err := utils.NormalizeLocalFunctionRef(c.schema, ref); err != nil {
 					return err
@@ -333,6 +332,7 @@ func (c *wddToTasksConverter) convertProcessingConnectionMap() error {
 					return fmt.Errorf("convert: unknown function instance '%s'", cm.From.Instance)
 				}
 				fromTsk = instance.DeepCopy()
+				fromTsk.Name = cm.From.ID
 			}
 		}
 
@@ -350,6 +350,7 @@ func (c *wddToTasksConverter) convertProcessingConnectionMap() error {
 					return fmt.Errorf("convert: unknown function instance '%s'", cm.To.Instance)
 				}
 				toTsk = instance.DeepCopy()
+				toTsk.Name = cm.To.ID
 			}
 		}
 
@@ -368,8 +369,8 @@ func (c *wddToTasksConverter) convertProcessingConnectionMap() error {
 			return err
 		}
 
-		// attach output port to output stream
 		if !fromIsWfInput {
+			// attach output port to output stream
 			// $.processing.connection-map[].from.port-name
 			var p *enginev1.OutputPortBindings
 			for i := range fromTsk.Spec.OutputPorts {
@@ -393,8 +394,8 @@ func (c *wddToTasksConverter) convertProcessingConnectionMap() error {
 			c.tskMap[cm.From.ID] = fromTsk
 		}
 
-		// attach input port to input stream
 		if !toIsWfOutput {
+			// attach input port to input stream
 			// $.processing.connection-map[].to.port-name
 			var p *enginev1.InputPortBinding
 			for i := range toTsk.Spec.InputPorts {

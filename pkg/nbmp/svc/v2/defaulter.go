@@ -48,22 +48,22 @@ func DefaultFunction(f *nbmpv2.Function) error {
 			return err
 		}
 	}
-	if f.Step == nil {
+	if f.Step != nil {
 		if err := DefaultStep(f.Step); err != nil {
 			return err
 		}
 	}
-	if f.ClientAssistant == nil {
+	if f.ClientAssistant != nil {
 		if err := DefaultClientAssistant(f.ClientAssistant); err != nil {
 			return err
 		}
 	}
-	if f.Assertion == nil {
+	if f.Assertion != nil {
 		if err := DefaultAssertion(f.Assertion); err != nil {
 			return err
 		}
 	}
-	if f.Security == nil {
+	if f.Security != nil {
 		if err := DefaultSecurity(f.Security); err != nil {
 			return err
 		}
@@ -81,17 +81,17 @@ func DefaultMediaProcessingEntityCapabilities(mpec *nbmpv2.MediaProcessingEntity
 	if err := DefaultGeneral(&mpec.General); err != nil {
 		return err
 	}
-	if mpec.Capabilities == nil {
+	if mpec.Capabilities != nil {
 		if err := DefaultCapabilities(mpec.Capabilities); err != nil {
 			return err
 		}
 	}
-	if mpec.Reporting == nil {
+	if mpec.Reporting != nil {
 		if err := DefaultReporting(mpec.Reporting); err != nil {
 			return err
 		}
 	}
-	if mpec.Notification == nil {
+	if mpec.Notification != nil {
 		if err := DefaultNotification(mpec.Notification); err != nil {
 			return err
 		}
@@ -126,32 +126,32 @@ func DefaultWorkflow(w *nbmpv2.Workflow) error {
 	if err := DefaultRequirement(&w.Requirement); err != nil {
 		return err
 	}
-	if w.Step == nil {
+	if w.Step != nil {
 		if err := DefaultStep(w.Step); err != nil {
 			return err
 		}
 	}
-	if w.ClientAssistant == nil {
+	if w.ClientAssistant != nil {
 		if err := DefaultClientAssistant(w.ClientAssistant); err != nil {
 			return err
 		}
 	}
-	if w.Failover == nil {
+	if w.Failover != nil {
 		if err := DefaultFailover(w.Failover); err != nil {
 			return err
 		}
 	}
-	if w.Assertion == nil {
+	if w.Assertion != nil {
 		if err := DefaultAssertion(w.Assertion); err != nil {
 			return err
 		}
 	}
-	if w.Reporting == nil {
+	if w.Reporting != nil {
 		if err := DefaultReporting(w.Reporting); err != nil {
 			return err
 		}
 	}
-	if w.Notification == nil {
+	if w.Notification != nil {
 		if err := DefaultNotification(w.Notification); err != nil {
 			return err
 		}
@@ -161,17 +161,17 @@ func DefaultWorkflow(w *nbmpv2.Workflow) error {
 	if err := DefaultAcknowledge(w.Acknowledge); err != nil {
 		return err
 	}
-	if w.Security == nil {
+	if w.Security != nil {
 		if err := DefaultSecurity(w.Security); err != nil {
 			return err
 		}
 	}
-	if w.Scale == nil {
+	if w.Scale != nil {
 		if err := DefaultScale(w.Scale); err != nil {
 			return err
 		}
 	}
-	if w.Schedule == nil {
+	if w.Schedule != nil {
 		if err := DefaultSchedule(w.Schedule); err != nil {
 			return err
 		}
@@ -201,32 +201,32 @@ func DefaultTask(t *nbmpv2.Task) error {
 	if err := DefaultRequirement(&t.Requirement); err != nil {
 		return err
 	}
-	if t.Step == nil {
+	if t.Step != nil {
 		if err := DefaultStep(t.Step); err != nil {
 			return err
 		}
 	}
-	if t.ClientAssistant == nil {
+	if t.ClientAssistant != nil {
 		if err := DefaultClientAssistant(t.ClientAssistant); err != nil {
 			return err
 		}
 	}
-	if t.Failover == nil {
+	if t.Failover != nil {
 		if err := DefaultFailover(t.Failover); err != nil {
 			return err
 		}
 	}
-	if t.Assertion == nil {
+	if t.Assertion != nil {
 		if err := DefaultAssertion(t.Assertion); err != nil {
 			return err
 		}
 	}
-	if t.Reporting == nil {
+	if t.Reporting != nil {
 		if err := DefaultReporting(t.Reporting); err != nil {
 			return err
 		}
 	}
-	if t.Notification == nil {
+	if t.Notification != nil {
 		if err := DefaultNotification(t.Notification); err != nil {
 			return err
 		}
@@ -236,17 +236,17 @@ func DefaultTask(t *nbmpv2.Task) error {
 	if err := DefaultAcknowledge(t.Acknowledge); err != nil {
 		return err
 	}
-	if t.Security == nil {
+	if t.Security != nil {
 		if err := DefaultSecurity(t.Security); err != nil {
 			return err
 		}
 	}
-	if t.Scale == nil {
+	if t.Scale != nil {
 		if err := DefaultScale(t.Scale); err != nil {
 			return err
 		}
 	}
-	if t.Schedule == nil {
+	if t.Schedule != nil {
 		if err := DefaultSchedule(t.Schedule); err != nil {
 			return err
 		}
@@ -431,12 +431,12 @@ func DefaultFunctionRestriction(fr *nbmpv2.FunctionRestriction) error {
 			return err
 		}
 	}
-	if fr.Step == nil {
+	if fr.Step != nil {
 		if err := DefaultStep(fr.Step); err != nil {
 			return err
 		}
 	}
-	if fr.Security == nil {
+	if fr.Security != nil {
 		if err := DefaultSecurity(fr.Security); err != nil {
 			return err
 		}

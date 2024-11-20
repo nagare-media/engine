@@ -163,8 +163,6 @@ func (m *workflowValidatorSpecLaxMiddleware) common(w *nbmpv2.Workflow) {
 		}
 	}
 
-	// Timeout >= 1 || nil
-
 	//// Output
 
 	// NBMP spec does not allow workflows with no output. Let's be more flexible and allow empty outputs.
@@ -205,8 +203,6 @@ func (m *workflowValidatorSpecLaxMiddleware) common(w *nbmpv2.Workflow) {
 		}
 	}
 
-	// Timeout >= 1 || nil
-
 	//// Processing
 
 	// Image (we will ignore this fields anyways)
@@ -244,11 +240,11 @@ func (m *workflowValidatorSpecLaxMiddleware) common(w *nbmpv2.Workflow) {
 					fmt.Sprintf("$.processing.function-restrictions[%d].instance", i))
 			}
 
-			// functions must have an ID
-			if fr.General.ID == "" {
-				w.Acknowledge.Failed = append(w.Acknowledge.Failed,
-					fmt.Sprintf("$.processing.function-restrictions[%d].general.id", i))
-			}
+			// TODO: functions must have an ID or processing keywords
+			// if fr.General.ID == "" {
+			// 	w.Acknowledge.Failed = append(w.Acknowledge.Failed,
+			// 		fmt.Sprintf("$.processing.function-restrictions[%d].general.id", i))
+			// }
 		}
 	}
 

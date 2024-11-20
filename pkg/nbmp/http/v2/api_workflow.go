@@ -98,7 +98,7 @@ func (api *workflowAPI) handleRequest(svcCall func(context.Context, *nbmpv2.Work
 		} else {
 			selfURL = *api.cfg.PublicBaseURL
 		}
-		selfURL += "/" + c.Path() + "/" + w.General.ID
+		selfURL += c.Path() + "/" + w.General.ID
 
 		// set status and headers
 		c.Set(fiber.HeaderContentType, nbmpv2.WorkflowDescriptionDocumentMIMEType)

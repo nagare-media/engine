@@ -134,30 +134,33 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 	}
 
 	// update Kubernetes resources
+	// TODO: should we DeepCopy and try to merge with existing resources instead of overwrite?
+	wNew.SetResourceVersion(wOld.GetResourceVersion())
 	if err = s.k8s.Update(ctx, &wNew); err != nil {
 		return err
 	}
 
 	for id := range tIDs {
-		_, isOld := inOldTsks[id]
-		_, isNew := inNewTsks[id]
+		tOld, isOld := inOldTsks[id]
+		tNew, isNew := inNewTsks[id]
 
 		switch {
 		case !isOld && isNew:
 			// create task
-			if err = s.k8s.Create(ctx, inNewTsks[id]); err != nil {
+			if err = s.k8s.Create(ctx, tNew); err != nil {
 				return err
 			}
 
 		case isOld && !isNew:
 			// delete task
-			if err = s.k8s.Delete(ctx, inOldTsks[id]); err != nil {
+			if err = s.k8s.Delete(ctx, tOld); err != nil {
 				return err
 			}
 
 		case isOld && isNew:
 			// update task
-			if err = s.k8s.Update(ctx, inNewTsks[id]); err != nil {
+			tNew.SetResourceVersion(tOld.GetResourceVersion())
+			if err = s.k8s.Update(ctx, tNew); err != nil {
 				return err
 			}
 		}

@@ -68,6 +68,7 @@ func (c *tasksToWDDConverter) Reset(tsks []enginev1.Task) {
 	c.streamIDs = make(map[string]struct{})
 	c.inputMap = make(map[string]*nbmpv2.Input)
 	c.outputMap = make(map[string]*nbmpv2.Output)
+	c.connectionMap = make(map[string]*nbmpv2.ConnectionMapping)
 }
 
 func (c *tasksToWDDConverter) Convert(wf *nbmpv2.Workflow) error {

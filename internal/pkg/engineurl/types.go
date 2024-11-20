@@ -48,7 +48,7 @@ func (u *URL) Parse() (ParsedURL, error) {
 		return nil, fmt.Errorf("engineurl: unknown scheme: %s", url.Scheme)
 	}
 
-	p := url.EscapedPath()
+	p := strings.TrimLeft(url.EscapedPath(), "/")
 	seg := strings.Split(p, "/")
 
 	switch seg[0] {
