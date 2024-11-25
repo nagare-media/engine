@@ -270,7 +270,7 @@ func (r *WorkflowReconciler) reconcileTasks(ctx context.Context, wf *enginev1.Wo
 	return ctrl.Result{}, nil
 }
 
-func (r *WorkflowReconciler) reconcileFailedTask(ctx context.Context, wf *enginev1.Workflow, task *enginev1.Task) {
+func (r *WorkflowReconciler) reconcileFailedTask(_ context.Context, wf *enginev1.Workflow, task *enginev1.Task) {
 	if utils.WorkflowHasTerminated(wf) {
 		// ignore failed tasks if Workflow already terminated
 		return
