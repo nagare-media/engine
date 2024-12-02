@@ -16,11 +16,11 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/google/uuid v1.6.0
 	github.com/mattn/go-isatty v0.0.20
-	github.com/minio/minio-go/v7 v7.0.80
+	github.com/minio/minio-go/v7 v7.0.81
 	github.com/nagare-media/models.go v0.0.0-20241028103833-42e87c3ea1d7
 	github.com/nats-io/nats.go v1.37.0
 	github.com/onsi/ginkgo/v2 v2.22.0
-	github.com/onsi/gomega v1.35.1
+	github.com/onsi/gomega v1.36.0
 	go.uber.org/zap v1.27.0
 	k8s.io/api v0.31.3
 	k8s.io/apiextensions-apiserver v0.31.3
