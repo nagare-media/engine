@@ -33,6 +33,10 @@ const (
 
 type URL string
 
+func IsEngineURL(u string) bool {
+	return strings.HasPrefix(u, NagareEngineScheme+"://")
+}
+
 func Parse(u string) (ParsedURL, error) {
 	url := URL(u)
 	return url.Parse()
