@@ -17,6 +17,7 @@
 # Validation
 
 [ -n "${CONTROLLER_GEN}" ] || fatal "mandatory variable \$CONTROLLER_GEN is empty"
+[ -n "${YQ}" ] || fatal "mandatory variable \$YQ is empty"
 
 # Main
 
@@ -30,7 +31,14 @@
 "${CONTROLLER_GEN}" \
   paths="./..." \
   webhook \
-  output:stdout > config/deployment-workflow-manager/workflow-manager_admission-webhooks.yaml
+  output:stdout > config/deployment-workflow-manager/.workflow-manager_admission-webhooks.yaml
+
+# set correct service name and port
+"${YQ}" --no-colors '(.webhooks[].clientConfig.service.name = "workflow-manager") | (.webhooks[].clientConfig.service.port |= 9443)' \
+  < config/deployment-workflow-manager/.workflow-manager_admission-webhooks.yaml \
+  > config/deployment-workflow-manager/workflow-manager_admission-webhooks.yaml
+
+rm config/deployment-workflow-manager/.workflow-manager_admission-webhooks.yaml
 
 # RBAC
 "${CONTROLLER_GEN}" \

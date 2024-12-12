@@ -4,409 +4,429 @@ kind: MutatingWebhookConfiguration
 metadata:
   name: mutating-webhook-configuration
 webhooks:
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-clusterfunction
-  failurePolicy: Fail
-  name: mclusterfunction.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clusterfunctions
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-clustermedialocation
-  failurePolicy: Fail
-  name: mclustermedialocation.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clustermedialocations
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-clustermediaprocessingentity
-  failurePolicy: Fail
-  name: mclustermediaprocessingentity.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clustermediaprocessingentities
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-clustertasktemplate
-  failurePolicy: Fail
-  name: mclustertasktemplate.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clustertasktemplates
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-function
-  failurePolicy: Fail
-  name: mfunction.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - functions
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-medialocation
-  failurePolicy: Fail
-  name: mmedialocation.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - medialocations
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-mediaprocessingentity
-  failurePolicy: Fail
-  name: mmediaprocessingentity.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - mediaprocessingentities
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-task
-  failurePolicy: Fail
-  name: mtask.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - tasks
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-tasktemplate
-  failurePolicy: Fail
-  name: mtasktemplate.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - tasktemplates
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-engine-nagare-media-v1alpha1-workflow
-  failurePolicy: Fail
-  name: mworkflow.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - workflows
-  sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-clusterfunction
+        port: 9443
+    failurePolicy: Fail
+    name: mclusterfunction.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clusterfunctions
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-clustermedialocation
+        port: 9443
+    failurePolicy: Fail
+    name: mclustermedialocation.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clustermedialocations
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-clustermediaprocessingentity
+        port: 9443
+    failurePolicy: Fail
+    name: mclustermediaprocessingentity.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clustermediaprocessingentities
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-clustertasktemplate
+        port: 9443
+    failurePolicy: Fail
+    name: mclustertasktemplate.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clustertasktemplates
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-function
+        port: 9443
+    failurePolicy: Fail
+    name: mfunction.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - functions
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-medialocation
+        port: 9443
+    failurePolicy: Fail
+    name: mmedialocation.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - medialocations
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-mediaprocessingentity
+        port: 9443
+    failurePolicy: Fail
+    name: mmediaprocessingentity.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - mediaprocessingentities
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-task
+        port: 9443
+    failurePolicy: Fail
+    name: mtask.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - tasks
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-tasktemplate
+        port: 9443
+    failurePolicy: Fail
+    name: mtasktemplate.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - tasktemplates
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /mutate-engine-nagare-media-v1alpha1-workflow
+        port: 9443
+    failurePolicy: Fail
+    name: mworkflow.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - workflows
+    sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: validating-webhook-configuration
 webhooks:
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-clusterfunction
-  failurePolicy: Fail
-  name: vclusterfunction.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clusterfunctions
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-clustermedialocation
-  failurePolicy: Fail
-  name: vclustermedialocation.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clustermedialocations
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity
-  failurePolicy: Fail
-  name: vclustermediaprocessingentity.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clustermediaprocessingentities
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-clustertasktemplate
-  failurePolicy: Fail
-  name: vclustertasktemplate.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clustertasktemplates
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-function
-  failurePolicy: Fail
-  name: vfunction.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - functions
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-medialocation
-  failurePolicy: Fail
-  name: vmedialocation.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - medialocations
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-mediaprocessingentity
-  failurePolicy: Fail
-  name: vmediaprocessingentity.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - mediaprocessingentities
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-task
-  failurePolicy: Fail
-  name: vtask.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - tasks
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-tasktemplate
-  failurePolicy: Fail
-  name: vtasktemplate.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - tasktemplates
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-engine-nagare-media-v1alpha1-workflow
-  failurePolicy: Fail
-  name: vworkflow.engine.nagare.media
-  rules:
-  - apiGroups:
-    - engine.nagare.media
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - workflows
-  sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-clusterfunction
+        port: 9443
+    failurePolicy: Fail
+    name: vclusterfunction.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clusterfunctions
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-clustermedialocation
+        port: 9443
+    failurePolicy: Fail
+    name: vclustermedialocation.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clustermedialocations
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity
+        port: 9443
+    failurePolicy: Fail
+    name: vclustermediaprocessingentity.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clustermediaprocessingentities
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-clustertasktemplate
+        port: 9443
+    failurePolicy: Fail
+    name: vclustertasktemplate.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clustertasktemplates
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-function
+        port: 9443
+    failurePolicy: Fail
+    name: vfunction.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - functions
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-medialocation
+        port: 9443
+    failurePolicy: Fail
+    name: vmedialocation.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - medialocations
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-mediaprocessingentity
+        port: 9443
+    failurePolicy: Fail
+    name: vmediaprocessingentity.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - mediaprocessingentities
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-task
+        port: 9443
+    failurePolicy: Fail
+    name: vtask.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - tasks
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-tasktemplate
+        port: 9443
+    failurePolicy: Fail
+    name: vtasktemplate.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - tasktemplates
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: workflow-manager
+        namespace: system
+        path: /validate-engine-nagare-media-v1alpha1-workflow
+        port: 9443
+    failurePolicy: Fail
+    name: vworkflow.engine.nagare.media
+    rules:
+      - apiGroups:
+          - engine.nagare.media
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - workflows
+    sideEffects: None

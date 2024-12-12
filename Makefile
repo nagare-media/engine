@@ -104,8 +104,9 @@ generate-modules: ## Generate Go modules files
 	@scripts/exec-local generate-modules
 
 .PHONY: generate-manifests
-generate-manifests: controller-gen ## Generate manifests (CRD, RBAC, etc.)
+generate-manifests: controller-gen yq ## Generate manifests (CRD, RBAC, etc.)
 	@	CONTROLLER_GEN=$(CONTROLLER_GEN) \
+		YQ=$(YQ) \
 	scripts/exec-local generate-manifests
 
 .PHONY: generate-go-deepcopy

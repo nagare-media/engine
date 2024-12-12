@@ -10,7 +10,8 @@ spec:
       clientConfig:
         service:
           namespace: system
-          name: webhook-service
+          name: workflow-manager
           path: /convert
+          port: 9443
       conversionReviewVersions:
         - v1
