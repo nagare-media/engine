@@ -205,7 +205,7 @@ spec:
                 description: |-
                   Patches applied to the Job template description of the Function.
 
-                  Only these fields may be patched:
+                  Cannot be updated.
                 properties:
                   metadata:
                     description: |-

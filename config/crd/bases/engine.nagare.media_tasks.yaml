@@ -157,7 +157,7 @@ spec:
                     description: Human readable name of this Task.
                     type: string
                 type: object
-              input-ports:
+              inputPorts:
                 description: Input ports of this task.
                 items:
                   properties:
@@ -449,7 +449,7 @@ spec:
                     type: object
                 type: object
                 x-kubernetes-map-type: atomic
-              output-ports:
+              outputPorts:
                 description: Output ports of this task.
                 items:
                   properties:
@@ -9279,8 +9279,8 @@ spec:
                 type: string
               queuedTime:
                 description: |-
-                  Represents time when the Task controller first started processing a Task. It is represented in RFC3339 form and is in
-                  UTC.
+                  Represents time when the Task controller first started processing a Task. It is represented in RFC3339 form and is
+                  in UTC.
                 format: date-time
                 type: string
               startTime:

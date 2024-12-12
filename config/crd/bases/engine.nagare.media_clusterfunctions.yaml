@@ -45,7 +45,9 @@ spec:
               defaultConfig:
                 additionalProperties:
                   type: string
-                description: Default configuration values.
+                description: |-
+                  Default configuration values.
+                  Cannot be updated.
                 type: object
               localMediaProcessingEntitiesOnly:
                 default: false

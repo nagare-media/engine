@@ -372,7 +372,7 @@ func (c *wddToTasksConverter) convertProcessingConnectionMap() error {
 		if !fromIsWfInput {
 			// attach output port to output stream
 			// $.processing.connection-map[].from.port-name
-			var p *enginev1.OutputPortBindings
+			var p *enginev1.OutputPortBinding
 			for i := range fromTsk.Spec.OutputPorts {
 				if fromTsk.Spec.OutputPorts[i].ID == cm.From.PortName {
 					p = &fromTsk.Spec.OutputPorts[i]
@@ -381,7 +381,7 @@ func (c *wddToTasksConverter) convertProcessingConnectionMap() error {
 			}
 
 			if p == nil {
-				fromTsk.Spec.OutputPorts = append(fromTsk.Spec.OutputPorts, enginev1.OutputPortBindings{ID: cm.From.PortName})
+				fromTsk.Spec.OutputPorts = append(fromTsk.Spec.OutputPorts, enginev1.OutputPortBinding{ID: cm.From.PortName})
 				p = &fromTsk.Spec.OutputPorts[len(fromTsk.Spec.OutputPorts)-1]
 			}
 

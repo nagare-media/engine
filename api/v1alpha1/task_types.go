@@ -100,11 +100,11 @@ type TaskSpec struct {
 
 	// Input ports of this task.
 	// +optional
-	InputPorts []InputPortBinding `json:"input-ports,omitempty"`
+	InputPorts []InputPortBinding `json:"inputPorts,omitempty"`
 
 	// Output ports of this task.
 	// +optional
-	OutputPorts []OutputPortBindings `json:"output-ports,omitempty"`
+	OutputPorts []OutputPortBinding `json:"outputPorts,omitempty"`
 
 	// Configuration values.
 	// +optional
@@ -120,7 +120,7 @@ type InputPortBinding struct {
 	Input *Media `json:"input,omitempty"`
 }
 
-type OutputPortBindings struct {
+type OutputPortBinding struct {
 	// ID of the port.
 	ID string `json:"id"`
 
@@ -183,8 +183,8 @@ type TaskStatus struct {
 	// A human readable message indicating why the Task is in this condition.
 	Message string `json:"message,omitempty"`
 
-	// Represents time when the Task controller first started processing a Task. It is represented in RFC3339 form and is in
-	// UTC.
+	// Represents time when the Task controller first started processing a Task. It is represented in RFC3339 form and is
+	// in UTC.
 	// +optional
 	QueuedTime *metav1.Time `json:"queuedTime,omitempty"`
 

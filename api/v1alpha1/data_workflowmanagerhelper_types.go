@@ -20,10 +20,21 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	WorkflowManagerHelperDataSecretType = "engine.nagare.media/workflow-manager-helper-data"
+)
+
 type WorkflowManagerHelperDataSpec struct {
+	Function WorkflowManagerHelperDataFunction `json:"function"`
 	Workflow WorkflowManagerHelperDataWorkflow `json:"workflow"`
 	Task     WorkflowManagerHelperDataTask     `json:"task"`
 	System   WorkflowManagerHelperDataSystem   `json:"system"`
+}
+
+type WorkflowManagerHelperDataFunction struct {
+	Name string `json:"name"`
+
+	Version string `json:"version"`
 }
 
 type WorkflowManagerHelperDataWorkflow struct {
@@ -40,10 +51,10 @@ type WorkflowManagerHelperDataTask struct {
 	HumanReadable *HumanReadableTaskDescription `json:"humanReadable,omitempty"`
 
 	// +optional
-	InputPorts []InputPortBinding `json:"input-ports,omitempty"`
+	InputPorts []InputPortBinding `json:"inputPorts,omitempty"`
 
 	// +optional
-	OutputPorts []OutputPortBindings `json:"output-ports,omitempty"`
+	OutputPorts []OutputPortBinding `json:"outputPorts,omitempty"`
 
 	// +optional
 	Config map[string]string `json:"config,omitempty"`
