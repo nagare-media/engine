@@ -73,7 +73,17 @@ func FullPatch(ctx context.Context, c client.Client, obj, oldObj client.Object) 
 
 func Patch(ctx context.Context, c client.Client, obj, oldObj client.Object) error {
 	patch := client.MergeFrom(oldObj)
-	changed, err := HasChangesIn(obj, patch, []string{"metadata", "spec"})
+	changed, err := HasChangesIn(obj, patch, []string{
+		// Common
+		"metadata",
+		"spec",
+		// ConfigMap / Secret
+		"immutable",
+		"type",
+		"data",
+		"binaryData",
+		"stringData",
+	})
 	if err != nil {
 		return err
 	}
