@@ -173,13 +173,13 @@ func (c *wddToTasksConverter) convertProcessingFunctionRestrictions() error {
 
 		// set media processing entity selector
 		// $.processing.function-restrictions.requirements.hardware.placement
-		mpeSel := &metav1.LabelSelector{MatchLabels: make(map[string]string)}
 		if fr.Requirements != nil && fr.Requirements.Hardware != nil && fr.Requirements.Hardware.Placement != nil {
-			mpeSel.MatchLabels[enginev1.MediaProcessingEntityLocationLabel] = string(*fr.Requirements.Hardware.Placement)
-		} else {
-			mpeSel.MatchLabels[enginev1.IsDefaultMediaProcessingEntityAnnotation] = "true"
+			tsk.Spec.MediaProcessingEntitySelector = &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					enginev1.MediaProcessingEntityLocationLabel: string(*fr.Requirements.Hardware.Placement),
+				},
+			}
 		}
-		tsk.Spec.MediaProcessingEntitySelector = mpeSel
 
 		// $.processing.function-restrictions.general
 		if fr.General != nil {
