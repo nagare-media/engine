@@ -45,6 +45,14 @@ func indexOwnerRef(ownerReferences []metav1.OwnerReference, ref metav1.OwnerRefe
 
 // Returns true if a and b point to the same object.
 func referSameObject(a, b metav1.OwnerReference) bool {
+	// UIDs must match if set
+	if a.UID != "" && b.UID != "" {
+		return a.UID == b.UID
+	}
+
+	// ignore version as different version still refer to the same object
+	// TODO: is is a fair assumption?
+
 	aGV, err := schema.ParseGroupVersion(a.APIVersion)
 	if err != nil {
 		return false
