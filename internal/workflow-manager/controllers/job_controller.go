@@ -81,7 +81,7 @@ func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		}
 	}
 
-	// Reconciliation logic is handled by task controller. However, this it is managed by another manager connected to the
+	// Reconciliation logic is handled by task controller. However, this is managed by another manager connected to the
 	// management cluster. We therefore use an event channel to trigger a reconciliation of the accompanying task.
 	r.EventChannel <- event.GenericEvent{
 		Object: &metav1.PartialObjectMetadata{
@@ -96,7 +96,11 @@ func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 }
 
 func (r *JobReconciler) Name() string {
-	return fmt.Sprintf("%s-%s-%s", r.MediaProcessingEntityRef.Namespace, r.MediaProcessingEntityRef.Name, JobControllerName)
+	ns := r.MediaProcessingEntityRef.Namespace
+	if ns == "" {
+		ns = "_cluster"
+	}
+	return fmt.Sprintf("%s_%s_%s", ns, r.MediaProcessingEntityRef.Name, JobControllerName)
 }
 
 // SetupWithManager sets up the controller with the Manager.
