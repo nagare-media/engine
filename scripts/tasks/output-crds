@@ -20,4 +20,4 @@
 
 # Main
 
-"${YQ}" -M '. | select(.kind == "CustomResourceDefinition")' < out/all.yaml > out/crds.yaml
+"${YQ}" --no-colors '. | select(.kind == "CustomResourceDefinition")' < out/all.yaml > out/crds.yaml
