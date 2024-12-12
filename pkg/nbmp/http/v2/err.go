@@ -47,7 +47,8 @@ func handleErr(c *fiber.Ctx, obj any, svcErr error, contentType string) error {
 		return fiber.ErrNotFound // 404
 
 	case svcErr == nbmp.ErrAlreadyExists,
-		apierrors.IsAlreadyExists(svcErr):
+		apierrors.IsAlreadyExists(svcErr),
+		apierrors.IsConflict(svcErr):
 		s = fiber.StatusConflict // 409
 
 	case svcErr == nbmp.ErrUnsupported:
