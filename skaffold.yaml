@@ -4,48 +4,6 @@ metadata:
   name: nagare-media-engine
 build:
   artifacts:
-    - image: ghcr.io/nagare-media/engine/function-mmsys-test-encode
-      runtimeType: go
-      context: .
-      docker:
-        dockerfile: build/package/image/function-mmsys-test-encode/Dockerfile.generic.generic
-        pullParent: false
-        noCache: false
-        squash: false
-        buildArgs:
-          OS: "{{ .OS }}"
-          ARCH: "{{ .ARCH }}"
-          GOVERSION: "{{ .GOVERSION }}"
-          BUILD_DATE: "{{ .BUILD_DATE }}"
-          GIT_COMMIT: "{{ .GIT_COMMIT }}"
-          GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
-          VERSION: "{{ .VERSION }}"
-      hooks:
-        after:
-          # Load image into edge kind clusters
-          - os: ["linux", "darwin"]
-            command: ["sh", "-c", "kind load docker-image --name nagare-media-edge $SKAFFOLD_IMAGE"]
-    - image: ghcr.io/nagare-media/engine/function-mmsys-test-scene-detection
-      runtimeType: go
-      context: .
-      docker:
-        dockerfile: build/package/image/function-mmsys-test-scene-detection/Dockerfile.generic.generic
-        pullParent: false
-        noCache: false
-        squash: false
-        buildArgs:
-          OS: "{{ .OS }}"
-          ARCH: "{{ .ARCH }}"
-          GOVERSION: "{{ .GOVERSION }}"
-          BUILD_DATE: "{{ .BUILD_DATE }}"
-          GIT_COMMIT: "{{ .GIT_COMMIT }}"
-          GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
-          VERSION: "{{ .VERSION }}"
-      hooks:
-        after:
-          # Load image into edge kind clusters
-          - os: ["linux", "darwin"]
-            command: ["sh", "-c", "kind load docker-image --name nagare-media-edge $SKAFFOLD_IMAGE"]
     - image: ghcr.io/nagare-media/engine/function-noop
       runtimeType: go
       context: .
