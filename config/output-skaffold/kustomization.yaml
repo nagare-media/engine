@@ -7,6 +7,9 @@ resources:
 patches:
   - path: patches/gateway-nbmp.yaml
   - path: patches/workflow-manager.yaml
+  # comment out if you want to test admission webhooks
+  - path: patches/mutating-webhook-configuration.yaml
+  - path: patches/validating-webhook-configuration.yaml
 
 generatorOptions:
   disableNameSuffixHash: true

@@ -15,6 +15,10 @@ spec:
             - "--zap-devel"
             - "--zap-stacktrace-level=panic"
             - "--zap-log-level=info"
+          livenessProbe:
+            $patch: delete
+          readinessProbe:
+            $patch: delete
           resources:
             limits:
               cpu: 4
