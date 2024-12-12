@@ -2,8 +2,6 @@
 apiVersion: engine.nagare.media/v1alpha1
 kind: MediaLocation
 metadata:
-  annotations:
-    beta.engine.nagare.media/is-default-step-media-location: "true"
   labels:
     app.kubernetes.io/name: medialocation
     app.kubernetes.io/instance: s3
@@ -38,8 +36,6 @@ stringData:
 #     app.kubernetes.io/instance: rtmp
 #     app.kubernetes.io/part-of: nagare-media-engine
 #     app.kubernetes.io/created-by: nagare-media-engine
-#   annotations:
-#     beta.engine.nagare.media/is-default-streaming-media-location: "true"
 #   name: rtmp
 # spec:
 # TODO(mtneug): add "streaming" media location

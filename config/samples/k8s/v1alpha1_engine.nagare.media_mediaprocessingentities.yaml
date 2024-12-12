@@ -3,19 +3,20 @@ apiVersion: engine.nagare.media/v1alpha1
 kind: MediaProcessingEntity
 metadata:
   annotations:
-    beta.engine.nagare.media/is-default-media-processing-entity: "true"
+    engine.nagare.media/is-default-media-processing-entity: "true"
   labels:
     app.kubernetes.io/name: mediaprocessingentity
     app.kubernetes.io/instance: local-cluster
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/created-by: nagare-media-engine
   name: local-cluster
+  namespace: default
 spec:
   local:
     namespace: default
 ---
 apiVersion: engine.nagare.media/v1alpha1
-kind: MediaProcessingEntity
+kind: ClusterMediaProcessingEntity
 metadata:
   labels:
     app.kubernetes.io/name: mediaprocessingentity
@@ -28,5 +29,6 @@ spec:
     kubeconfig:
       # this secret is created within the default namespace in the kind management test cluster during `make kind-up`.
       secretRef:
+        namespace: default
         name: edge-cluster-kubeconfig
         key: kubeconfig
