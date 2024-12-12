@@ -258,7 +258,7 @@ func (c *tasksToWDDConverter) convertProcessingConnectionMap(wf *nbmpv2.Workflow
 				// must be a task URL
 				tu, ok := u.(*engineurl.TaskURL)
 				if !ok {
-					return fmt.Errorf("convert: unexpected nagare-engine URL type: %T", tu)
+					return fmt.Errorf("convert: unexpected nagare-media-engine URL type: %T", tu)
 				}
 
 				// $.processing.connection-map[].from.id
@@ -355,7 +355,7 @@ func (c *tasksToWDDConverter) convertProcessingConnectionMap(wf *nbmpv2.Workflow
 				// must be a task URL
 				tu, ok := u.(*engineurl.TaskURL)
 				if !ok {
-					return fmt.Errorf("convert: unexpected nagare-engine URL type: %T", tu)
+					return fmt.Errorf("convert: unexpected nagare-media-engine URL type: %T", tu)
 				}
 
 				// $.processing.connection-map[].to.id
