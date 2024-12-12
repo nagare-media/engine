@@ -436,7 +436,7 @@ func (c *tasksToWDDConverter) convertProcessingFunctionRestrictions(wf *nbmpv2.W
 
 		// $.processing.function-restrictions.general.state
 		fr.General.State = ptr.To(engineTaskPhaseToNBMP(t.Status.Phase))
-		if t.DeletionTimestamp != nil {
+		if !t.DeletionTimestamp.IsZero() {
 			fr.General.State = ptr.To(nbmpv2.DestroyedState)
 		}
 
@@ -474,7 +474,7 @@ func (c *tasksToWDDConverter) convertProcessingFunctionRestrictions(wf *nbmpv2.W
 		}
 
 		// $.processing.function-restrictions.processing.start-time
-		if t.Status.StartTime != nil {
+		if !t.Status.StartTime.IsZero() {
 			if fr.Processing == nil {
 				fr.Processing = &nbmpv2.Processing{}
 			}

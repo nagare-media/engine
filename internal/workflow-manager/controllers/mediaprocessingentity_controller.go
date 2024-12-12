@@ -161,8 +161,7 @@ func (r *MediaProcessingEntityReconciler) reconcileMediaProcessingEntity(ctx con
 	}()
 
 	// add finalizers
-	if !controllerutil.ContainsFinalizer(mpe, enginev1.MediaProcessingEntityProtectionFinalizer) {
-		controllerutil.AddFinalizer(mpe, enginev1.MediaProcessingEntityProtectionFinalizer)
+	if controllerutil.AddFinalizer(mpe, enginev1.MediaProcessingEntityProtectionFinalizer) {
 		return ctrl.Result{}, nil
 	}
 
@@ -202,8 +201,7 @@ func (r *MediaProcessingEntityReconciler) reconcileClusterMediaProcessingEntity(
 	}()
 
 	// add finalizers
-	if !controllerutil.ContainsFinalizer(cmpe, enginev1.MediaProcessingEntityProtectionFinalizer) {
-		controllerutil.AddFinalizer(cmpe, enginev1.MediaProcessingEntityProtectionFinalizer)
+	if controllerutil.AddFinalizer(cmpe, enginev1.MediaProcessingEntityProtectionFinalizer) {
 		return ctrl.Result{}, nil
 	}
 

@@ -81,13 +81,12 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_
 	}()
 
 	// add finalizers
-	if !controllerutil.ContainsFinalizer(wf, enginev1.WorkflowProtectionFinalizer) {
-		controllerutil.AddFinalizer(wf, enginev1.WorkflowProtectionFinalizer)
+	if controllerutil.AddFinalizer(wf, enginev1.WorkflowProtectionFinalizer) {
 		return ctrl.Result{}, nil
 	}
 
 	// handle delete
-	if !wf.DeletionTimestamp.IsZero() {
+	if utils.IsInDeletion(wf) {
 		return r.reconcileDelete(ctx, wf)
 	}
 

@@ -19,9 +19,14 @@ package utils
 import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
+
+func IsInDeletion[T interface{ GetDeletionTimestamp() *metav1.Time }](obj T) bool {
+	return !obj.GetDeletionTimestamp().IsZero()
+}
 
 func WorkflowHasTerminated(wf *enginev1.Workflow) bool {
 	return !WorkflowIsActive(wf)

@@ -68,12 +68,12 @@ func (c *workflowToWDDConverter) Convert(wdd *nbmpv2.Workflow) error {
 
 	// $.general.state
 	wdd.General.State = ptr.To(engineWorkflowPhaseToNBMP(c.wf.Status.Phase))
-	if c.wf.DeletionTimestamp != nil {
+	if !c.wf.DeletionTimestamp.IsZero() {
 		wdd.General.State = ptr.To(nbmpv2.DestroyedState)
 	}
 
 	// $.processing.start-time
-	if c.wf.Status.StartTime != nil {
+	if !c.wf.Status.StartTime.IsZero() {
 		wdd.Processing.StartTime = ptr.To(c.wf.Status.StartTime.Time)
 	}
 
