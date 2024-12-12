@@ -18,6 +18,4 @@ leaderElection:
   leaderElect: false
   resourceName: a3df9e9e.engine.nagare.media
 nats:
-  url: nats://nats:4222
-  username: nagare-media-engine
-  password: nagare-media-engine
+  url: nats://nats.nats.svc.cluster.local:4222
