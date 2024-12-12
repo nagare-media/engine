@@ -44,7 +44,6 @@ type FunctionSpec struct {
 	// - spec.template.spec.restartPolicy: must be "OnFailure" or "Never". The default is "Never"
 	//
 	// Cannot be updated.
-	// TODO: make some exceptions
 	// TODO: hinder changes to this field
 	Template batchv1.JobTemplateSpec `json:"template"`
 
@@ -55,6 +54,8 @@ type FunctionSpec struct {
 	LocalMediaProcessingEntitiesOnly bool `json:"localMediaProcessingEntitiesOnly"`
 
 	// Default configuration values.
+	// Cannot be updated.
+	// TODO: hinder changes to this field
 	// +optional
 	DefaultConfig map[string]string `json:"defaultConfig,omitempty"`
 }

@@ -107,6 +107,7 @@ func (c *workflowManagerHelperDataToTDDConverter) Convert(tdd *nbmpv2.Task) erro
 
 		// $.input.media-parameters
 		// $.input.metadata-parameters
+		// TODO: filter out duplicate inputs
 		mediaParameters, metadataParameters, err := c.convertMediaToInputAndOutput(ip.Input)
 		if err != nil {
 			return err
@@ -147,6 +148,7 @@ func (c *workflowManagerHelperDataToTDDConverter) Convert(tdd *nbmpv2.Task) erro
 
 		// $.output.media-parameters
 		// $.output.metadata-parameters
+		// TODO: filter out duplicate outputs
 		mediaParameters, metadataParameters, err := c.convertMediaToInputAndOutput(op.Output)
 		if err != nil {
 			return err

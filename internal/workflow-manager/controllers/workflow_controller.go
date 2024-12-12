@@ -279,6 +279,8 @@ func (r *WorkflowReconciler) reconcileFailedTask(_ context.Context, wf *enginev1
 
 	// TODO: this should probably be handled by the task controller?
 
+	// TODO: check task template
+
 	policy := enginev1.FailWorkflowJobFailurePolicyAction
 	if task.Spec.JobFailurePolicy != nil && task.Spec.JobFailurePolicy.DefaultAction != nil {
 		policy = *task.Spec.JobFailurePolicy.DefaultAction

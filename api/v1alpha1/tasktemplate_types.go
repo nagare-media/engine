@@ -51,10 +51,8 @@ type TaskTemplateSpec struct {
 
 	// Patches applied to the Job template description of the Function.
 	//
-	// Only these fields may be patched:
-	// TODO: update white list
-	// TODO: enforce limits
-	// TODO: which fields should be patchable?
+	// Cannot be updated.
+	// TODO: hinder changes to this field
 	// +optional
 	TemplatePatches *batchv1.JobTemplateSpec `json:"templatePatches,omitempty"`
 
