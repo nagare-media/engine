@@ -31,6 +31,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/pkg/apis/utils"
 	"github.com/nagare-media/engine/internal/workflow-manager/predicate"
 	"github.com/nagare-media/engine/pkg/apis/meta"
 )
@@ -72,12 +73,13 @@ func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 	taskName := job.Labels[enginev1.TaskNameLabel]
 	taskNamespace := job.Labels[enginev1.TaskNamespaceLabel]
 
-	// handle delete
-	if !job.DeletionTimestamp.IsZero() {
+	// handle termination and deletion
+	if !utils.JobIsActive(job) || utils.IsInDeletion(job) {
 		// remove finalizer
-		controllerutil.RemoveFinalizer(job, enginev1.JobProtectionFinalizer)
-		if err := r.Client.Update(ctx, job); err != nil {
-			return ctrl.Result{}, err
+		if controllerutil.RemoveFinalizer(job, enginev1.JobProtectionFinalizer) {
+			if err := r.Client.Update(ctx, job); err != nil {
+				return ctrl.Result{}, err
+			}
 		}
 	}
 
