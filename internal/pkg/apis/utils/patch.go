@@ -24,9 +24,9 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
+	"sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/kustomize/kyaml/yaml/merge2"
-	"sigs.k8s.io/yaml"
+	"sigs.k8s.io/kustomize/kyaml/yaml/walk"
 )
 
 func FullServerSideApply(ctx context.Context, c client.Client, obj client.Object, manager string) error {
@@ -125,26 +125,45 @@ func HasChangesIn(obj client.Object, patch client.Patch, keys []string) (bool, e
 	return false, nil
 }
 
-func StrategicMerge(original, modified, patchedObj any) error {
-	var yamlOriginal, yamlModified []byte
-	var yamlPatched string
-	var err error
+func StrategicMergeList[T any](dest *T, objs ...*T) error {
+	var (
+		err error
+		res *yaml.RNode
+	)
 
-	if yamlOriginal, err = yaml.Marshal(original); err != nil {
-		return err
+	// convert to YAML objects
+	nodes := make([]*yaml.RNode, 0, len(objs))
+	for _, o := range objs {
+		if o == nil {
+			continue
+		}
+
+		var n yaml.Node
+		err = n.Encode(o)
+		if err != nil {
+			return err
+		}
+
+		nodes = append(nodes, yaml.NewRNode(&n))
 	}
 
-	if yamlModified, err = yaml.Marshal(modified); err != nil {
-		return err
+	if len(nodes) == 0 {
+		return nil
 	}
 
-	if yamlPatched, err = merge2.MergeStrings(string(yamlModified), string(yamlOriginal), true, kyaml.MergeOptions{}); err != nil {
-		return err
+	if len(nodes) == 1 {
+		res = nodes[0]
+	} else {
+		// TODO: fix merge function
+		res, err = walk.Walker{
+			Sources:               nodes,
+			Visitor:               merge2.Merger{},
+			InferAssociativeLists: true,
+		}.Walk()
+		if err != nil {
+			return err
+		}
 	}
 
-	if err = yaml.Unmarshal([]byte(yamlPatched), patchedObj); err != nil {
-		return err
-	}
-
-	return nil
+	return res.YNode().Decode(dest)
 }
