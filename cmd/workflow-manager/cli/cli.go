@@ -32,11 +32,11 @@ import (
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	ctrlcfg "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -151,45 +151,12 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	nsCacheConfigMap := map[string]cache.Config{}
-	if cfg.CacheConfig.Namespace != nil {
-		nsCacheConfigMap[*cfg.CacheConfig.Namespace] = cache.Config{}
-	}
-
-	// TODO: make more options configurable
-	options := ctrl.Options{
-		Scheme: scheme,
-
-		Metrics: server.Options{
-			BindAddress: ":8080",
-		},
-
-		WebhookServer: webhook.NewServer(webhook.Options{
-			Port: 9443,
-		}),
-
-		HealthProbeBindAddress: ":8081",
-		ReadinessEndpointName:  "/readyz",
-		LivenessEndpointName:   "/healthz",
-
-		Cache: cache.Options{
-			SyncPeriod:        &cfg.CacheConfig.SyncPeriod.Duration,
-			DefaultNamespaces: nsCacheConfigMap,
-		},
-
-		LeaderElection:             *cfg.LeaderElection.LeaderElect,
-		LeaseDuration:              &cfg.LeaderElection.LeaseDuration.Duration,
-		RenewDeadline:              &cfg.LeaderElection.RenewDeadline.Duration,
-		RetryPeriod:                &cfg.LeaderElection.RetryPeriod.Duration,
-		LeaderElectionResourceLock: cfg.LeaderElection.ResourceLock,
-		LeaderElectionID:           cfg.LeaderElection.ResourceName,
-		LeaderElectionNamespace:    cfg.LeaderElection.ResourceNamespace,
-	}
+	mgrOpts := c.getManagerOptions(cfg)
 
 	// create components
 
 	restCfg := ctrl.GetConfigOrDie()
-	mgr, err := ctrl.NewManager(restCfg, options)
+	mgr, err := ctrl.NewManager(restCfg, mgrOpts)
 	if err != nil {
 		setupLog.Error(err, "unable to start workflow-manager")
 		return err
@@ -242,7 +209,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		Client:          mgr.GetClient(),
 		Scheme:          mgr.GetScheme(),
 		LocalRESTConfig: restCfg,
-		ManagerOptions:  options,
+		ManagerOptions:  mgrOpts,
 		JobEventChannel: jobEventChannel,
 	}
 	if err = mpeReconciler.SetupWithManager(mgr); err != nil {
@@ -289,4 +256,70 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	}
 
 	return nil
+}
+
+func (c *cli) getManagerOptions(cfg *enginev1.WorkflowManagerConfig) ctrl.Options {
+	mgrOpts := ctrl.Options{
+		Scheme: scheme,
+	}
+
+	// Cache
+
+	mgrOpts.Cache.DefaultNamespaces = map[string]cache.Config{}
+	if cfg.Cache.Namespace != nil {
+		mgrOpts.Cache.DefaultNamespaces[*cfg.Cache.Namespace] = cache.Config{}
+	}
+	if cfg.Cache.SyncPeriod != nil {
+		mgrOpts.Cache.SyncPeriod = &cfg.Cache.SyncPeriod.Duration
+	}
+
+	// LeaderElection
+
+	if cfg.LeaderElection.LeaderElect != nil {
+		mgrOpts.LeaderElection = *cfg.LeaderElection.LeaderElect
+	}
+	mgrOpts.LeaderElectionResourceLock = cfg.LeaderElection.ResourceLock
+	mgrOpts.LeaderElectionNamespace = cfg.LeaderElection.ResourceNamespace
+	mgrOpts.LeaderElectionID = cfg.LeaderElection.ResourceName
+	if cfg.LeaderElection.LeaseDuration.Duration != 0 {
+		mgrOpts.LeaseDuration = &cfg.LeaderElection.LeaseDuration.Duration
+	}
+	if cfg.LeaderElection.RenewDeadline.Duration != 0 {
+		mgrOpts.RenewDeadline = &cfg.LeaderElection.RenewDeadline.Duration
+	}
+	if cfg.LeaderElection.RetryPeriod.Duration != 0 {
+		mgrOpts.RetryPeriod = &cfg.LeaderElection.RetryPeriod.Duration
+	}
+
+	// Metrics
+
+	mgrOpts.Metrics.BindAddress = cfg.Metrics.BindAddress
+
+	// Health
+
+	mgrOpts.HealthProbeBindAddress = cfg.Health.BindAddress
+	mgrOpts.LivenessEndpointName = cfg.Health.LivenessEndpointName
+	mgrOpts.ReadinessEndpointName = cfg.Health.ReadinessEndpointName
+
+	// Webhook
+
+	whOpts := webhook.Options{}
+	whOpts.Host = cfg.Webhook.Host
+	if cfg.Webhook.Port != nil {
+		whOpts.Port = *cfg.Webhook.Port
+	}
+	whOpts.CertDir = cfg.Webhook.CertDir
+	mgrOpts.WebhookServer = webhook.NewServer(whOpts)
+
+	// GracefulShutdownTimeout
+
+	if cfg.GracefulShutdownTimeout != nil {
+		mgrOpts.GracefulShutdownTimeout = &cfg.GracefulShutdownTimeout.Duration
+	}
+
+	// Controller
+
+	mgrOpts.Controller = ctrlcfg.Controller(cfg.Controller)
+
+	return mgrOpts
 }

@@ -20,26 +20,26 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/ptr"
 )
 
 var (
 	DefaultWorkflowManagerConfig = WorkflowManagerConfig{
 		WorkflowManagerConfigSpec: WorkflowManagerConfigSpec{
-			CacheConfig: DefaultKubernetesCacheConfig,
-			LeaderElection: LeaderElectionConfig{
-				LeaderElect:  ptr.To(false),
-				ResourceName: "a3df9e9e.engine.nagare.media",
-			},
-			WorkflowTerminationWaitingDuration:             &metav1.Duration{Duration: 20 * time.Second},
+			Cache:                              DefaultCacheConfig,
+			LeaderElection:                     DefaultLeaderElectionConfig,
+			Metrics:                            DefaultMetricsConfig,
+			Health:                             DefaultHealthConfig,
+			Webhook:                            DefaultWebhookConfig,
+			WorkflowTerminationWaitingDuration: &metav1.Duration{Duration: 20 * time.Second},
 			RemoteMediaProcessingEntityStabilizingDuration: &metav1.Duration{Duration: 5 * time.Second},
+			NATS: DefaultNATSConfig,
 		},
 	}
 )
 
 type WorkflowManagerConfigSpec struct {
 	// Kubernetes cache configuration.
-	CacheConfig KubernetesCacheConfig `json:"cache"`
+	Cache CacheConfig `json:"cache"`
 
 	// LeaderElection is the LeaderElection config to be used when configuring
 	// the manager.Manager leader election
@@ -55,19 +55,19 @@ type WorkflowManagerConfigSpec struct {
 	// Controller contains global configuration options for controllers
 	// registered within this manager.
 	// +optional
-	Controller *ControllerConfigSpec `json:"controller,omitempty"`
+	Controller ControllerConfig `json:"controller,omitempty"`
 
 	// Metrics contains the controller metrics configuration
 	// +optional
-	Metrics *ControllerMetrics `json:"metrics,omitempty"`
+	Metrics MetricsConfig `json:"metrics,omitempty"`
 
 	// Health contains the controller health configuration
 	// +optional
-	Health *ControllerHealth `json:"health,omitempty"`
+	Health HealthConfig `json:"health,omitempty"`
 
 	// Webhook contains the controllers webhook configuration
 	// +optional
-	Webhook *ControllerWebhook `json:"webhook,omitempty"`
+	Webhook WebhookConfig `json:"webhook,omitempty"`
 
 	// Duration to wait after all Tasks of a Workflow terminated to mark the Workflow as successful. This helps mitigate
 	// race conditions and should not be too low. Defaults to "20s".
@@ -102,14 +102,19 @@ func (c *WorkflowManagerConfig) DefaultWithValuesFrom(d WorkflowManagerConfig) {
 }
 
 func (c *WorkflowManagerConfig) doDefaultWithValuesFrom(d WorkflowManagerConfig) {
+	c.Cache.DefaultWithValuesFrom(d.Cache)
+	c.LeaderElection.DefaultWithValuesFrom(d.LeaderElection)
+	c.Controller.DefaultWithValuesFrom(d.Controller)
+	c.Metrics.DefaultWithValuesFrom(d.Metrics)
+	c.Health.DefaultWithValuesFrom(d.Health)
+	c.Webhook.DefaultWithValuesFrom(d.Webhook)
 	if c.WorkflowTerminationWaitingDuration == nil {
 		c.WorkflowTerminationWaitingDuration = d.WorkflowTerminationWaitingDuration
 	}
 	if c.RemoteMediaProcessingEntityStabilizingDuration == nil {
 		c.RemoteMediaProcessingEntityStabilizingDuration = d.RemoteMediaProcessingEntityStabilizingDuration
 	}
-	c.CacheConfig.DefaultWithValuesFrom(d.CacheConfig)
-	c.LeaderElection.DefaultWithValuesFrom(d.LeaderElection)
+	c.NATS.DefaultWithValuesFrom(d.NATS)
 }
 
 func (c *WorkflowManagerConfig) Validate() error {

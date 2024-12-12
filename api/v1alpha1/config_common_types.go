@@ -21,16 +21,40 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nagare-media/models.go/base"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	configv1alpha1 "k8s.io/component-base/config/v1alpha1"
 	"k8s.io/utils/ptr"
+	ctrlcfg "sigs.k8s.io/controller-runtime/pkg/config"
+
+	"github.com/nagare-media/models.go/base"
+)
+
+var (
+	DefaultNATSConfig = NATSConfig{
+		// TODO: set useful default
+		URL: "nats://nats.nats.svc.cluster.local:4222",
+	}
 )
 
 type NATSConfig struct {
 	// TODO: add auth methods
 	URL base.URI `json:"url"`
+}
+
+func (c *NATSConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultNATSConfig)
+}
+
+func (c *NATSConfig) DefaultWithValuesFrom(d NATSConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultNATSConfig)
+}
+
+func (c *NATSConfig) doDefaultWithValuesFrom(d NATSConfig) {
+	if c.URL == "" {
+		c.URL = d.URL
+	}
 }
 
 var (
@@ -118,12 +142,12 @@ func (c *WebserverConfig) Validate(cfgPrefix string) error {
 }
 
 var (
-	DefaultKubernetesCacheConfig = KubernetesCacheConfig{
+	DefaultCacheConfig = CacheConfig{
 		SyncPeriod: &metav1.Duration{Duration: 10 * time.Hour},
 	}
 )
 
-type KubernetesCacheConfig struct {
+type CacheConfig struct {
 	// SyncPeriod determines the minimum frequency at which watched resources are
 	// reconciled. A lower period will correct entropy more quickly, but reduce
 	// responsiveness to change if there are many watched resources. Change this
@@ -143,59 +167,73 @@ type KubernetesCacheConfig struct {
 	Namespace *string `json:"Namespace,omitempty"`
 }
 
-func (c *KubernetesCacheConfig) Default() {
-	c.doDefaultWithValuesFrom(DefaultKubernetesCacheConfig)
+func (c *CacheConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultCacheConfig)
 }
 
-func (c *KubernetesCacheConfig) DefaultWithValuesFrom(d KubernetesCacheConfig) {
+func (c *CacheConfig) DefaultWithValuesFrom(d CacheConfig) {
 	c.doDefaultWithValuesFrom(d)
-	c.doDefaultWithValuesFrom(DefaultKubernetesCacheConfig)
+	c.doDefaultWithValuesFrom(DefaultCacheConfig)
 }
 
-func (c *KubernetesCacheConfig) doDefaultWithValuesFrom(d KubernetesCacheConfig) {
+func (c *CacheConfig) doDefaultWithValuesFrom(d CacheConfig) {
 	if c.SyncPeriod == nil {
 		c.SyncPeriod = d.SyncPeriod
 	}
 }
 
-// ControllerConfigSpec defines the global configuration for
-// controllers registered with the manager.
-type ControllerConfigSpec struct {
-	// GroupKindConcurrency is a map from a Kind to the number of concurrent reconciliation
-	// allowed for that controller.
-	//
-	// When a controller is registered within this manager using the builder utilities,
-	// users have to specify the type the controller reconciles in the For(...) call.
-	// If the object's kind passed matches one of the keys in this map, the concurrency
-	// for that controller is set to the number specified.
-	//
-	// The key is expected to be consistent in form with GroupKind.String(),
-	// e.g. ReplicaSet in apps group (regardless of version) would be `ReplicaSet.apps`.
-	// +optional
-	GroupKindConcurrency map[string]int `json:"groupKindConcurrency,omitempty"`
+var (
+	DefaultControllerConfig = ControllerConfig{
+		SkipNameValidation:      ptr.To(false),
+		GroupKindConcurrency:    nil,
+		MaxConcurrentReconciles: 1,
+		CacheSyncTimeout:        2 * time.Minute,
+		RecoverPanic:            nil,
+		NeedLeaderElection:      nil,
+	}
+)
 
-	// MaxConcurrentReconciles is the maximum number of concurrent Reconciles which can be run. Defaults to 1.
-	// +optional
-	MaxConcurrentReconciles *int `json:"maxConcurrentReconciles,omitempty"`
+// ControllerConfig defines the global configuration for controllers registered with the manager.
+type ControllerConfig ctrlcfg.Controller
 
-	// CacheSyncTimeout refers to the time limit set to wait for syncing caches.
-	// Defaults to 2 minutes if not set.
-	// +optional
-	CacheSyncTimeout time.Duration `json:"cacheSyncTimeout,omitempty"`
-
-	// RecoverPanic indicates whether the panic caused by reconcile should be recovered.
-	// Defaults to the Controller.RecoverPanic setting from the Manager if unset.
-	// +optional
-	RecoverPanic *bool `json:"recoverPanic,omitempty"`
-
-	// NeedLeaderElection indicates whether the controller needs to use leader election.
-	// Defaults to true, which means the controller will use leader election.
-	// +optional
-	NeedLeaderElection *bool `json:"needLeaderElection,omitempty"`
+func (c *ControllerConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultControllerConfig)
 }
 
-// ControllerMetrics defines the metrics configs.
-type ControllerMetrics struct {
+func (c *ControllerConfig) DefaultWithValuesFrom(d ControllerConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultControllerConfig)
+}
+
+func (c *ControllerConfig) doDefaultWithValuesFrom(d ControllerConfig) {
+	if c.SkipNameValidation == nil {
+		c.SkipNameValidation = d.SkipNameValidation
+	}
+	if c.GroupKindConcurrency == nil {
+		c.GroupKindConcurrency = d.GroupKindConcurrency
+	}
+	if c.MaxConcurrentReconciles == 0 {
+		c.MaxConcurrentReconciles = d.MaxConcurrentReconciles
+	}
+	if c.CacheSyncTimeout == 0 {
+		c.CacheSyncTimeout = d.CacheSyncTimeout
+	}
+	if c.RecoverPanic == nil {
+		c.RecoverPanic = d.RecoverPanic
+	}
+	if c.NeedLeaderElection == nil {
+		c.NeedLeaderElection = d.NeedLeaderElection
+	}
+}
+
+var (
+	DefaultMetricsConfig = MetricsConfig{
+		BindAddress: ":8080",
+	}
+)
+
+// MetricsConfig defines the metrics configs.
+type MetricsConfig struct {
 	// BindAddress is the TCP address that the controller should bind to
 	// for serving prometheus metrics.
 	// It can be set to "0" to disable the metrics serving.
@@ -203,13 +241,36 @@ type ControllerMetrics struct {
 	BindAddress string `json:"bindAddress,omitempty"`
 }
 
-// ControllerHealth defines the health configs.
-type ControllerHealth struct {
-	// HealthProbeBindAddress is the TCP address that the controller should bind to
+func (c *MetricsConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultMetricsConfig)
+}
+
+func (c *MetricsConfig) DefaultWithValuesFrom(d MetricsConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultMetricsConfig)
+}
+
+func (c *MetricsConfig) doDefaultWithValuesFrom(d MetricsConfig) {
+	if c.BindAddress == "" {
+		c.BindAddress = d.BindAddress
+	}
+}
+
+var (
+	DefaultHealthConfig = HealthConfig{
+		BindAddress:           ":8081",
+		ReadinessEndpointName: "/readyz",
+		LivenessEndpointName:  "/healthz",
+	}
+)
+
+// HealthConfig defines the health configs.
+type HealthConfig struct {
+	// BindAddress is the TCP address that the controller should bind to
 	// for serving health probes
 	// It can be set to "0" or "" to disable serving the health probe.
 	// +optional
-	HealthProbeBindAddress string `json:"healthProbeBindAddress,omitempty"`
+	BindAddress string `json:"bindAddress,omitempty"`
 
 	// ReadinessEndpointName, defaults to "readyz"
 	// +optional
@@ -220,8 +281,37 @@ type ControllerHealth struct {
 	LivenessEndpointName string `json:"livenessEndpointName,omitempty"`
 }
 
-// ControllerWebhook defines the webhook server for the controller.
-type ControllerWebhook struct {
+func (c *HealthConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultHealthConfig)
+}
+
+func (c *HealthConfig) DefaultWithValuesFrom(d HealthConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultHealthConfig)
+}
+
+func (c *HealthConfig) doDefaultWithValuesFrom(d HealthConfig) {
+	if c.BindAddress == "" {
+		c.BindAddress = d.BindAddress
+	}
+	if c.ReadinessEndpointName == "" {
+		c.ReadinessEndpointName = d.ReadinessEndpointName
+	}
+	if c.LivenessEndpointName == "" {
+		c.LivenessEndpointName = d.LivenessEndpointName
+	}
+}
+
+var (
+	DefaultWebhookConfig = WebhookConfig{
+		Port:    ptr.To(9443),
+		Host:    "",
+		CertDir: "",
+	}
+)
+
+// WebhookConfig defines the webhook server for the controller.
+type WebhookConfig struct {
 	// Port is the port that the webhook server serves at.
 	// It is used to set webhook.Server.Port.
 	// +optional
@@ -238,6 +328,27 @@ type ControllerWebhook struct {
 	// must be named tls.key and tls.crt, respectively.
 	// +optional
 	CertDir string `json:"certDir,omitempty"`
+}
+
+func (c *WebhookConfig) Default() {
+	c.doDefaultWithValuesFrom(DefaultWebhookConfig)
+}
+
+func (c *WebhookConfig) DefaultWithValuesFrom(d WebhookConfig) {
+	c.doDefaultWithValuesFrom(d)
+	c.doDefaultWithValuesFrom(DefaultWebhookConfig)
+}
+
+func (c *WebhookConfig) doDefaultWithValuesFrom(d WebhookConfig) {
+	if c.Port == nil {
+		c.Port = d.Port
+	}
+	if c.Host == "" {
+		c.Host = d.Host
+	}
+	if c.CertDir == "" {
+		c.CertDir = d.CertDir
+	}
 }
 
 var (
