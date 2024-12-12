@@ -19,6 +19,7 @@ package utils
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/utils/ptr"
@@ -56,9 +57,15 @@ func ServerSideApplyStatus(ctx context.Context, c client.Client, obj client.Obje
 }
 
 func FullPatch(ctx context.Context, c client.Client, obj, oldObj client.Object) error {
+	// we create a copy as Patch / PatchStatus will replace obj.
+	// Running Patch will thus remove any changes made to status fields.
+	objCopy, ok := obj.DeepCopyObject().(client.Object)
+	if !ok {
+		return errors.New("patch: not a client.Object")
+	}
 	return kerrors.NewAggregate([]error{
 		// apply changes to non-.status
-		Patch(ctx, c, obj, oldObj),
+		Patch(ctx, c, objCopy, oldObj),
 		// apply changes to .status
 		PatchStatus(ctx, c, obj, oldObj),
 	})
