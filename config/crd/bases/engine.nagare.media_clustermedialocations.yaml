@@ -53,37 +53,10 @@ spec:
                   auth:
                     description: HTTP authentication configuration.
                     maxProperties: 1
-                    minProperties: 1
+                    minProperties: 0
                     properties:
                       basic:
                         description: Configures an HTTP basic authentication method.
-                        properties:
-                          secretRef:
-                            description: |-
-                              Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
-                              MediaLocation can only reference Secrets from its own Namespace.
-                            properties:
-                              apiVersion:
-                                description: API version of the referred object.
-                                type: string
-                              key:
-                                description: Key within the ConfigMap or Secret.
-                                type: string
-                              kind:
-                                description: Kind of the referred object.
-                                type: string
-                              name:
-                                description: Name of the referred object.
-                                type: string
-                              namespace:
-                                description: Namespace of the referred object.
-                                type: string
-                            type: object
-                        required:
-                        - secretRef
-                        type: object
-                      digest:
-                        description: Configures an HTTP digest authentication method.
                         properties:
                           secretRef:
                             description: |-
@@ -119,9 +92,9 @@ spec:
                               be passed to. The default is "Authorization".
                             type: string
                           headerValuePrefix:
-                            default: 'Bearer '
+                            default: Bearer
                             description: Prefix of the HTTP header value before the
-                              token. The default is "Bearer ".
+                              token. The default is "Bearer".
                             type: string
                           secretRef:
                             description: |-
@@ -369,7 +342,6 @@ spec:
                     type: string
                   auth:
                     description: RTMP authentication configuration.
-                    minProperties: 1
                     properties:
                       basic:
                         description: Configures an RTMP basic authentication method.
@@ -465,7 +437,7 @@ spec:
                   auth:
                     description: RTSP authentication configuration.
                     maxProperties: 1
-                    minProperties: 1
+                    minProperties: 0
                     properties:
                       basic:
                         description: Configures an RTSP basic authentication method.

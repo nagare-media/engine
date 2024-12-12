@@ -17,9 +17,26 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"errors"
+	"net/url"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	meta "github.com/nagare-media/engine/pkg/apis/meta"
+)
+
+const (
+	HeadersQueryArgKey = "nme-headers"
+)
+
+const (
+	HTTPBasicAuthUsernameKey = "username"
+	HTTPBasicAuthPasswordKey = "password"
+
+	HTTPTokenAuthTokenKey = "token"
+
+	HTTPTokenAuthDefaultHeader            = "Authorization"
+	HTTPTokenAuthDefaultHeaderValuePrefix = "Bearer"
 )
 
 // Specification of a media location.
@@ -71,6 +88,29 @@ type MediaLocationConfig struct {
 	//               SRT, RTP, FTP, SFTP, Swift, Google Cloud Storage, Azure Blob Storage
 }
 
+func (ml *MediaLocationConfig) URL() (*url.URL, error) {
+	switch {
+	case ml.HTTP != nil:
+		return ml.HTTP.URL()
+	case ml.S3 != nil:
+		return ml.S3.URL()
+	case ml.Opencast != nil:
+		return ml.Opencast.URL()
+	case ml.RTMP != nil:
+		return ml.RTMP.URL()
+	case ml.RTSP != nil:
+		return ml.RTSP.URL()
+	case ml.RIST != nil:
+		return ml.RIST.URL()
+	}
+	return nil, errors.New("invalid MediaLocation: no configuration specified")
+}
+
+func (ml *MediaLocationConfig) String() string {
+	u, _ := ml.URL()
+	return u.String()
+}
+
 // Configuration of an HTTP media location.
 type HTTPMediaLocation struct {
 	// HTTP base URL. Media referencing this location are relative to this URL.
@@ -100,23 +140,85 @@ type HTTPMediaLocation struct {
 	Auth *HTTPAuthConfig `json:"auth,omitempty"`
 }
 
+func (ml *HTTPMediaLocation) URL() (*url.URL, error) {
+	u, err := url.Parse(ml.BaseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	for _, arg := range ml.QueryArgs {
+		val := ""
+		if arg.Value != nil {
+			val = *arg.Value
+		}
+		q.Add(arg.Name, val)
+	}
+
+	for _, h := range ml.Headers {
+		val := ""
+		if h.Value != nil {
+			val = *h.Value
+		}
+		q.Add(HeadersQueryArgKey, url.QueryEscape(h.Name+"="+val))
+	}
+
+	switch {
+	case ml.Auth.Basic != nil:
+		user := ml.Auth.Basic.SecretRef.Data[HTTPBasicAuthUsernameKey]
+		pass := ml.Auth.Basic.SecretRef.Data[HTTPBasicAuthPasswordKey]
+		if user != nil {
+			if pass != nil {
+				u.User = url.UserPassword(string(user), string(pass))
+			} else {
+				u.User = url.User(string(user))
+			}
+		}
+
+	case ml.Auth.Token != nil:
+		token := ml.Auth.Token.SecretRef.Data[HTTPTokenAuthTokenKey]
+		if token != nil {
+			header := HTTPTokenAuthDefaultHeader
+			if ml.Auth.Token.HeaderName != nil {
+				header = *ml.Auth.Token.HeaderName
+			}
+
+			prefix := HTTPTokenAuthDefaultHeaderValuePrefix
+			if ml.Auth.Token.HeaderValuePrefix != nil {
+				prefix = *ml.Auth.Token.HeaderValuePrefix
+			}
+
+			val := string(token)
+			if prefix != "" {
+				val = prefix + " " + val
+			}
+
+			q.Set(HeadersQueryArgKey, url.QueryEscape(header+"="+val))
+		}
+	}
+
+	u.RawQuery = q.Encode()
+
+	return u, nil
+}
+
+func (ml *HTTPMediaLocation) String() string {
+	u, _ := ml.URL()
+	return u.String()
+}
+
 // Configuration of an HTTP authentication method.
-// Exactly one of these must be set.
-// TODO(mtneug): is this a valid assumption? Maybe allow specifying multiple methods and choose during request time?
-// +kubebuilder:validation:MinProperties=1
+// At most one of these must be set.
+// +kubebuilder:validation:MinProperties=0
 // +kubebuilder:validation:MaxProperties=1
 type HTTPAuthConfig struct {
 	// Configures an HTTP basic authentication method.
 	// +optional
 	Basic *HTTPBasicAuth `json:"basic,omitempty"`
 
-	// Configures an HTTP digest authentication method.
-	// +optional
-	Digest *HTTPDigestAuth `json:"digest,omitempty"`
-
 	// Configures an HTTP bearer token authentication method.
 	// +optional
-	Token *HTTPToken `json:"token,omitempty"`
+	Token *HTTPTokenAuth `json:"token,omitempty"`
 }
 
 // Configuration of an HTTP basic authentication method.
@@ -126,15 +228,8 @@ type HTTPBasicAuth struct {
 	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
 }
 
-// Configuration of an HTTP digest authentication method.
-type HTTPDigestAuth struct {
-	// Reference to a Secret that contains the keys "username" and "password". Only references to Secrets are allowed. A
-	// MediaLocation can only reference Secrets from its own Namespace.
-	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
-}
-
 // Configuration of an HTTP bearer token authentication method.
-type HTTPToken struct {
+type HTTPTokenAuth struct {
 	// Reference to a Secret that contains the key "token". Only references to Secrets are allowed. A MediaLocation can
 	// only reference Secrets from its own Namespace.
 	SecretRef meta.ConfigMapOrSecretReference `json:"secretRef"`
@@ -144,10 +239,10 @@ type HTTPToken struct {
 	// +optional
 	HeaderName *string `json:"headerName,omitempty"`
 
-	// Prefix of the HTTP header value before the token. The default is "Bearer ".
-	// +kubebuilder:default="Bearer "
+	// Prefix of the HTTP header value before the token. The default is "Bearer".
+	// +kubebuilder:default="Bearer"
 	// +optional
-	HeaderValuePrefix *string `json:"headerValuePrefix,omitempty"`
+	HeaderValuePrefix *string `json:"headerValuePrefix"`
 }
 
 // Configuration of an S3 media location.
@@ -169,6 +264,16 @@ type S3MediaLocation struct {
 	// +kubebuilder:default=false
 	// +optional
 	UsePathStyle bool `json:"usePathStyle"`
+}
+
+func (ml *S3MediaLocation) URL() (*url.URL, error) {
+	// TODO: implement
+	return nil, errors.New("todo: implement")
+}
+
+func (ml *S3MediaLocation) String() string {
+	u, _ := ml.URL()
+	return u.String()
 }
 
 // Configuration of an S3 authentication method.
@@ -220,6 +325,16 @@ type OpencastMediaLocation struct {
 	Auth OpencastAuthConfig `json:"auth"`
 }
 
+func (ml *OpencastMediaLocation) URL() (*url.URL, error) {
+	// TODO: implement
+	return nil, errors.New("todo: implement")
+}
+
+func (ml *OpencastMediaLocation) String() string {
+	u, _ := ml.URL()
+	return u.String()
+}
+
 // Configuration for overwriting specific Opencast endpoints. These will be used instead of the endpoints given by the
 // Opencast service registry.
 type OpencastEndpointOverwrites struct {
@@ -263,9 +378,18 @@ type RTMPMediaLocation struct {
 	Auth *RTMPAuthConfig `json:"auth,omitempty"`
 }
 
+func (ml *RTMPMediaLocation) URL() (*url.URL, error) {
+	// TODO: implement
+	return nil, errors.New("todo: implement")
+}
+
+func (ml *RTMPMediaLocation) String() string {
+	u, _ := ml.URL()
+	return u.String()
+}
+
 // Configuration of an RTMP authentication method.
 // Multiple methods can be set.
-// +kubebuilder:validation:MinProperties=1
 type RTMPAuthConfig struct {
 	// Configures an RTMP basic authentication method.
 	// +optional
@@ -316,9 +440,19 @@ type RTSPMediaLocation struct {
 	Auth *RTSPAuthConfig `json:"auth,omitempty"`
 }
 
+func (ml *RTSPMediaLocation) URL() (*url.URL, error) {
+	// TODO: implement
+	return nil, errors.New("todo: implement")
+}
+
+func (ml *RTSPMediaLocation) String() string {
+	u, _ := ml.URL()
+	return u.String()
+}
+
 // Configuration of an RTSP authentication method.
-// Exactly one of these must be set.
-// +kubebuilder:validation:MinProperties=1
+// At most one of these must be set.
+// +kubebuilder:validation:MinProperties=0
 // +kubebuilder:validation:MaxProperties=1
 type RTSPAuthConfig struct {
 	// Configures an RTSP basic authentication method.
@@ -352,6 +486,16 @@ type RISTMediaLocation struct {
 	// RIST encryption configuration.
 	// +optional
 	Encryption *RISTEncryption `json:"encryption,omitempty"`
+}
+
+func (ml *RISTMediaLocation) URL() (*url.URL, error) {
+	// TODO: implement
+	return nil, errors.New("todo: implement")
+}
+
+func (ml *RISTMediaLocation) String() string {
+	u, _ := ml.URL()
+	return u.String()
 }
 
 // Configuration of RIST encryption
