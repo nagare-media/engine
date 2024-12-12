@@ -135,7 +135,7 @@ func ResolveExactRef(ctx context.Context, c client.Client, ref *meta.ExactObject
 		if err != nil {
 			return nil, err
 		}
-		return nil, apierrors.NewConflict(mapping.Resource.GroupResource(), ref.Name, errors.New("reference has conflicting UID"))
+		return obj, apierrors.NewConflict(mapping.Resource.GroupResource(), ref.Name, errors.New("reference has conflicting UID"))
 	}
 	return obj, nil
 }
