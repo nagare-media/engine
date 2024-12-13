@@ -19,6 +19,7 @@ package exec
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
@@ -96,7 +97,11 @@ func (a *action) Exec(ctx actions.Context) (*nbmpv2.Task, error) {
 	// start command
 	l.Info("start process")
 	if err := cmd.Run(); err != nil {
-		l.Error(err, "process terminated with error")
+		if ec := cmd.ProcessState.ExitCode(); ec > 0 {
+			l.Error(err, fmt.Sprintf("process terminated with error code %d", ec))
+		} else {
+			l.Error(err, "process terminated with error")
+		}
 		return ctx.Task, err
 	} else {
 		l.Info("process terminated successfully")
