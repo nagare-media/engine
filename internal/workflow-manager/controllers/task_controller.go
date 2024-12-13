@@ -1245,7 +1245,7 @@ func (r *TaskReconciler) resolveMediaLocation(ctx context.Context, key client.Ob
 	if err == nil {
 		return &ml.Spec, nil
 	}
-	if err != nil && !apierrors.IsNotFound(err) {
+	if !apierrors.IsNotFound(err) {
 		return nil, err
 	}
 
