@@ -92,13 +92,14 @@ func (u *updatableFile[T]) start() {
 
 	fe, ok := <-u.w.Events
 	for ; ok; fe, ok = <-u.w.Events {
-		if !(fe.Op.Has(fsnotify.Write) || fe.Op.Has(fsnotify.Create)) {
-			continue
-		}
-		// fe.Name should be an absolut path as we watch only absolut paths
-		if u.f != fe.Name {
-			continue
-		}
+		// TODO: filter by event operation (based on Kubernetes behavior):
+		//     CREATE "/run/secrets/engine.nagare.media/task/..2024_12_13_10_48_04.1309658368"
+		//     CHMOD  "/run/secrets/engine.nagare.media/task/..2024_12_13_10_48_04.1309658368"
+		//     CREATE "/run/secrets/engine.nagare.media/task/..data_tmp"
+		//     RENAME "/run/secrets/engine.nagare.media/task/..data_tmp"
+		//     CREATE "/run/secrets/engine.nagare.media/task/..data ← /run/secrets/engine.nagare.media/task/..data_tmp"
+		//     REMOVE "/run/secrets/engine.nagare.media/task/..2024_12_13_10_45_49.1604045035"
+		_ = fe
 		_ = update() // TODO: report error?
 	}
 	// watcher closed => terminate
