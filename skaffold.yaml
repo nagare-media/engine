@@ -20,11 +20,6 @@ build:
           GIT_COMMIT: "{{ .GIT_COMMIT }}"
           GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
           VERSION: "{{ .VERSION }}"
-      hooks:
-        after:
-          # Load image into edge kind clusters
-          - os: ["linux", "darwin"]
-            command: ["sh", "-c", "kind load docker-image --name nagare-media-edge $SKAFFOLD_IMAGE"]
     - image: ghcr.io/nagare-media/engine/function-sleep
       runtimeType: go
       context: .
@@ -41,11 +36,6 @@ build:
           GIT_COMMIT: "{{ .GIT_COMMIT }}"
           GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
           VERSION: "{{ .VERSION }}"
-      hooks:
-        after:
-          # Load image into edge kind clusters
-          - os: ["linux", "darwin"]
-            command: ["sh", "-c", "kind load docker-image --name nagare-media-edge $SKAFFOLD_IMAGE"]
     - image: ghcr.io/nagare-media/engine/gateway-nbmp
       runtimeType: go
       context: .
@@ -94,11 +84,6 @@ build:
           GIT_COMMIT: "{{ .GIT_COMMIT }}"
           GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
           VERSION: "{{ .VERSION }}"
-      hooks:
-        after:
-          # Load image into edge kind clusters
-          - os: ["linux", "darwin"]
-            command: ["sh", "-c", "kind load docker-image --name nagare-media-edge $SKAFFOLD_IMAGE"]
   tagPolicy:
     customTemplate:
       template: "dev"
@@ -117,11 +102,35 @@ deploy:
       apply:
         - --server-side
     hooks:
+      before:
+        # Load function image into kind clusters
+        - host:
+            os: ["linux", "darwin"]
+            command:
+              - "kind"
+              - "load"
+              - "docker-image"
+              - "--name"
+              - "nagare-media-mgmt"
+              - "ghcr.io/nagare-media/engine/workflow-manager-helper:dev"
+              - "ghcr.io/nagare-media/engine/function-noop:dev"
+              - "ghcr.io/nagare-media/engine/function-sleep:dev"
+        - host:
+            os: ["linux", "darwin"]
+            command:
+              - "kind"
+              - "load"
+              - "docker-image"
+              - "--name"
+              - "nagare-media-edge"
+              - "ghcr.io/nagare-media/engine/workflow-manager-helper:dev"
+              - "ghcr.io/nagare-media/engine/function-noop:dev"
+              - "ghcr.io/nagare-media/engine/function-sleep:dev"
       after:
         # add test resources
         - host:
             os: ["linux", "darwin"]
-            command: ["sh", "-c", "kubectl --context kind-nagare-media-mgmt apply --server-side -f config/samples/k8s/v1alpha1_engine.nagare.media_functions.yaml"]
+            command: ["kubectl", "--context", "kind-nagare-media-mgmt", "apply", "--server-side", "-f", "config/samples/k8s/v1alpha1_engine.nagare.media_functions.yaml"]
         - host:
             os: ["linux", "darwin"]
-            command: ["sh", "-c", "kubectl --context kind-nagare-media-mgmt apply --server-side -f config/samples/k8s/v1alpha1_engine.nagare.media_mediaprocessingentities.yaml"]
+            command: ["kubectl", "--context", "kind-nagare-media-mgmt", "apply", "--server-side", "-f", "config/samples/k8s/v1alpha1_engine.nagare.media_mediaprocessingentities.yaml"]
