@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"os"
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -26,14 +27,20 @@ import (
 )
 
 func main() {
-	ctx := signals.SetupSignalHandler()
+	sigCtx := signals.SetupSignalHandler()
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		<-sigCtx.Done()
+		cancel()
+	}()
+
 	log.IntoContext(ctx, log.Log.
 		WithName("nagare-media").
 		WithName("engine").
 		WithName("workflow-vacuum"))
 
 	c := cli.New()
-	if err := c.Execute(ctx, os.Args[1:]); err != nil {
+	if err := c.Execute(ctx, os.Args[1:]); err != nil || sigCtx.Err() != nil {
 		os.Exit(1)
 	}
 }

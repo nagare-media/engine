@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 
@@ -27,16 +28,21 @@ import (
 )
 
 func main() {
-	fn := filepath.Base(os.Args[0])
+	sigCtx := signals.SetupSignalHandler()
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		<-sigCtx.Done()
+		cancel()
+	}()
 
-	ctx := signals.SetupSignalHandler()
 	log.IntoContext(ctx, log.Log.
 		WithName("nagare-media").
 		WithName("engine").
 		WithName("functions"))
 
+	fn := filepath.Base(os.Args[0])
 	c := cli.New()
-	if err := c.Execute(ctx, fn, os.Args[1:]); err != nil {
+	if err := c.Execute(ctx, fn, os.Args[1:]); err != nil || sigCtx.Err() != nil {
 		os.Exit(1)
 	}
 }
