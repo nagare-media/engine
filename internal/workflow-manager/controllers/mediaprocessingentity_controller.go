@@ -126,13 +126,13 @@ func (c *mpeClient) Namespace() string {
 	return c.namespace
 }
 
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities/finalizers,verbs=update
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities/finalizers,verbs=update
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities/finalizers,verbs=update
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities/finalizers,verbs=update
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities/status,verbs=get;update;patch
 
 func (r *MediaProcessingEntityReconciler) reconcileMediaProcessingEntity(ctx context.Context, req ctrl.Request) (_ ctrl.Result, reterr error) {
 	log := logf.FromContext(ctx)

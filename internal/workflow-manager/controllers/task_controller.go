@@ -88,23 +88,23 @@ type TaskReconciler struct {
 	ensureFuncs map[enginev1.TaskPhase][]EnsureFunc[*enginev1.Task]
 }
 
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks/finalizers,verbs=update
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=functions,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=clusterfunctions,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=medialocations,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermedialocations,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasktemplates,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustertasktemplates,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;watch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=clusterworkflows,verbs=get;list;watch
-// +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get
+// +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clusterfunctions,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermedialocations,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clustertasktemplates,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=clusterworkflows,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=functions,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=medialocations,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=mediaprocessingentities,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks/finalizers,verbs=update
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=tasktemplates,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;watch
 
 func (r *TaskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, reterr error) {
 	log := logf.FromContext(ctx)

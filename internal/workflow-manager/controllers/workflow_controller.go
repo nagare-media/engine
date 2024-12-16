@@ -49,10 +49,10 @@ type WorkflowReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows/finalizers,verbs=update
 // +kubebuilder:rbac:groups=engine.nagare.media,resources=tasks,verbs=get;list;watch
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows/finalizers,verbs=update
+// +kubebuilder:rbac:groups=engine.nagare.media,resources=workflows/status,verbs=get;update;patch
 
 func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, reterr error) {
 	log := logf.FromContext(ctx)
