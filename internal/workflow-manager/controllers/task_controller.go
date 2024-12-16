@@ -128,7 +128,8 @@ func (r *TaskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctr
 	oldTask := task.DeepCopy()
 	defer func() {
 		r.reconcileCondition(ctx, reterr, task)
-		apiErrs := kerrors.FilterOut(utils.FullPatch(ctx, r.Client, task, oldTask), apierrors.IsNotFound)
+		_, err := utils.FullPatch(ctx, r.Client, task, oldTask)
+		apiErrs := kerrors.FilterOut(err, apierrors.IsNotFound)
 		if apiErrs != nil {
 			log.Error(apiErrs, "error patching Task")
 		}
@@ -717,7 +718,7 @@ func (r *TaskReconciler) ensureJobExists(ctx context.Context, task *enginev1.Tas
 
 	// create or patch Job
 	if exists {
-		err = utils.Patch(ctx, c, job, oldJob)
+		_, err = utils.Patch(ctx, c, job, oldJob)
 	} else {
 		err = c.Create(ctx, job)
 	}
@@ -791,7 +792,7 @@ func (r *TaskReconciler) ensureJobServiceExists(ctx context.Context, task *engin
 	})
 
 	if exists {
-		err = utils.Patch(ctx, c, svc, svcOld)
+		_, err = utils.Patch(ctx, c, svc, svcOld)
 	} else {
 		err = c.Create(ctx, svc)
 	}
@@ -911,7 +912,7 @@ func (r *TaskReconciler) ensureWorkflowManagerHelperDataSecretExists(ctx context
 	}
 
 	if exists {
-		err = utils.Patch(ctx, c, secret, secretOld)
+		_, err := utils.Patch(ctx, c, secret, secretOld)
 	} else {
 		err = c.Create(ctx, secret)
 	}

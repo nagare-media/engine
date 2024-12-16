@@ -73,7 +73,8 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_
 	oldWf := wf.DeepCopy()
 	defer func() {
 		r.reconcileCondition(ctx, reterr, wf)
-		apiErrs := kerrors.FilterOut(utils.FullPatch(ctx, r.Client, wf, oldWf), apierrors.IsNotFound)
+		_, err := utils.FullPatch(ctx, r.Client, wf, oldWf)
+		apiErrs := kerrors.FilterOut(err, apierrors.IsNotFound)
 		if apiErrs != nil {
 			log.Error(apiErrs, "error patching Workflow")
 		}

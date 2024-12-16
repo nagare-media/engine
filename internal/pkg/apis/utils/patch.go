@@ -56,22 +56,24 @@ func ServerSideApplyStatus(ctx context.Context, c client.Client, obj client.Obje
 	})
 }
 
-func FullPatch(ctx context.Context, c client.Client, obj, oldObj client.Object) error {
+func FullPatch(ctx context.Context, c client.Client, obj, oldObj client.Object) (bool, error) {
 	// we create a copy as Patch / PatchStatus will replace obj.
 	// Running Patch will thus remove any changes made to status fields.
 	objCopy, ok := obj.DeepCopyObject().(client.Object)
 	if !ok {
-		return errors.New("patch: not a client.Object")
+		return false, errors.New("patch: not a client.Object")
 	}
-	return kerrors.NewAggregate([]error{
-		// apply changes to non-.status
-		Patch(ctx, c, objCopy, oldObj),
-		// apply changes to .status
-		PatchStatus(ctx, c, obj, oldObj),
-	})
+
+	// apply changes to non-.status
+	changed1, err1 := Patch(ctx, c, objCopy, oldObj)
+
+	// apply changes to .status
+	changed2, err2 := PatchStatus(ctx, c, obj, oldObj)
+
+	return changed1 || changed2, kerrors.NewAggregate([]error{err1, err2})
 }
 
-func Patch(ctx context.Context, c client.Client, obj, oldObj client.Object) error {
+func Patch(ctx context.Context, c client.Client, obj, oldObj client.Object) (bool, error) {
 	patch := client.MergeFrom(oldObj)
 	changed, err := HasChangesIn(obj, patch, []string{
 		// Common
@@ -85,24 +87,24 @@ func Patch(ctx context.Context, c client.Client, obj, oldObj client.Object) erro
 		"stringData",
 	})
 	if err != nil {
-		return err
+		return false, err
 	}
 	if !changed {
-		return nil
+		return false, nil
 	}
-	return c.Patch(ctx, obj, patch)
+	return true, c.Patch(ctx, obj, patch)
 }
 
-func PatchStatus(ctx context.Context, c client.Client, obj, oldObj client.Object) error {
+func PatchStatus(ctx context.Context, c client.Client, obj, oldObj client.Object) (bool, error) {
 	patch := client.MergeFrom(oldObj)
 	changed, err := HasChangesIn(obj, patch, []string{"status"})
 	if err != nil {
-		return err
+		return false, err
 	}
 	if !changed {
-		return nil
+		return false, nil
 	}
-	return c.Status().Patch(ctx, obj, patch)
+	return true, c.Status().Patch(ctx, obj, patch)
 }
 
 func HasChangesIn(obj client.Object, patch client.Patch, keys []string) (bool, error) {

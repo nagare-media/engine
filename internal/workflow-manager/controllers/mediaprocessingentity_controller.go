@@ -153,7 +153,8 @@ func (r *MediaProcessingEntityReconciler) reconcileMediaProcessingEntity(ctx con
 	oldMPE := mpe.DeepCopy()
 	defer func() {
 		r.reconcileCondition(ctx, reterr, mpe)
-		apiErrs := kerrors.FilterOut(utils.FullPatch(ctx, r.Client, mpe, oldMPE), apierrors.IsNotFound)
+		_, err := utils.FullPatch(ctx, r.Client, mpe, oldMPE)
+		apiErrs := kerrors.FilterOut(err, apierrors.IsNotFound)
 		if apiErrs != nil {
 			log.Error(apiErrs, "error patching MediaProcessingEntity")
 		}
@@ -193,7 +194,8 @@ func (r *MediaProcessingEntityReconciler) reconcileClusterMediaProcessingEntity(
 	oldMPE := cmpe.DeepCopy()
 	defer func() {
 		r.reconcileCondition(ctx, reterr, (*enginev1.MediaProcessingEntity)(cmpe))
-		apiErrs := kerrors.FilterOut(utils.FullPatch(ctx, r.Client, cmpe, oldMPE), apierrors.IsNotFound)
+		_, err := utils.FullPatch(ctx, r.Client, cmpe, oldMPE)
+		apiErrs := kerrors.FilterOut(err, apierrors.IsNotFound)
 		if apiErrs != nil {
 			log.Error(apiErrs, "error patching ClusterMediaProcessingEntity")
 		}
