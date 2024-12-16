@@ -73,6 +73,7 @@ func (s *workflowService) Create(ctx context.Context, wf *nbmpv2.Workflow) error
 	}
 
 	for _, t := range tsks {
+		s.setCommonLabels(t.Labels, wf)
 		if err := s.k8s.Create(ctx, &t); err != nil {
 			return err
 		}
@@ -94,9 +95,9 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 	}
 
 	tsksOld := &enginev1.TaskList{}
-	err = s.k8s.List(ctx, tsksOld, client.MatchingLabels{
-		enginev1.WorkflowNameLabel: wf.General.ID,
-	})
+	sel := client.MatchingLabels{}
+	s.setCommonLabels(sel, wf)
+	err = s.k8s.List(ctx, tsksOld, sel)
 	if err != nil {
 		return err
 	}
@@ -147,6 +148,7 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 		switch {
 		case !isOld && isNew:
 			// create task
+			s.setCommonLabels(tNew.Labels, wf)
 			if err = s.k8s.Create(ctx, tNew); err != nil {
 				return err
 			}
@@ -160,6 +162,7 @@ func (s *workflowService) Update(ctx context.Context, wf *nbmpv2.Workflow) error
 		case isOld && isNew:
 			// update task
 			tNew.SetResourceVersion(tOld.GetResourceVersion())
+			s.setCommonLabels(tNew.Labels, wf)
 			if err = s.k8s.Update(ctx, tNew); err != nil {
 				return err
 			}
@@ -202,9 +205,9 @@ func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) err
 	}
 
 	tsks := &enginev1.TaskList{}
-	err = s.k8s.List(ctx, tsks, client.MatchingLabels{
-		enginev1.WorkflowNameLabel: wf.General.ID,
-	})
+	sel := client.MatchingLabels{}
+	s.setCommonLabels(sel, wf)
+	err = s.k8s.List(ctx, tsks, sel)
 	if err != nil {
 		return err
 	}
@@ -227,4 +230,9 @@ func (s *workflowService) Retrieve(ctx context.Context, wf *nbmpv2.Workflow) err
 	*wf = wfNew
 
 	return nil
+}
+
+func (s *workflowService) setCommonLabels(labels map[string]string, wf *nbmpv2.Workflow) {
+	labels[enginev1.WorkflowNamespaceLabel] = s.cfg.Kubernetes.Namespace
+	labels[enginev1.WorkflowNameLabel] = wf.General.ID
 }
