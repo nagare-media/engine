@@ -12,7 +12,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/google/uuid v1.6.0
 	github.com/mattn/go-isatty v0.0.20
-	github.com/minio/minio-go/v7 v7.0.81
+	github.com/minio/minio-go/v7 v7.0.82
 	github.com/nagare-media/models.go v0.0.0-20241028110832-3cf01c064ecc
 	github.com/nats-io/nats.go v1.37.0
 	github.com/onsi/ginkgo/v2 v2.22.0
