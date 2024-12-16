@@ -89,6 +89,7 @@ type TaskReconciler struct {
 }
 
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get
+// +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch;update;patch
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
@@ -801,6 +802,8 @@ func (r *TaskReconciler) ensureJobServiceExists(ctx context.Context, task *engin
 }
 
 func (r *TaskReconciler) ensureWorkflowManagerHelperDataSecretExists(ctx context.Context, task *enginev1.Task) (Result, error) {
+	log := logf.FromContext(ctx)
+
 	// get MPE client for this task
 	c, err := r.getMPEClientForTask(task)
 	if err != nil {
@@ -912,7 +915,14 @@ func (r *TaskReconciler) ensureWorkflowManagerHelperDataSecretExists(ctx context
 	}
 
 	if exists {
-		_, err := utils.Patch(ctx, c, secret, secretOld)
+		changed, err := utils.Patch(ctx, c, secret, secretOld)
+		if changed {
+			// It takes a sync loop interval to propagate Secret changes to Pods. This can be faster if we update the Pod
+			// container and force a reconsiliation.
+			if err2 := r.tryForcedJobPodsSync(ctx, task); err2 != nil {
+				log.Error(err, "failed to force a Pod sync to speedup Secret propagation")
+			}
+		}
 	} else {
 		err = c.Create(ctx, secret)
 	}
@@ -1032,6 +1042,48 @@ func (r *TaskReconciler) setCommonLabels(labels map[string]string, task *enginev
 	labels[enginev1.WorkflowNameLabel] = task.Spec.WorkflowRef.Name
 	labels[enginev1.TaskNamespaceLabel] = task.Namespace
 	labels[enginev1.TaskNameLabel] = task.Name
+}
+
+func (r *TaskReconciler) tryForcedJobPodsSync(ctx context.Context, task *enginev1.Task) error {
+	job, err := r.resolveJobRef(ctx, task)
+	if err != nil {
+		return err
+	}
+
+	c, err := r.getMPEClientForTask(task)
+	if err != nil {
+		return err
+	}
+
+	sel, err := metav1.LabelSelectorAsSelector(job.Spec.Selector)
+	if err != nil {
+		return err
+	}
+
+	pods := &corev1.PodList{}
+	err = c.List(ctx, pods, client.MatchingLabelsSelector{Selector: sel})
+	if err != nil {
+		return err
+	}
+
+	var errs []error
+
+	for _, pod := range pods.Items {
+		if pod.Status.Phase == corev1.PodRunning {
+			oldPod := pod.DeepCopy()
+			if pod.Annotations == nil {
+				pod.Annotations = make(map[string]string)
+			}
+			pod.Annotations[enginev1.LastConfigChangePodAnnotation] = time.Now().UTC().Format(time.RFC3339)
+
+			_, err = utils.Patch(ctx, c, &pod, oldPod)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	return kerrors.NewAggregate(errs)
 }
 
 func (r *TaskReconciler) resolveWorkflowRef(ctx context.Context, task *enginev1.Task) (*enginev1.Workflow, error) {

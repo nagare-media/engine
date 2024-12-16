@@ -41,6 +41,12 @@ const (
 	JobProtectionFinalizer = "engine.nagare.media/job-protection"
 )
 
+const (
+	// Annotation that indicates the last config change. If this annotation does not exist, there may have been no config
+	// changes. Users should not rely on this annotation. This is mainly set to force a Pod sync.
+	LastConfigChangePodAnnotation = "engine.nagare.media/last-config-change"
+)
+
 // Specification of a Task.
 type TaskSpec struct {
 	// Reference to a TaskTemplate or ClusterTaskTemplate. Only references to these two kinds are allowed. A Task can only
