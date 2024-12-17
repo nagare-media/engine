@@ -354,7 +354,7 @@ func (r *MediaProcessingEntityReconciler) reconcile(ctx context.Context, mpe *en
 	return ctrl.Result{}, nil
 }
 
-func (r *MediaProcessingEntityReconciler) newLocalManager(ctx context.Context, mpe *enginev1.MediaProcessingEntity) (Manager, error) {
+func (r *MediaProcessingEntityReconciler) newLocalManager(_ context.Context, mpe *enginev1.MediaProcessingEntity) (Manager, error) {
 	// shallow copy
 	opts := r.ManagerOptions
 
