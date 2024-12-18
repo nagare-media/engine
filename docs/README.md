@@ -2,8 +2,10 @@
 
 ## MMSys 2024 Examples
 
-* [Example for `mmsys-test-scene-detection` function](../config/samples/k8s/mmsys-test-scene-detection/README.md)
-* [Example for `mmsys-test-encode` function](../config/samples/k8s/mmsys-test-encode/README.md)
+These examples are based on an older version of this repository tagged as `mmsys-2024`.
+
+* [Example for `mmsys-test-scene-detection` function](https://github.com/nagare-media/engine/blob/mmsys-2024/config/samples/k8s/mmsys-test-encode/README.md)
+* [Example for `mmsys-test-encode` function](https://github.com/nagare-media/engine/blob/mmsys-2024/config/samples/k8s/mmsys-test-scene-detection/README.md)
 
 ## Reference
 

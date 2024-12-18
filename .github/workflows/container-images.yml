@@ -21,8 +21,6 @@ jobs:
     strategy:
       matrix:
         image:
-          - function-mmsys-test-encode
-          - function-mmsys-test-scene-detection
           - function-noop
           - function-sleep
           - gateway-nbmp
