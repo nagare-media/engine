@@ -12,4 +12,4 @@ task:
       action: task-shim.engine.nagare.media/exec
       config:
         command: ./bin/functions-dev-darwin-arm64
-        args: ["--zap-devel", "--zap-log-level", "debug", "--zap-stacktrace-level", "panic", "sleep", "/tmp/nbmp.tdd"]
+        args: ["--zap-devel", "--zap-log-level", "debug", "--zap-stacktrace-level", "panic", "generic-sleep", "/tmp/nbmp.tdd"]

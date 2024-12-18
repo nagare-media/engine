@@ -21,8 +21,8 @@ jobs:
     strategy:
       matrix:
         image:
-          - function-noop
-          - function-sleep
+          - function-generic-noop
+          - function-generic-sleep
           - gateway-nbmp
           - workflow-manager
           - workflow-manager-helper

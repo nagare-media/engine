@@ -34,10 +34,6 @@ import (
 	"github.com/nagare-media/engine/internal/functions"
 	"github.com/nagare-media/engine/internal/pkg/version"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
-
-	// Import nagare media functions to be included in this multi-binary.
-	_ "github.com/nagare-media/engine/internal/functions/noop"
-	_ "github.com/nagare-media/engine/internal/functions/sleep"
 )
 
 const BaseBinaryName = "functions"

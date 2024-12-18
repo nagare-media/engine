@@ -13,7 +13,7 @@ task:
     name: sleep
     description: A task that sleeps.
   config:
-    sleep.engine.nagare.media/duration: 10s
+    generic-sleep.engine.nagare.media/duration: 10s
 
 system:
   nats:

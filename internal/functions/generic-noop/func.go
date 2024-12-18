@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package noop
+package function
 
 import (
 	"context"
@@ -28,23 +28,23 @@ import (
 
 // Function description
 const (
-	Name = "noop"
+	Name = "generic-noop"
 )
 
-// function noop does nothing. It can be used for debugging.
+// function generic-noop does nothing. It can be used for debugging.
 type function struct{}
 
 var _ nbmp.Function = &function{}
 
-// Exec noop function.
+// Exec generic-noop function.
 func (f *function) Exec(ctx context.Context) error {
-	log.FromContext(ctx).WithName(Name).Info("run noop")
+	log.FromContext(ctx).WithName(Name).Info("running")
 	return nil
 }
 
-// BuildTask from noop function.
+// BuildTask from generic-noop function.
 func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
-	log.FromContext(ctx).WithName(Name).Info("build noop")
+	log.FromContext(ctx).WithName(Name).Info("building")
 	return &function{}, nil
 }
 

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package sleep
+package function
 
 import (
 	"context"
@@ -31,9 +31,9 @@ import (
 
 // Function description
 const (
-	Name = "sleep"
+	Name = "generic-sleep"
 
-	DurationParameterKey = "sleep.engine.nagare.media/duration"
+	DurationParameterKey = "generic-sleep.engine.nagare.media/duration"
 )
 
 // function sleeps for a certain amount of time. It can be used for debugging.
@@ -43,7 +43,7 @@ type function struct {
 
 var _ nbmp.Function = &function{}
 
-// Exec sleep function.
+// Exec generic-sleep function.
 func (f *function) Exec(ctx context.Context) error {
 	l := log.FromContext(ctx, "duration", f.duration).WithName(Name)
 
@@ -58,7 +58,7 @@ func (f *function) Exec(ctx context.Context) error {
 	return nil
 }
 
-// BuildTask from sleep function.
+// BuildTask from generic-sleep function.
 func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
 	var err error
 	f := &function{}

@@ -25,12 +25,12 @@
     "function-restrictions": [{
       "instance": "sleep-10s",
       "general": {
-        "id": "ClusterFunction/sleep"
+        "id": "ClusterFunction/generic-sleep"
       },
       "configuration": {
         "parameters": [
           {
-            "name": "sleep.engine.nagare.media/duration",
+            "name": "generic-sleep.engine.nagare.media/duration",
             "datatype": "string",
             "values": [{"restrictions": ["10s"]}]
           }

@@ -25,6 +25,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 
 	"github.com/nagare-media/engine/cmd/functions/cli"
+
+	// Import nagare media functions to be included in this multi-binary.
+	_ "github.com/nagare-media/engine/internal/functions/generic-noop"
+	_ "github.com/nagare-media/engine/internal/functions/generic-sleep"
 )
 
 func main() {

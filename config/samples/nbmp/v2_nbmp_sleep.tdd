@@ -36,7 +36,7 @@
         "values": [{"restrictions": ["0bf0de1d-7d8a-45e1-8770-b12e0eefdf49"]}]
       },
       {
-        "name": "sleep.engine.nagare.media/duration",
+        "name": "generic-sleep.engine.nagare.media/duration",
         "datatype": "string",
         "values": [{"restrictions": ["10s"]}]
       }
