@@ -203,8 +203,15 @@ clean: ## Cleanup build output
 .PHONY: image
 image: $(addprefix image-, $(IMAGES)) ## Build all container images
 
+## image-function-data-buffer:                ## Build data-buffer function container image
 ## image-function-generic-noop:               ## Build generic-noop function container image
 ## image-function-generic-sleep:              ## Build generic-sleep function container image
+## image-function-media-encode:               ## Build media-encode function container image
+## image-function-media-generate-testpattern: ## Build media-generate-testpattern function container image
+## image-function-media-merge:                ## Build media-merge function container image
+## image-function-media-metadata-technical:   ## Build media-metadata-technical function container image
+## image-function-media-package-hls:          ## Build media-package-hls function container image
+## image-function-script-lua:                 ## Build script-lua function container image
 ## image-gateway-nbmp:                        ## Build NBMP gateway container image
 ## image-workflow-manager:                    ## Build workflow manager container image
 ## image-workflow-manager-helper:             ## Build workflow manager helper container image

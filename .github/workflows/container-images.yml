@@ -21,8 +21,15 @@ jobs:
     strategy:
       matrix:
         image:
+          - function-data-buffer
           - function-generic-noop
           - function-generic-sleep
+          - function-media-encode
+          - function-media-generate-testpattern
+          - function-media-merge
+          - function-media-metadata-technical
+          - function-media-package-hls
+          - function-script-lua
           - gateway-nbmp
           - workflow-manager
           - workflow-manager-helper

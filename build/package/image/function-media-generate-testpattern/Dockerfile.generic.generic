@@ -1,0 +1,93 @@
+# syntax=docker/dockerfile:1.4
+
+ARG GOVERSION
+FROM --platform=${BUILDPLATFORM} docker.io/library/golang:${GOVERSION} AS build
+
+ARG SKAFFOLD_GO_GCFLAGS=""
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    go mod download
+COPY . .
+
+# BUILD_DATE changes ofter so move this section down to allow for caching
+ARG TARGETOS \
+    TARGETARCH \
+    TARGETVARIANT \
+    VERSION \
+    GIT_COMMIT \
+    GIT_TREE_STATE \
+    BUILD_DATE
+
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/app/tmp,id=app-tmp-${TARGETARCH}-${TARGETVARIANT},sharing=locked \
+    make build-task-shim \
+      "OS=${TARGETOS}" \
+      "ARCH=${TARGETARCH}" \
+      "VERSION=${VERSION}" \
+      "GIT_COMMIT=${GIT_COMMIT}" \
+      "GIT_TREE_STATE=${GIT_TREE_STATE}" \
+      "BUILD_DATE=${BUILD_DATE}" \
+ && make build-functions \
+      "OS=${TARGETOS}" \
+      "ARCH=${TARGETARCH}" \
+      "VERSION=${VERSION}" \
+      "GIT_COMMIT=${GIT_COMMIT}" \
+      "GIT_TREE_STATE=${GIT_TREE_STATE}" \
+      "BUILD_DATE=${BUILD_DATE}"
+
+FROM gcr.io/distroless/static:latest
+LABEL org.opencontainers.image.base.name="gcr.io/distroless/static:latest"
+
+ENV GOTRACEBACK=all
+
+ARG TARGETOS \
+    TARGETARCH \
+    VERSION \
+    GIT_COMMIT \
+    BUILD_DATE
+
+LABEL maintainer="Matthias Neugebauer <mtneug@shio.solutions>" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.authors="Matthias Neugebauer <mtneug@shio.solutions>" \
+      org.opencontainers.image.url="ghcr.io/nagare-media/engine/function-media-generate-testpattern" \
+      org.opencontainers.image.documentation="https://nagare.media" \
+      org.opencontainers.image.source="https://github.com/nagare-media/engine" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      org.opencontainers.image.vendor="nagare media" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.title="nagare media engine" \
+      org.opencontainers.image.description="nagare media engine — an open source modern cloud- and edge-native media workflow system running on Kubernetes"
+
+WORKDIR /
+COPY --from=build "/app/bin/task-shim-${VERSION}-${TARGETOS}-${TARGETARCH}" /task-shim
+COPY --from=build "/app/bin/functions-${VERSION}-${TARGETOS}-${TARGETARCH}" /media-generate-testpattern
+USER 65532:65532
+
+COPY <<EOF /config/task-shim.yaml
+apiVersion: engine.nagare.media/v1alpha1
+kind: TaskShimConfig
+task:
+  actions:
+    - name: write task description document
+      action: task-shim.engine.nagare.media/file
+      config: |
+        path: /tmp/nbmp.tdd
+        content: |
+          {{ toJson .Task }}
+    - name: execute function
+      action: task-shim.engine.nagare.media/exec
+      config:
+        command: /media-generate-testpattern
+        args: ["/tmp/nbmp.tdd"]
+EOF
+
+# NBMP Task API
+EXPOSE 8888
+
+ENTRYPOINT [ "/task-shim" ]
+CMD [ "--config", "/config/task-shim.yaml" ]

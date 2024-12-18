@@ -27,8 +27,15 @@ import (
 	"github.com/nagare-media/engine/cmd/functions/cli"
 
 	// Import nagare media functions to be included in this multi-binary.
+	_ "github.com/nagare-media/engine/internal/functions/data-buffer"
 	_ "github.com/nagare-media/engine/internal/functions/generic-noop"
 	_ "github.com/nagare-media/engine/internal/functions/generic-sleep"
+	_ "github.com/nagare-media/engine/internal/functions/media-encode"
+	_ "github.com/nagare-media/engine/internal/functions/media-generate-testpattern"
+	_ "github.com/nagare-media/engine/internal/functions/media-merge"
+	_ "github.com/nagare-media/engine/internal/functions/media-metadata-technical"
+	_ "github.com/nagare-media/engine/internal/functions/media-package-hls"
+	_ "github.com/nagare-media/engine/internal/functions/script-lua"
 )
 
 func main() {
