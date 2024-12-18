@@ -8,5 +8,3 @@ metadata:
     app.kubernetes.io/created-by: nagare-media-engine
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/managed-by: kustomize
-webserver:
-  bindAddress: :8080

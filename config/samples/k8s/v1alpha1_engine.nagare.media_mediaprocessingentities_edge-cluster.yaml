@@ -1,20 +1,3 @@
----
-apiVersion: engine.nagare.media/v1alpha1
-kind: MediaProcessingEntity
-metadata:
-  annotations:
-    engine.nagare.media/is-default-media-processing-entity: "true"
-  labels:
-    app.kubernetes.io/name: mediaprocessingentity
-    app.kubernetes.io/instance: local-cluster
-    app.kubernetes.io/part-of: nagare-media-engine
-    app.kubernetes.io/created-by: nagare-media-engine
-  name: local-cluster
-  namespace: default
-spec:
-  local:
-    namespace: default
----
 apiVersion: engine.nagare.media/v1alpha1
 kind: ClusterMediaProcessingEntity
 metadata:

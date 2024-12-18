@@ -8,10 +8,4 @@ metadata:
     app.kubernetes.io/created-by: nagare-media-engine
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/managed-by: kustomize
-webserver:
-  bindAddress: :8080
-  publicBaseURL: http://engine.nagare.localtest.me
-workflow:
-  kubernetes:
-    namespace: default
-    gpuResourceName: nvidia.com/gpu
+# TODO: add all options with defaults

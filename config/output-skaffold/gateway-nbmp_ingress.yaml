@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
+    # Don't fail requests when debugging.
     nginx.ingress.kubernetes.io/proxy-read-timeout: "999999"
   labels:
     app.kubernetes.io/name: ingress
