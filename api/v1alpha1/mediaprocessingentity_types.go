@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	meta "github.com/nagare-media/engine/pkg/apis/meta"
+	"github.com/nagare-media/engine/pkg/apis/meta"
 )
 
 const (

@@ -20,7 +20,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	meta "github.com/nagare-media/engine/pkg/apis/meta"
+	"github.com/nagare-media/engine/pkg/apis/meta"
 )
 
 const (
