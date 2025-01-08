@@ -24,9 +24,10 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
+
+	"github.com/nagare-media/engine/internal/pkg/backoff"
 )
 
 const (
@@ -76,21 +77,10 @@ func CreateJetStreamConn(ctx context.Context, url string) (*nats.Conn, jetstream
 		l.Error(err, fmt.Sprintf("failed; retrying after %s", t))
 	}
 
-	expBackOff := &backoff.ExponentialBackOff{
-		InitialInterval:     500 * time.Millisecond,
-		RandomizationFactor: 0.25,
-		Multiplier:          1.5,
-		MaxInterval:         5 * time.Second,
-		MaxElapsedTime:      0, // = indefinitely (we use contexts for that)
-		Stop:                backoff.Stop,
-		Clock:               backoff.SystemClock,
-	}
-	expBackOff.Reset()
-
 	ctx, cancel := context.WithTimeout(ctx, NATSConnectionTimeout)
 	defer cancel()
 
-	err := backoff.RetryNotify(op, backoff.WithContext(expBackOff, ctx), no)
+	err := backoff.RetryFunc(ctx, op, backoff.WithNotify(no))
 	return nc, js, err
 }
 

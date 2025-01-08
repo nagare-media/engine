@@ -31,10 +31,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/yaml"
 
-	backoff "github.com/cenkalti/backoff/v4"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/pkg/backoff"
 	"github.com/nagare-media/engine/internal/pkg/uuid"
 	"github.com/nagare-media/engine/internal/task-shim/actions"
 	metaaction "github.com/nagare-media/engine/internal/task-shim/actions/meta"
@@ -199,16 +199,7 @@ func (s *taskService) createReportClient(t *nbmpv2.Task) error {
 		URL:    string(t.Reporting.URL),
 		Client: http.DefaultClient,
 	}
-	expBackOff := &backoff.ExponentialBackOff{
-		InitialInterval:     500 * time.Millisecond,
-		RandomizationFactor: 0.25,
-		Multiplier:          1.5,
-		MaxInterval:         2 * time.Second,
-		MaxElapsedTime:      0, // = indefinitely (we use contexts for that)
-		Stop:                backoff.Stop,
-		Clock:               backoff.SystemClock,
-	}
-	s.reportClient = events.ClientWithBackoff(c, expBackOff)
+	s.reportClient = events.ClientWithBackoff(c, backoff.New())
 
 	return nil
 }

@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cenkalti/backoff/v4"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/nagare-media/engine/internal/pkg/backoff"
 	"github.com/nagare-media/engine/internal/pkg/mime"
 )
 
@@ -114,11 +114,11 @@ func ClientWithBackoff(c Client, b backoff.BackOff) *backoffClient {
 func (c *backoffClient) Send(ctx context.Context, e cloudevents.Event) error {
 	c.b.Reset()
 	op := func() error { return c.c.Send(ctx, e) }
-	return backoff.Retry(op, backoff.WithContext(c.b, ctx))
+	return backoff.RetryFunc(ctx, op)
 }
 
 func (c *backoffClient) SendAsyncAck(ctx context.Context, e cloudevents.Event) error {
 	c.b.Reset()
 	op := func() error { return c.c.SendAsyncAck(ctx, e) }
-	return backoff.Retry(op, backoff.WithContext(c.b, ctx))
+	return backoff.RetryFunc(ctx, op)
 }

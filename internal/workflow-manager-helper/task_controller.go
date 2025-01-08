@@ -30,11 +30,11 @@ import (
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	backoff "github.com/cenkalti/backoff/v4"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/nats-io/nats.go/jetstream"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	"github.com/nagare-media/engine/internal/pkg/backoff"
 	"github.com/nagare-media/engine/internal/pkg/mime"
 	enginenats "github.com/nagare-media/engine/internal/pkg/nats"
 	nbmpconvv2 "github.com/nagare-media/engine/internal/pkg/nbmpconv/v2"
@@ -183,7 +183,7 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context, data *enginev1.WorkflowM
 	ctxCreate, cancel := context.WithTimeout(ctx, TaskCreateTimeout)
 	defer cancel()
 
-	err = backoff.RetryNotify(op, newBackOffWithContext(ctxCreate), no)
+	err = backoff.RetryFunc(ctxCreate, op, backoff.WithNotify(no))
 	if err != nil {
 		l.Error(err, "failed to create task")
 	}
@@ -406,16 +406,7 @@ func (c *taskCtrl) eventEmitterLoop(ctx context.Context, data *enginev1.Workflow
 			URL:    string(*p.Input.URL),
 			Client: http.DefaultClient,
 		}
-		expBackOff := &backoff.ExponentialBackOff{
-			InitialInterval:     500 * time.Millisecond,
-			RandomizationFactor: 0.25,
-			Multiplier:          1.5,
-			MaxInterval:         2 * time.Second,
-			MaxElapsedTime:      0, // = indefinitely (we use contexts for that)
-			Stop:                backoff.Stop,
-			Clock:               backoff.SystemClock,
-		}
-		eventClients[p.Input.ID] = events.ClientWithBackoff(ec, expBackOff)
+		eventClients[p.Input.ID] = events.ClientWithBackoff(ec, backoff.New())
 	}
 
 	if len(eventClients) == 0 {
@@ -523,7 +514,7 @@ func (c *taskCtrl) updateTask(ctx context.Context, data *enginev1.WorkflowManage
 	ctxUpdate, cancel := context.WithTimeout(ctx, TaskUpdateTimeout)
 	defer cancel()
 
-	err = backoff.RetryNotify(op, newBackOffWithContext(ctxUpdate), no)
+	err = backoff.RetryFunc(ctxUpdate, op, backoff.WithNotify(no))
 	if err != nil {
 		l.Error(err, "failed to update task")
 	}
@@ -558,7 +549,7 @@ func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 	ctxDelete, cancel := context.WithTimeout(ctx, TaskDeleteTimeout)
 	defer cancel()
 
-	err := backoff.RetryNotify(op, newBackOffWithContext(ctxDelete), no)
+	err := backoff.RetryFunc(ctxDelete, op, backoff.WithNotify(no))
 	if err != nil {
 		l.Error(err, "failed to delete task")
 	}
