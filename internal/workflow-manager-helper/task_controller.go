@@ -164,14 +164,14 @@ func (c *taskCtrl) createTaskPhase(ctx context.Context, data *enginev1.WorkflowM
 		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.CreateRequestTimeout.Duration)
 		defer cancel()
 
-		t, err = c.client.Create(ctx, t)
+		t2, err := c.client.Create(ctx, t)
 		if err != nil {
 			// TODO: check if t is not nil to give more infos in log
 			l.Error(err, "failed to create NBMP Task")
 			return err
 		}
 
-		c.tskInstanceID = t.General.ID
+		c.tskInstanceID = t2.General.ID
 
 		return nil
 	}
@@ -493,15 +493,15 @@ func (c *taskCtrl) updateTask(ctx context.Context, data *enginev1.WorkflowManage
 		ctx, cancel := context.WithTimeout(ctx, c.cfg.TaskController.UpdateRequestTimeout.Duration)
 		defer cancel()
 
-		t, err = c.client.Update(ctx, t)
+		t2, err := c.client.Update(ctx, t)
 		if err != nil {
 			// TODO: check if t is not nil to give more infos in log
 			l.Error(err, "failed to update NBMP Task")
 			return err
 		}
 
-		if c.tskInstanceID != t.General.ID {
-			return fmt.Errorf("NBMP task ID '%s' doesn't match task instance ID '%s'", t.General.ID, c.tskInstanceID)
+		if c.tskInstanceID != t2.General.ID {
+			return fmt.Errorf("NBMP task ID '%s' doesn't match task instance ID '%s'", t2.General.ID, c.tskInstanceID)
 		}
 
 		return nil
