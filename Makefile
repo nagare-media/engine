@@ -292,3 +292,12 @@ $(YQ): $(LOCALBIN)
 	@  test -s $(LOCALBIN)/yq \
 	&& $(LOCALBIN)/yq --version | grep -q $(YQ_VERSION) \
 	|| GOBIN=$(LOCALBIN) go install github.com/mikefarah/yq/v4@$(YQ_VERSION)
+
+##@ Examples
+
+## run-sink-pull-http-ffplay:    ## Run example sink HTTP (pull) ffplay
+## run-sink-push-http-ffplay:    ## Run example sink HTTP (push) ffplay
+## run-source-pull-http-ffmpeg:  ## Run example source HTTP (pull) ffmpeg
+## run-source-push-http-ffmpeg:  ## Run example source HTTP (push) ffmpeg
+run-%:
+	@scripts/exec-local "run-$*"

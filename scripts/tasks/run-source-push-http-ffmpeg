@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Copyright 2022-2025 The nagare media authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Main
+
+ffmpeg -hide_banner \
+  -re -f lavfi -i "
+    testsrc2=size=1920x1080:rate=25,
+    drawbox=x=0:y=0:w=1400:h=100:c=black@.6:t=fill,
+    drawtext=x= 10:y=10:fontsize=108:fontcolor=white:text='%{pts\:gmtime\:$(date +%s)\:%Y-%m-%d}',
+    drawtext=x=690:y=10:fontsize=108:fontcolor=white:timecode='$(date -u '+%H\:%M\:%S')\:00':rate=25:tc24hmax=1,
+    setparams=field_mode=prog:range=tv:color_primaries=bt709:color_trc=bt709:colorspace=bt709,
+    format=yuv420p
+  " \
+  -fflags genpts \
+  -c:v libx264 \
+    -preset:v veryfast \
+    -tune zerolatency \
+    -profile:v main \
+    -crf:v 23 -bufsize:v:0 4500k -maxrate:v 5000k \
+    -g:v 100000 -keyint_min:v 50000 -force_key_frames:v "expr:gte(t,n_forced*2)" \
+    -x264opts no-open-gop=1 \
+    -bf 2 -b_strategy 2 -refs 1 \
+    -rc-lookahead 24 \
+    -export_side_data prft \
+    -field_order progressive -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv \
+    -pix_fmt yuv420p \
+  -f mpegts \
+  'http://127.0.0.1:8111/streams/in/input'
