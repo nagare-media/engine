@@ -45,9 +45,9 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/apis/utils"
-	"github.com/nagare-media/engine/internal/pkg/engineurl"
 	apiclient "github.com/nagare-media/engine/internal/workflow-manager/client"
 	"github.com/nagare-media/engine/pkg/apis/meta"
+	"github.com/nagare-media/engine/pkg/engineurl"
 	"github.com/nagare-media/engine/pkg/maps"
 	"github.com/nagare-media/models.go/base"
 )

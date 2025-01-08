@@ -32,9 +32,9 @@ import (
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/apis/utils"
-	"github.com/nagare-media/engine/internal/pkg/engineurl"
 	nbmpconv "github.com/nagare-media/engine/internal/pkg/nbmpconv"
 	"github.com/nagare-media/engine/pkg/apis/meta"
+	"github.com/nagare-media/engine/pkg/engineurl"
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	"github.com/nagare-media/models.go/base"
