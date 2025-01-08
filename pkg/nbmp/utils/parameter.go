@@ -53,7 +53,7 @@ func SetStringParameterValue(parameters []nbmpv2.Parameter, key, value string) [
 	pnew := nbmpv2.Parameter{
 		Name:     key,
 		Datatype: nbmpv2.StringDatatype,
-		Values: []nbmpv2.ParameterValue{nbmpv2.StringParameterValue{
+		Values: []nbmpv2.ParameterValue{&nbmpv2.StringParameterValue{
 			Restrictions: []string{value},
 		}},
 	}
