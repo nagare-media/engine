@@ -5,23 +5,7 @@
   "general": {
     "id": "6ca5cc44-9e7b-4104-b3df-e11b84c26e42",
     "name": "sleep",
-    "description": "A task that sleeps.",
-    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1",
-    "output-ports": [{
-      "port-name": "dummy",
-      "bind": {
-        "stream-id": "dummy-connection"
-      }
-    }]
-  },
-  "output": {
-    "media-parameters": [{
-      "stream-id": "dummy-connection",
-      "name": "0bf0de1d-7d8a-45e1-8770-b12e0eefdf49 --\u003e c0825793-d106-4e5d-b263-cf416abde2a6",
-      "protocol": "nagare-media-engine",
-      "mode": "push",
-      "caching-server-url": "nagare-media-engine:///task/d08b10de-ea8e-422f-be57-9d32e3082765/c0825793-d106-4e5d-b263-cf416abde2a6/dummy/dummy-connection"
-    }]
+    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1"
   },
   "configuration": {
     "parameters": [
@@ -29,6 +13,16 @@
         "name": "engine.nagare.media/workflow-id",
         "datatype": "string",
         "values": [{"restrictions": ["d08b10de-ea8e-422f-be57-9d32e3082765"]}]
+      },
+      {
+        "name": "engine.nagare.media/workflow-name",
+        "datatype": "string",
+        "values": [{"restrictions": ["example"]}]
+      },
+      {
+        "name": "engine.nagare.media/workflow-description",
+        "datatype": "string",
+        "values": [{"restrictions": ["An example workflow."]}]
       },
       {
         "name": "engine.nagare.media/task-id",
@@ -41,5 +35,10 @@
         "values": [{"restrictions": ["10s"]}]
       }
     ]
+  },
+  "reporting": {
+    "report-type": "engine.nagare.media/cloud-events",
+    "url": "http://127.0.0.1:8181/events",
+    "delivery-method": "HTTP POST"
   }
 }

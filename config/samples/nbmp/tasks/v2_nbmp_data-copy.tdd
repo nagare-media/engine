@@ -1,0 +1,69 @@
+{
+  "scheme": {
+    "uri": "urn:mpeg:mpegi:nbmp:2023"
+  },
+  "general": {
+    "id": "2f098fc5-145c-4900-a79c-5a69b9b028e2",
+    "name": "data-copy",
+    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1",
+    "input-ports": [{
+      "port-name": "in",
+      "bind": {
+        "stream-id": "input"
+      }
+    }],
+    "output-ports": [{
+      "port-name": "out.0",
+      "bind": {
+        "stream-id": "output"
+      }
+    }]
+  },
+  "input": {
+    "media-parameters": [{
+      "stream-id": "input",
+      "name": "input",
+      "protocol": "buffered",
+      "mode": "push",
+      "caching-server-url": "buffered://127.0.0.1:8111/streams/in/input?nme-buffered-protocol=http"
+    }]
+  },
+  "output": {
+    "media-parameters": [{
+      "stream-id": "output",
+      "name": "output",
+      "protocol": "buffered",
+      "mode": "push",
+      "caching-server-url": "buffered://127.0.0.1:8999/streams/out/output?nme-buffered-protocol=http"
+    }]
+  },
+  "configuration": {
+    "parameters": [
+      {
+        "name": "engine.nagare.media/workflow-id",
+        "datatype": "string",
+        "values": [{"restrictions": ["d08b10de-ea8e-422f-be57-9d32e3082765"]}]
+      },
+      {
+        "name": "engine.nagare.media/workflow-name",
+        "datatype": "string",
+        "values": [{"restrictions": ["example"]}]
+      },
+      {
+        "name": "engine.nagare.media/workflow-description",
+        "datatype": "string",
+        "values": [{"restrictions": ["An example workflow."]}]
+      },
+      {
+        "name": "engine.nagare.media/task-id",
+        "datatype": "string",
+        "values": [{"restrictions": ["0bf0de1d-7d8a-45e1-8770-b12e0eefdf49"]}]
+      }
+    ]
+  },
+  "reporting": {
+    "report-type": "engine.nagare.media/cloud-events",
+    "url": "http://127.0.0.1:8181/events",
+    "delivery-method": "HTTP POST"
+  }
+}
