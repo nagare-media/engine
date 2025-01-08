@@ -22,6 +22,8 @@ jobs:
       matrix:
         image:
           - function-data-buffer
+          - function-data-copy
+          - function-data-discard
           - function-generic-noop
           - function-generic-sleep
           - function-media-encode

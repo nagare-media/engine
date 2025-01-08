@@ -20,6 +20,38 @@ build:
           GIT_COMMIT: "{{ .GIT_COMMIT }}"
           GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
           VERSION: "{{ .VERSION }}"
+    - image: ghcr.io/nagare-media/engine/function-data-copy
+      runtimeType: go
+      context: .
+      docker:
+        dockerfile: build/package/image/function-data-copy/Dockerfile.generic.generic
+        pullParent: false
+        noCache: false
+        squash: false
+        buildArgs:
+          OS: "{{ .OS }}"
+          ARCH: "{{ .ARCH }}"
+          GOVERSION: "{{ .GOVERSION }}"
+          BUILD_DATE: "{{ .BUILD_DATE }}"
+          GIT_COMMIT: "{{ .GIT_COMMIT }}"
+          GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
+          VERSION: "{{ .VERSION }}"
+    - image: ghcr.io/nagare-media/engine/function-data-discard
+      runtimeType: go
+      context: .
+      docker:
+        dockerfile: build/package/image/function-data-discard/Dockerfile.generic.generic
+        pullParent: false
+        noCache: false
+        squash: false
+        buildArgs:
+          OS: "{{ .OS }}"
+          ARCH: "{{ .ARCH }}"
+          GOVERSION: "{{ .GOVERSION }}"
+          BUILD_DATE: "{{ .BUILD_DATE }}"
+          GIT_COMMIT: "{{ .GIT_COMMIT }}"
+          GIT_TREE_STATE: "{{ .GIT_TREE_STATE }}"
+          VERSION: "{{ .VERSION }}"
     - image: ghcr.io/nagare-media/engine/function-generic-noop
       runtimeType: go
       context: .

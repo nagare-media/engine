@@ -28,6 +28,8 @@ import (
 
 	// Import nagare media functions to be included in this multi-binary.
 	_ "github.com/nagare-media/engine/internal/functions/functions/data-buffer"
+	_ "github.com/nagare-media/engine/internal/functions/functions/data-copy"
+	_ "github.com/nagare-media/engine/internal/functions/functions/data-discard"
 	_ "github.com/nagare-media/engine/internal/functions/functions/generic-noop"
 	_ "github.com/nagare-media/engine/internal/functions/functions/generic-sleep"
 	_ "github.com/nagare-media/engine/internal/functions/functions/media-encode"

@@ -204,6 +204,8 @@ clean: ## Cleanup build output
 image: $(addprefix image-, $(IMAGES)) ## Build all container images
 
 ## image-function-data-buffer:                ## Build data-buffer function container image
+## image-function-data-copy:                  ## Build data-copy function container image
+## image-function-data-discard:               ## Build data-discard function container image
 ## image-function-generic-noop:               ## Build generic-noop function container image
 ## image-function-generic-sleep:              ## Build generic-sleep function container image
 ## image-function-media-encode:               ## Build media-encode function container image
