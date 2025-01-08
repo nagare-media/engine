@@ -10,3 +10,6 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
 webserver:
   publicBaseURL: http://engine.nagare.localtest.me
+workflow:
+  kubernetes:
+    namespace: default

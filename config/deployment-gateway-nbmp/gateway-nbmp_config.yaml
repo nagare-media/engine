@@ -8,3 +8,6 @@ metadata:
     app.kubernetes.io/created-by: nagare-media-engine
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/managed-by: kustomize
+workflow:
+  kubernetes:
+    namespace: default
