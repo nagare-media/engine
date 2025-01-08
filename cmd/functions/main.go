@@ -27,15 +27,19 @@ import (
 	"github.com/nagare-media/engine/cmd/functions/cli"
 
 	// Import nagare media functions to be included in this multi-binary.
-	_ "github.com/nagare-media/engine/internal/functions/data-buffer"
-	_ "github.com/nagare-media/engine/internal/functions/generic-noop"
-	_ "github.com/nagare-media/engine/internal/functions/generic-sleep"
-	_ "github.com/nagare-media/engine/internal/functions/media-encode"
-	_ "github.com/nagare-media/engine/internal/functions/media-generate-testpattern"
-	_ "github.com/nagare-media/engine/internal/functions/media-merge"
-	_ "github.com/nagare-media/engine/internal/functions/media-metadata-technical"
-	_ "github.com/nagare-media/engine/internal/functions/media-package-hls"
-	_ "github.com/nagare-media/engine/internal/functions/script-lua"
+	_ "github.com/nagare-media/engine/internal/functions/functions/data-buffer"
+	_ "github.com/nagare-media/engine/internal/functions/functions/generic-noop"
+	_ "github.com/nagare-media/engine/internal/functions/functions/generic-sleep"
+	_ "github.com/nagare-media/engine/internal/functions/functions/media-encode"
+	_ "github.com/nagare-media/engine/internal/functions/functions/media-generate-testpattern"
+	_ "github.com/nagare-media/engine/internal/functions/functions/media-merge"
+	_ "github.com/nagare-media/engine/internal/functions/functions/media-metadata-technical"
+	_ "github.com/nagare-media/engine/internal/functions/functions/media-package-hls"
+	_ "github.com/nagare-media/engine/internal/functions/functions/script-lua"
+
+	// Import io implementations to be included in this multi-binary.
+	_ "github.com/nagare-media/engine/internal/functions/io/protocols/buffered"
+	_ "github.com/nagare-media/engine/internal/functions/io/protocols/http"
 )
 
 func main() {

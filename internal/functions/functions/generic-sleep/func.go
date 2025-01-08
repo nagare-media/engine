@@ -1,5 +1,5 @@
 /*
-Copyright 2022-2024 The nagare media authors
+Copyright 2022-2025 The nagare media authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,41 +18,59 @@ package function
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/nagare-media/engine/internal/functions"
 	"github.com/nagare-media/engine/pkg/nbmp"
+	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
 // Function description
 const (
-	Name = "media-package-hls"
+	Name = "generic-sleep"
+
+	DurationParameterKey = "generic-sleep.engine.nagare.media/duration"
 )
 
-// function packages input streams into HLS.
+// function sleeps for a certain amount of time. It can be used for debugging.
 type function struct {
+	duration time.Duration
 }
 
 var _ nbmp.Function = &function{}
 
-// Exec media-package-hls function.
+// Exec generic-sleep function.
 func (f *function) Exec(ctx context.Context) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	l := log.FromContext(ctx, "duration", f.duration).WithName(Name)
 
-	l := log.FromContext(ctx).WithName(Name)
-	ctx = log.IntoContext(ctx, l)
-
-	_ = ctx // TODO: implement
+	l.Info("going to sleep")
+	select {
+	case <-ctx.Done():
+		l.Error(context.Cause(ctx), "sleep disrupted")
+	case <-time.After(f.duration):
+		l.Info("woke up")
+	}
 
 	return nil
 }
 
-// BuildTask from media-package-hls function.
+// BuildTask from generic-sleep function.
 func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
+	var err error
 	f := &function{}
+
+	d, ok := nbmputils.GetStringParameterValue(t.Configuration.Parameters, DurationParameterKey)
+	if !ok {
+		return nil, fmt.Errorf("missing %s parameter", DurationParameterKey)
+	}
+	if f.duration, err = time.ParseDuration(d); err != nil {
+		return nil, err
+	}
+
 	return f, nil
 }
 

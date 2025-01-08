@@ -1,5 +1,5 @@
 /*
-Copyright 2022-2024 The nagare media authors
+Copyright 2022-2025 The nagare media authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,24 +28,32 @@ import (
 
 // Function description
 const (
-	Name = "generic-noop"
+	Name = "media-merge"
 )
 
-// function generic-noop does nothing. It can be used for debugging.
-type function struct{}
+// function merges multiple input streams.
+type function struct {
+}
 
 var _ nbmp.Function = &function{}
 
-// Exec generic-noop function.
+// Exec media-merge function.
 func (f *function) Exec(ctx context.Context) error {
-	log.FromContext(ctx).WithName(Name).Info("running")
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	l := log.FromContext(ctx).WithName(Name)
+	ctx = log.IntoContext(ctx, l)
+
+	_ = ctx // TODO: implement
+
 	return nil
 }
 
-// BuildTask from generic-noop function.
+// BuildTask from media-merge function.
 func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
-	log.FromContext(ctx).WithName(Name).Info("building")
-	return &function{}, nil
+	f := &function{}
+	return f, nil
 }
 
 func init() {

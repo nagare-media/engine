@@ -1,5 +1,5 @@
 /*
-Copyright 2022-2024 The nagare media authors
+Copyright 2022-2025 The nagare media authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,16 +28,16 @@ import (
 
 // Function description
 const (
-	Name = "media-encode"
+	Name = "script-lua"
 )
 
-// function encodes input stream.
+// function executes Lua script.
 type function struct {
 }
 
 var _ nbmp.Function = &function{}
 
-// Exec media-encode function.
+// Exec script-lua function.
 func (f *function) Exec(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -50,7 +50,7 @@ func (f *function) Exec(ctx context.Context) error {
 	return nil
 }
 
-// BuildTask from media-encode function.
+// BuildTask from script-lua function.
 func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
 	f := &function{}
 	return f, nil
