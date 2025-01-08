@@ -532,8 +532,8 @@ func (c *taskCtrl) updateTask(ctx context.Context, data *enginev1.WorkflowManage
 
 func (c *taskCtrl) deleteTaskPhase(ctx context.Context) error {
 	l := log.FromContext(ctx, "phase", "delete-task")
-	// we start a new context because the original ctx might have been canceled
-	ctx = log.IntoContext(context.Background(), l)
+	// we ignore potentially canceled ctx
+	ctx = log.IntoContext(context.WithoutCancel(ctx), l)
 	l.Info("starting new phase")
 
 	op := func() error {

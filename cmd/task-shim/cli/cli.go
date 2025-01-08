@@ -146,7 +146,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	// We work with two separate contexts:
 	//   ctx     : was given to CLI and should normally only cancel if a termination signal was send by the OS
 	//   httpCtx : is used for the HTTP server
-	httpCtx, httpCtxCancel := context.WithCancel(context.Background())
+	httpCtx, httpCtxCancel := context.WithCancel(context.WithoutCancel(ctx))
 	httpCtx = log.IntoContext(httpCtx, l)
 
 	var taskErr error

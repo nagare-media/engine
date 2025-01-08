@@ -176,7 +176,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		reportsCtrlDone             = make(chan struct{})
 
 		// create a new context for the reports controller as it should only be terminated after the task controller has terminated
-		reportsCtx, reportsCtxCancel = context.WithCancel(context.Background())
+		reportsCtx, reportsCtxCancel = context.WithCancel(context.WithoutCancel(ctx))
 	)
 
 	go func() { taskCtrlErr = taskCtrl.Start(ctx); close(taskCtrlDone); reportsCtxCancel() }()

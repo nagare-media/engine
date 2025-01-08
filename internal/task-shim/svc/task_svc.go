@@ -508,8 +508,8 @@ func (s *taskService) observeEvent(t string) {
 		panic(fmt.Sprintf("Event creation results in invalid CloudEvent; fix implementation! error: %s", err))
 	}
 
-	// we start a new context because rootCtx might have been canceled
-	ctx, cancel := context.WithTimeout(context.Background(), ReportTimeout)
+	// we ignore potentially canceled rootCtx and create new context with timeout
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(s.rootCtx), ReportTimeout)
 	defer cancel()
 
 	if err := s.reportClient.Send(ctx, e); err != nil {

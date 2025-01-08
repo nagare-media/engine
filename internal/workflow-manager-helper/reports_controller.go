@@ -123,8 +123,8 @@ func (c *reportsCtrl) Start(ctx context.Context) error {
 				continue
 			}
 
-			// we start a new context because the original ctx might have been canceled
-			ctx, cancel := context.WithTimeout(context.Background(), ReportsNATSPublishTimeout)
+			// we ignore potentially canceled ctx and create new context with timeout
+			ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), ReportsNATSPublishTimeout)
 			defer cancel()
 
 			_, err = c.js.PublishMsg(ctx, &nats.Msg{
