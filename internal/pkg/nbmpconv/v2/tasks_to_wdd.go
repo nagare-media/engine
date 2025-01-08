@@ -130,18 +130,15 @@ func (c *tasksToWDDConverter) convertInputs(wf *nbmpv2.Workflow) error {
 
 			// add new input
 
-			mediaParameters, metadataParameters, err := c.convertMediaToInputAndOutput(p.Input)
-			if err != nil {
+			in := &nbmpv2.Input{}
+			if err = c.convertMediaToInputAndOutput(p.Input, in); err != nil {
 				return err
 			}
 
 			if err = c.observeStreamID(p.Input.ID); err != nil {
 				return err
 			}
-			c.inputMap[p.Input.ID] = &nbmpv2.Input{
-				MediaParameters:    mediaParameters,
-				MetadataParameters: metadataParameters,
-			}
+			c.inputMap[p.Input.ID] = in
 		}
 	}
 
@@ -184,18 +181,15 @@ func (c *tasksToWDDConverter) convertOutputs(wf *nbmpv2.Workflow) error {
 
 			// add new output
 
-			mediaParameters, metadataParameters, err := c.convertMediaToInputAndOutput(p.Output)
-			if err != nil {
+			out := &nbmpv2.Output{}
+			if err = c.convertMediaToInputAndOutput(p.Output, out); err != nil {
 				return err
 			}
 
 			if err = c.observeStreamID(p.Output.ID); err != nil {
 				return err
 			}
-			c.outputMap[p.Output.ID] = &nbmpv2.Output{
-				MediaParameters:    mediaParameters,
-				MetadataParameters: metadataParameters,
-			}
+			c.outputMap[p.Output.ID] = out
 		}
 	}
 
@@ -270,13 +264,9 @@ func (c *tasksToWDDConverter) convertProcessingConnectionMap(wf *nbmpv2.Workflow
 					PortName: tu.PortName,
 				}
 
-				mediaParameters, metadataParameters, err := c.convertMediaToInputAndOutput(p.Input)
-				if err != nil {
+				inputStream = &nbmpv2.Input{}
+				if err = c.convertMediaToInputAndOutput(p.Input, inputStream); err != nil {
 					return err
-				}
-				inputStream = &nbmpv2.Input{
-					MediaParameters:    mediaParameters,
-					MetadataParameters: metadataParameters,
 				}
 			}
 
@@ -367,13 +357,9 @@ func (c *tasksToWDDConverter) convertProcessingConnectionMap(wf *nbmpv2.Workflow
 					PortName: tu.PortName,
 				}
 
-				mediaParameters, metadataParameters, err := c.convertMediaToInputAndOutput(p.Output)
-				if err != nil {
+				outputStream = &nbmpv2.Output{}
+				if err = c.convertMediaToInputAndOutput(p.Output, outputStream); err != nil {
 					return err
-				}
-				outputStream = &nbmpv2.Output{
-					MediaParameters:    mediaParameters,
-					MetadataParameters: metadataParameters,
 				}
 			}
 
@@ -566,48 +552,43 @@ func (c *tasksToWDDConverter) convertProcessingFunctionRestrictions(wf *nbmpv2.W
 	return nil
 }
 
-func (c *tasksToWDDConverter) convertMediaToInputAndOutput(m *enginev1.Media) ([]nbmpv2.MediaParameter, []nbmpv2.MetadataParameter, error) {
-	var (
-		err                error
-		mediaParameters    []nbmpv2.MediaParameter
-		metadataParameters []nbmpv2.MetadataParameter
-	)
-
+func (c *tasksToWDDConverter) convertMediaToInputAndOutput(m *enginev1.Media, io nbmpv2.InputOrOutput) error {
 	switch m.Type {
 	case enginev1.MediaMediaType:
 		mp := nbmpv2.MediaParameter{}
 		c.mediaConverter.Reset(m)
 		if err := c.mediaConverter.Convert(&mp); err != nil {
-			return nil, nil, err
+			return err
 		}
 		// remove query parameters
 		url, err := c.removeQueryParameters(&mp.CachingServerURL)
 		if err != nil {
-			return nil, nil, err
+			return err
 		}
 		if url != nil {
 			mp.CachingServerURL = *url
 		}
-		mediaParameters = append(mediaParameters, mp)
+		io.SetMediaParameters(append(io.GetMediaParameters(), mp))
 
 	case enginev1.MetadataMediaType:
 		mp := nbmpv2.MetadataParameter{}
 		c.metadataConverter.Reset(m)
 		if err := c.metadataConverter.Convert(&mp); err != nil {
-			return nil, nil, err
+			return err
 		}
 		// remove query parameters
+		var err error
 		mp.CachingServerURL, err = c.removeQueryParameters(mp.CachingServerURL)
 		if err != nil {
-			return nil, nil, err
+			return err
 		}
-		metadataParameters = append(metadataParameters, mp)
+		io.SetMetadataParameters(append(io.GetMetadataParameters(), mp))
 
 	default:
-		return nil, nil, fmt.Errorf("convert: unknown media type '%s'", m.Type)
+		return fmt.Errorf("convert: unknown media type '%s'", m.Type)
 	}
 
-	return mediaParameters, metadataParameters, nil
+	return nil
 }
 
 func (c *tasksToWDDConverter) removeQueryParameters(u *base.URI) (*base.URI, error) {

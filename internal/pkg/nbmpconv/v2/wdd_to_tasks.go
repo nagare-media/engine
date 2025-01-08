@@ -446,7 +446,7 @@ func (c *wddToTasksConverter) createMediaStream(cm nbmpv2.ConnectionMapping) (*e
 	// $.processing.connection-map[].from.output-restrictions
 	var fromRestrictions *enginev1.Media
 	if cm.From.OutputRestrictions != nil {
-		fromRestrictions, err = c.convertMediaOrMetadataRestrictionToMedia(cm.From.OutputRestrictions.MediaParameters, cm.From.OutputRestrictions.MetadataParameters)
+		fromRestrictions, err = c.convertMediaOrMetadataRestrictionToMedia(cm.From.OutputRestrictions)
 		if err != nil {
 			return nil, err
 		}
@@ -457,7 +457,7 @@ func (c *wddToTasksConverter) createMediaStream(cm nbmpv2.ConnectionMapping) (*e
 	// $.processing.connection-map[].to.input-restrictions
 	var toRestrictions *enginev1.Media
 	if cm.To.InputRestrictions != nil {
-		toRestrictions, err = c.convertMediaOrMetadataRestrictionToMedia(cm.To.InputRestrictions.MediaParameters, cm.To.InputRestrictions.MetadataParameters)
+		toRestrictions, err = c.convertMediaOrMetadataRestrictionToMedia(cm.To.InputRestrictions)
 		if err != nil {
 			return nil, err
 		}
@@ -589,101 +589,105 @@ func (c *wddToTasksConverter) createMediaStream(cm nbmpv2.ConnectionMapping) (*e
 }
 
 func (c *wddToTasksConverter) mergeMediaRestrictions(stream, restrictions *enginev1.Media) error {
-	if restrictions != nil {
-		// Type
-		if restrictions.Type != "" {
-			if stream.Type == "" {
-				stream.Type = restrictions.Type
-			} else if stream.Type != restrictions.Type {
-				return errors.New("convert: unfulfilled restriction: type")
-			}
-		}
+	if restrictions == nil {
+		return nil
+	}
 
-		// ID
-		if restrictions.ID != "" {
-			if stream.ID == "" {
-				stream.ID = restrictions.ID
-			} else if stream.ID != restrictions.ID {
-				return errors.New("convert: unfulfilled restriction: ID")
-			}
+	// Type
+	if restrictions.Type != "" {
+		if stream.Type == "" {
+			stream.Type = restrictions.Type
+		} else if stream.Type != restrictions.Type {
+			return errors.New("convert: unfulfilled restriction: type")
 		}
+	}
 
-		// HumanReadable.Name
-		if restrictions.HumanReadable != nil && restrictions.HumanReadable.Name != nil {
-			if stream.HumanReadable == nil || (stream.HumanReadable != nil && stream.HumanReadable.Name == nil) {
-				stream.HumanReadable.Name = restrictions.HumanReadable.Name
-			} else if stream.HumanReadable.Name != restrictions.HumanReadable.Name {
-				return errors.New("convert: unfulfilled restriction: description")
-			}
+	// ID
+	if restrictions.ID != "" {
+		if stream.ID == "" {
+			stream.ID = restrictions.ID
+		} else if stream.ID != restrictions.ID {
+			return errors.New("convert: unfulfilled restriction: ID")
 		}
+	}
 
-		// Direction
-		if restrictions.Direction != nil {
-			if stream.Direction == nil {
-				stream.Direction = restrictions.Direction
-			} else if stream.Direction != restrictions.Direction {
-				return errors.New("convert: unfulfilled restriction: mode")
-			}
+	// HumanReadable.Name
+	if restrictions.HumanReadable != nil && restrictions.HumanReadable.Name != nil {
+		if stream.HumanReadable == nil || (stream.HumanReadable != nil && stream.HumanReadable.Name == nil) {
+			stream.HumanReadable.Name = restrictions.HumanReadable.Name
+		} else if stream.HumanReadable.Name != restrictions.HumanReadable.Name {
+			return errors.New("convert: unfulfilled restriction: description")
 		}
+	}
 
-		// URL
-		if restrictions.URL != nil {
-			if stream.URL == nil {
-				stream.URL = restrictions.URL
-			} else if stream.URL != restrictions.URL {
-				return errors.New("convert: unfulfilled restriction: caching-server-url")
-			}
+	// Direction
+	if restrictions.Direction != nil {
+		if stream.Direction == nil {
+			stream.Direction = restrictions.Direction
+		} else if stream.Direction != restrictions.Direction {
+			return errors.New("convert: unfulfilled restriction: mode")
 		}
+	}
 
-		// Labels
-		for k, vr := range restrictions.Labels {
-			if stream.Labels == nil {
-				stream.Labels = make(map[string]string)
-			}
-			vs, ok := stream.Labels[k]
-			if !ok {
-				stream.Labels[k] = vr
-			} else if vr != vs {
-				return errors.New("convert: unfulfilled restriction: keyword")
-			}
+	// URL
+	if restrictions.URL != nil {
+		if stream.URL == nil {
+			stream.URL = restrictions.URL
+		} else if stream.URL != restrictions.URL {
+			return errors.New("convert: unfulfilled restriction: caching-server-url")
 		}
+	}
 
-		// Metadata.MimeType
-		if restrictions.Metadata.MimeType != nil {
-			if stream.Metadata.MimeType == nil {
-				stream.Metadata.MimeType = restrictions.Metadata.MimeType
-			} else if stream.Metadata.MimeType != restrictions.Metadata.MimeType {
-				return errors.New("convert: unfulfilled restriction: mime-type")
-			}
+	// Labels
+	for k, vr := range restrictions.Labels {
+		if stream.Labels == nil {
+			stream.Labels = make(map[string]string)
 		}
+		vs, ok := stream.Labels[k]
+		if !ok {
+			stream.Labels[k] = vr
+		} else if vr != vs {
+			return errors.New("convert: unfulfilled restriction: keyword")
+		}
+	}
 
-		// Metadata.CodecType
-		if restrictions.Metadata.CodecType != nil {
-			if stream.Metadata.CodecType == nil {
-				stream.Metadata.CodecType = restrictions.Metadata.CodecType
-			} else if stream.Metadata.CodecType != restrictions.Metadata.CodecType {
-				return errors.New("convert: unfulfilled restriction: codec-type")
-			}
+	// Metadata.MimeType
+	if restrictions.Metadata.MimeType != nil {
+		if stream.Metadata.MimeType == nil {
+			stream.Metadata.MimeType = restrictions.Metadata.MimeType
+		} else if stream.Metadata.MimeType != restrictions.Metadata.MimeType {
+			return errors.New("convert: unfulfilled restriction: mime-type")
+		}
+	}
+
+	// Metadata.CodecType
+	if restrictions.Metadata.CodecType != nil {
+		if stream.Metadata.CodecType == nil {
+			stream.Metadata.CodecType = restrictions.Metadata.CodecType
+		} else if stream.Metadata.CodecType != restrictions.Metadata.CodecType {
+			return errors.New("convert: unfulfilled restriction: codec-type")
 		}
 	}
 
 	return nil
 }
 
-func (c *wddToTasksConverter) convertMediaOrMetadataRestrictionToMedia(mediaRestrictions []nbmpv2.MediaParameter, metadataRestrictions []nbmpv2.MetadataParameter) (*enginev1.Media, error) {
-	if len(mediaRestrictions) == 0 && len(metadataRestrictions) == 0 {
+func (c *wddToTasksConverter) convertMediaOrMetadataRestrictionToMedia(restrictions nbmpv2.InputOrOutput) (*enginev1.Media, error) {
+	n := len(restrictions.GetMediaParameters()) + len(restrictions.GetMetadataParameters())
+
+	if n == 0 {
 		return nil, nil
 	}
 
-	if len(mediaRestrictions)+len(metadataRestrictions) > 1 {
-		return nil, fmt.Errorf("convert: invalid number of media or metadata restrictions '%d'", len(mediaRestrictions)+len(metadataRestrictions))
+	if n > 1 {
+		return nil, fmt.Errorf("convert: invalid number of media or metadata restrictions '%d'", n)
 	}
 
 	switch {
-	case len(mediaRestrictions) == 1:
-		return c.convertMediaParametersToMedia(&mediaRestrictions[0])
-	case len(metadataRestrictions) == 1:
-		return c.convertMetadataParametersToMedia(&metadataRestrictions[0])
+	case len(restrictions.GetMediaParameters()) == 1:
+		return c.convertMediaParametersToMedia(&restrictions.GetMediaParameters()[0])
+	case len(restrictions.GetMetadataParameters()) == 1:
+		return c.convertMetadataParametersToMedia(&restrictions.GetMetadataParameters()[0])
 	}
 
 	return nil, fmt.Errorf("convert: illegal state reached: no restriction converted")

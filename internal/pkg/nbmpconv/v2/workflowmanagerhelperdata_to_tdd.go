@@ -108,12 +108,9 @@ func (c *workflowManagerHelperDataToTDDConverter) Convert(tdd *nbmpv2.Task) erro
 		// $.input.media-parameters
 		// $.input.metadata-parameters
 		// TODO: filter out duplicate inputs
-		mediaParameters, metadataParameters, err := c.convertMediaToInputAndOutput(ip.Input)
-		if err != nil {
+		if err := c.convertMediaToInputAndOutput(ip.Input, &tdd.Input); err != nil {
 			return err
 		}
-		tdd.Input.MediaParameters = append(tdd.Input.MediaParameters, mediaParameters...)
-		tdd.Input.MetadataParameters = append(tdd.Input.MetadataParameters, metadataParameters...)
 	}
 
 	// $.output
@@ -149,12 +146,9 @@ func (c *workflowManagerHelperDataToTDDConverter) Convert(tdd *nbmpv2.Task) erro
 		// $.output.media-parameters
 		// $.output.metadata-parameters
 		// TODO: filter out duplicate outputs
-		mediaParameters, metadataParameters, err := c.convertMediaToInputAndOutput(op.Output)
-		if err != nil {
+		if err := c.convertMediaToInputAndOutput(op.Output, &tdd.Output); err != nil {
 			return err
 		}
-		tdd.Output.MediaParameters = append(tdd.Output.MediaParameters, mediaParameters...)
-		tdd.Output.MetadataParameters = append(tdd.Output.MetadataParameters, metadataParameters...)
 	}
 
 	// $.configuration
@@ -203,32 +197,27 @@ func (c *workflowManagerHelperDataToTDDConverter) Convert(tdd *nbmpv2.Task) erro
 	return nil
 }
 
-func (c *workflowManagerHelperDataToTDDConverter) convertMediaToInputAndOutput(m *enginev1.Media) ([]nbmpv2.MediaParameter, []nbmpv2.MetadataParameter, error) {
-	var (
-		mediaParameters    []nbmpv2.MediaParameter
-		metadataParameters []nbmpv2.MetadataParameter
-	)
-
+func (c *workflowManagerHelperDataToTDDConverter) convertMediaToInputAndOutput(m *enginev1.Media, io nbmpv2.InputOrOutput) error {
 	switch m.Type {
 	case enginev1.MediaMediaType:
 		mp := nbmpv2.MediaParameter{}
 		c.mediaConverter.Reset(m)
 		if err := c.mediaConverter.Convert(&mp); err != nil {
-			return nil, nil, err
+			return err
 		}
-		mediaParameters = append(mediaParameters, mp)
+		io.SetMediaParameters(append(io.GetMediaParameters(), mp))
 
 	case enginev1.MetadataMediaType:
 		mp := nbmpv2.MetadataParameter{}
 		c.metadataConverter.Reset(m)
 		if err := c.metadataConverter.Convert(&mp); err != nil {
-			return nil, nil, err
+			return err
 		}
-		metadataParameters = append(metadataParameters, mp)
+		io.SetMetadataParameters(append(io.GetMetadataParameters(), mp))
 
 	default:
-		return nil, nil, fmt.Errorf("convert: unknown media type '%s'", m.Type)
+		return fmt.Errorf("convert: unknown media type '%s'", m.Type)
 	}
 
-	return mediaParameters, metadataParameters, nil
+	return nil
 }

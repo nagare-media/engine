@@ -74,12 +74,7 @@ func (c *mediaParameterToMediaConverter) Convert(m *enginev1.Media) error {
 
 	// $.mode
 	if c.mp.Mode != nil {
-		switch *c.mp.Mode {
-		case nbmpv2.PullMediaAccessMode:
-			m.Direction = ptr.To(enginev1.PullMediaDirection)
-		case nbmpv2.PushMediaAccessMode:
-			m.Direction = ptr.To(enginev1.PushMediaDirection)
-		}
+		m.Direction = ptr.To(MediaAccessModeToMediaDirection(*c.mp.Mode))
 	}
 
 	// TODO: $.throughput

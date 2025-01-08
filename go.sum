@@ -102,8 +102,8 @@ github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 h1:n6/
 github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00/go.mod h1:Pm3mSP3c5uWn86xMLZ5Sa7JB9GsEZySvHYXCTK4E9q4=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822/go.mod h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=
-github.com/nagare-media/models.go v0.0.0-20241028110832-3cf01c064ecc h1:Suk4cdSMuG4ATc64XmPGc//NdIBe8KKx3KhuYSkaHiE=
-github.com/nagare-media/models.go v0.0.0-20241028110832-3cf01c064ecc/go.mod h1:cZqg2qusBTT4lasafnfLGMhWhU2HkTuNU/NA30vt/Yk=
+github.com/nagare-media/models.go v0.0.0-20250108160023-98fa97a2d480 h1:o1coOGZRInHTSz05FAKILM1YXiBW1RgWYj0YGG5kx60=
+github.com/nagare-media/models.go v0.0.0-20250108160023-98fa97a2d480/go.mod h1:cZqg2qusBTT4lasafnfLGMhWhU2HkTuNU/NA30vt/Yk=
 github.com/nats-io/nats.go v1.38.0 h1:A7P+g7Wjp4/NWqDOOP/K6hfhr54DvdDQUznt5JFg9XA=
 github.com/nats-io/nats.go v1.38.0/go.mod h1:IGUM++TwokGnXPs82/wCuiHS02/aKrdYUQkU8If6yjw=
 github.com/nats-io/nkeys v0.4.9 h1:qe9Faq2Gxwi6RZnZMXfmGMZkg3afLLOtrU+gDZJ35b0=

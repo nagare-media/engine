@@ -71,12 +71,7 @@ func (c *mediaToMetadataParameterConverter) Convert(mp *nbmpv2.MetadataParameter
 
 	// $.mode
 	if c.m.Direction != nil {
-		switch *c.m.Direction {
-		case enginev1.PullMediaDirection:
-			mp.Mode = ptr.To(nbmpv2.PullMediaAccessMode)
-		case enginev1.PushMediaDirection:
-			mp.Mode = ptr.To(nbmpv2.PushMediaAccessMode)
-		}
+		mp.Mode = ptr.To(MediaDirectionToMediaAccessMode(*c.m.Direction))
 	}
 
 	// TODO: $.max-size
