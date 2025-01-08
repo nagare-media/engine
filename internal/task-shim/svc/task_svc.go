@@ -100,7 +100,7 @@ func (s *taskService) init() {
 
 		// terminate process
 		l.Info("terminate process")
-		s.terminateFunc(s.rootCtx.Err())
+		s.terminateFunc(context.Cause(s.rootCtx))
 	}()
 
 	// Go routine to handle termination if Create is never called
