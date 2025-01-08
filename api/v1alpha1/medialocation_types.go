@@ -22,11 +22,8 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	meta "github.com/nagare-media/engine/pkg/apis/meta"
-)
-
-const (
-	HeadersQueryArgKey = "nme-headers"
+	"github.com/nagare-media/engine/pkg/apis/meta"
+	"github.com/nagare-media/engine/pkg/engineurl"
 )
 
 const (
@@ -34,9 +31,6 @@ const (
 	HTTPBasicAuthPasswordKey = "password"
 
 	HTTPTokenAuthTokenKey = "token"
-
-	HTTPTokenAuthDefaultHeader            = "Authorization"
-	HTTPTokenAuthDefaultHeaderValuePrefix = "Bearer"
 )
 
 // Specification of a media location.
@@ -160,7 +154,7 @@ func (ml *HTTPMediaLocation) URL() (*url.URL, error) {
 		if h.Value != nil {
 			val = *h.Value
 		}
-		q.Add(HeadersQueryArgKey, url.QueryEscape(h.Name+"="+val))
+		q.Add(engineurl.HeadersQueryKey, url.QueryEscape(h.Name+"="+val))
 	}
 
 	switch {
@@ -178,12 +172,12 @@ func (ml *HTTPMediaLocation) URL() (*url.URL, error) {
 	case ml.Auth.Token != nil:
 		token := ml.Auth.Token.SecretRef.Data[HTTPTokenAuthTokenKey]
 		if token != nil {
-			header := HTTPTokenAuthDefaultHeader
+			header := engineurl.HTTPTokenAuthDefaultHeader
 			if ml.Auth.Token.HeaderName != nil {
 				header = *ml.Auth.Token.HeaderName
 			}
 
-			prefix := HTTPTokenAuthDefaultHeaderValuePrefix
+			prefix := engineurl.HTTPTokenAuthDefaultHeaderValuePrefix
 			if ml.Auth.Token.HeaderValuePrefix != nil {
 				prefix = *ml.Auth.Token.HeaderValuePrefix
 			}
@@ -193,7 +187,7 @@ func (ml *HTTPMediaLocation) URL() (*url.URL, error) {
 				val = prefix + " " + val
 			}
 
-			q.Set(HeadersQueryArgKey, url.QueryEscape(header+"="+val))
+			q.Set(engineurl.HeadersQueryKey, url.QueryEscape(header+"="+val))
 		}
 	}
 
