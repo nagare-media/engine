@@ -51,6 +51,8 @@ func NewServer(cfg *enginev1.WebserverConfig) *server {
 			IdleTimeout:  cfg.IdleTimeout.Duration,
 			Network:      *cfg.Network,
 
+			StreamRequestBody: true,
+
 			RequestMethods: []string{
 				fiber.MethodGet,
 				fiber.MethodPost,
