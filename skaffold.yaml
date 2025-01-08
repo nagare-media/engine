@@ -256,7 +256,7 @@ deploy:
         # add test resources
         - host:
             os: ["linux", "darwin"]
-            command: ["kubectl", "--context", "kind-nagare-media-mgmt", "apply", "--server-side", "-f", "config/samples/k8s/v1alpha1_engine.nagare.media_functions.yaml"]
+            command: ["kubectl", "--context", "kind-nagare-media-mgmt", "apply", "--server-side", "-f", "config/samples/k8s/v1alpha1_engine.nagare.media_functions_*.yaml"]
         - host:
             os: ["linux", "darwin"]
-            command: ["kubectl", "--context", "kind-nagare-media-mgmt", "apply", "--server-side", "-f", "config/samples/k8s/v1alpha1_engine.nagare.media_mediaprocessingentities.yaml"]
+            command: ["kubectl", "--context", "kind-nagare-media-mgmt", "apply", "--server-side", "-f", "config/samples/k8s/v1alpha1_engine.nagare.media_mediaprocessingentities_*.yaml"]
