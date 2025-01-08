@@ -1225,17 +1225,24 @@ func (r *TaskReconciler) resolveMediaStream(ctx context.Context, task *enginev1.
 		// Transform Task URL:
 		//
 		//    nagare-media-engine:///task/{WorkflowID}/{TaskID}/{PortName}/{StreamID}?{RawQuery}
-		//    http://task-{TaskID}.{namespace}.svc.cluster.local/streams/{PortName}/{StreamID}?{RawQuery}
+		//    buffered://task-{TaskID}.{namespace}.svc.cluster.local/streams/{PortName}/{StreamID}?{RawQuery}
 
 		// TODO: add support for non-default cluster-domains (i.e. don't assume .cluster.local)
 		// TODO: add support for cross-namespace connections (i.e. don't assume task.Namespace is namespace of Task URL)
 		// TODO: add support for cross-cluster connections (i.e. allow external connections through some gateway)
 		// TODO: add support for arbitrary streaming protocols
+
+		q, err := url.ParseQuery(u.RawQuery)
+		if err != nil {
+			return nil, err
+		}
+		q.Add(engineurl.BufferedProtocolQueryKey, "http")
+
 		res := url.URL{
-			Scheme:   "http",
+			Scheme:   "buffered",
 			Host:     fmt.Sprintf("%s%s.%s.svc.cluster.local", ResourcePrefix, u.TaskID, task.Namespace),
 			Path:     fmt.Sprintf("/streams/%s/%s", u.PortName, u.StreamID),
-			RawQuery: u.RawQuery,
+			RawQuery: q.Encode(),
 		}
 		newUrl = base.URI(res.String())
 
