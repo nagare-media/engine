@@ -21,3 +21,11 @@ import "context"
 type Starter interface {
 	Start(context.Context) error
 }
+
+type Func func(context.Context) error
+
+var _ Starter = Func(func(ctx context.Context) error { return nil })
+
+func (f Func) Start(ctx context.Context) error {
+	return f(ctx)
+}
