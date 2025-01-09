@@ -3,12 +3,12 @@ kind: ClusterFunction
 metadata:
   labels:
     app.kubernetes.io/name: function
-    app.kubernetes.io/instance: data-buffer
+    app.kubernetes.io/instance: data-buffer-fs
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/part-of: nagare-media-engine
     app.kubernetes.io/created-by: nagare-media-engine
     beta.engine.nagare.media/function-type: data
-  name: data-buffer
+  name: data-buffer-fs
 spec:
   version: 0.0.1
   template: # JobTemplate
@@ -25,7 +25,7 @@ spec:
             runAsGroup: 0
           containers:
             - name: function
-              image: ghcr.io/nagare-media/engine/function-data-buffer:dev
+              image: ghcr.io/nagare-media/engine/function-data-buffer-fs:dev
               imagePullPolicy: IfNotPresent
               ports:
                 - name: stream-http

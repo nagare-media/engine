@@ -53,7 +53,7 @@ ARG TARGETOS \
 LABEL maintainer="Matthias Neugebauer <mtneug@shio.solutions>" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.authors="Matthias Neugebauer <mtneug@shio.solutions>" \
-      org.opencontainers.image.url="ghcr.io/nagare-media/engine/function-data-buffer" \
+      org.opencontainers.image.url="ghcr.io/nagare-media/engine/function-data-buffer-fs" \
       org.opencontainers.image.documentation="https://nagare.media" \
       org.opencontainers.image.source="https://github.com/nagare-media/engine" \
       org.opencontainers.image.version="${VERSION}" \
@@ -65,7 +65,7 @@ LABEL maintainer="Matthias Neugebauer <mtneug@shio.solutions>" \
 
 WORKDIR /
 COPY --from=build "/app/bin/task-shim-${VERSION}-${TARGETOS}-${TARGETARCH}" /task-shim
-COPY --from=build "/app/bin/functions-${VERSION}-${TARGETOS}-${TARGETARCH}" /data-buffer
+COPY --from=build "/app/bin/functions-${VERSION}-${TARGETOS}-${TARGETARCH}" /data-buffer-fs
 USER 65532:65532
 
 COPY <<EOF /config/task-shim.yaml
@@ -82,7 +82,7 @@ task:
     - name: execute function
       action: task-shim.engine.nagare.media/exec
       config:
-        command: /data-buffer
+        command: /data-buffer-fs
         args: ["/tmp/nbmp.tdd"]
 EOF
 

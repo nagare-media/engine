@@ -27,7 +27,7 @@ import (
 	"github.com/nagare-media/engine/cmd/functions/cli"
 
 	// Import nagare media functions to be included in this multi-binary.
-	_ "github.com/nagare-media/engine/internal/functions/functions/data-buffer"
+	_ "github.com/nagare-media/engine/internal/functions/functions/data-buffer-fs"
 	_ "github.com/nagare-media/engine/internal/functions/functions/data-copy"
 	_ "github.com/nagare-media/engine/internal/functions/functions/data-discard"
 	_ "github.com/nagare-media/engine/internal/functions/functions/generic-noop"

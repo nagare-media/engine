@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         image:
-          - function-data-buffer
+          - function-data-buffer-fs
           - function-data-copy
           - function-data-discard
           - function-generic-noop

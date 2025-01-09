@@ -203,7 +203,7 @@ clean: ## Cleanup build output
 .PHONY: image
 image: $(addprefix image-, $(IMAGES)) ## Build all container images
 
-## image-function-data-buffer:                ## Build data-buffer function container image
+## image-function-data-buffer-fs:             ## Build data-buffer-fs function container image
 ## image-function-data-copy:                  ## Build data-copy function container image
 ## image-function-data-discard:               ## Build data-discard function container image
 ## image-function-generic-noop:               ## Build generic-noop function container image

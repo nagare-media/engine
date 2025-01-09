@@ -28,7 +28,7 @@ import (
 
 // Function description
 const (
-	Name = "data-buffer"
+	Name = "data-buffer-fs"
 )
 
 // function buffers input stream.
@@ -37,7 +37,7 @@ type function struct {
 
 var _ nbmp.Function = &function{}
 
-// Exec data-buffer function.
+// Exec data-buffer-fs function.
 func (f *function) Exec(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -50,7 +50,7 @@ func (f *function) Exec(ctx context.Context) error {
 	return nil
 }
 
-// BuildTask from data-buffer function.
+// BuildTask from data-buffer-fs function.
 func BuildTask(ctx context.Context, t *nbmpv2.Task) (nbmp.Function, error) {
 	f := &function{}
 	return f, nil

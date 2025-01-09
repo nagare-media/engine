@@ -4,11 +4,11 @@ metadata:
   name: nagare-media-engine
 build:
   artifacts:
-    - image: ghcr.io/nagare-media/engine/function-data-buffer
+    - image: ghcr.io/nagare-media/engine/function-data-buffer-fs
       runtimeType: go
       context: .
       docker:
-        dockerfile: build/package/image/function-data-buffer/Dockerfile.generic.generic
+        dockerfile: build/package/image/function-data-buffer-fs/Dockerfile.generic.generic
         pullParent: false
         noCache: false
         squash: false
@@ -257,7 +257,7 @@ deploy:
               - "--name"
               - "nagare-media-mgmt"
               - "ghcr.io/nagare-media/engine/workflow-manager-helper:dev"
-              - "ghcr.io/nagare-media/engine/function-data-buffer:dev"
+              - "ghcr.io/nagare-media/engine/function-data-buffer-fs:dev"
               - "ghcr.io/nagare-media/engine/function-generic-noop:dev"
               - "ghcr.io/nagare-media/engine/function-generic-sleep:dev"
               - "ghcr.io/nagare-media/engine/function-media-encode:dev"
@@ -275,7 +275,7 @@ deploy:
               - "--name"
               - "nagare-media-edge"
               - "ghcr.io/nagare-media/engine/workflow-manager-helper:dev"
-              - "ghcr.io/nagare-media/engine/function-data-buffer:dev"
+              - "ghcr.io/nagare-media/engine/function-data-buffer-fs:dev"
               - "ghcr.io/nagare-media/engine/function-generic-noop:dev"
               - "ghcr.io/nagare-media/engine/function-generic-sleep:dev"
               - "ghcr.io/nagare-media/engine/function-media-encode:dev"
