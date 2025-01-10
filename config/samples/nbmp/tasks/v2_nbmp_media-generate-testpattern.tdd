@@ -19,7 +19,7 @@
       "name": "output",
       "protocol": "buffered",
       "mode": "push",
-      "caching-server-url": "buffered://127.0.0.1:8999/streams/out/output?nme-buffered-protocol=http"
+      "caching-server-url": "buffered://127.0.0.1:8999/streams/out?nme-buffered-protocol=http"
     }]
   },
   "configuration": {

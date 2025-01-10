@@ -1241,7 +1241,7 @@ func (r *TaskReconciler) resolveMediaStream(ctx context.Context, task *enginev1.
 		res := url.URL{
 			Scheme:   "buffered",
 			Host:     fmt.Sprintf("%s%s.%s.svc.cluster.local", ResourcePrefix, u.TaskID, task.Namespace),
-			Path:     fmt.Sprintf("/streams/%s/%s", u.PortName, u.StreamID),
+			Path:     fmt.Sprintf("/streams/%s", u.PortName),
 			RawQuery: q.Encode(),
 		}
 		newUrl = base.URI(res.String())

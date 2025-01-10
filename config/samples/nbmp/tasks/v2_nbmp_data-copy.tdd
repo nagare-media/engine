@@ -25,7 +25,7 @@
       "name": "input",
       "protocol": "buffered",
       "mode": "push",
-      "caching-server-url": "buffered://127.0.0.1:8111/streams/in/input?nme-buffered-protocol=http"
+      "caching-server-url": "buffered://127.0.0.1:8111/streams/in?nme-buffered-protocol=http"
     }]
   },
   "output": {
@@ -34,7 +34,7 @@
       "name": "output",
       "protocol": "buffered",
       "mode": "push",
-      "caching-server-url": "buffered://127.0.0.1:8999/streams/out/output?nme-buffered-protocol=http"
+      "caching-server-url": "buffered://127.0.0.1:8999/streams/out?nme-buffered-protocol=http"
     }]
   },
   "configuration": {

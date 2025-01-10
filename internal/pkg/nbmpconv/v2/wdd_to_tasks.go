@@ -527,7 +527,6 @@ func (c *wddToTasksConverter) createMediaStream(cm nbmpv2.ConnectionMapping) (*e
 			WorkflowID: c.wdd.General.ID,
 			TaskID:     originPort.ID,
 			PortName:   originPort.PortName,
-			StreamID:   stream.ID,
 		}
 		streamURL = tu.URL()
 	}

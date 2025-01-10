@@ -57,7 +57,7 @@ func (u *URL) Parse() (ParsedURL, error) {
 
 	switch seg[0] {
 	case TaskURLPathSegment:
-		if len(seg) != 5 {
+		if len(seg) != 4 {
 			return nil, fmt.Errorf("engineurl: invalid task URL path: %s", p)
 		}
 
@@ -65,7 +65,6 @@ func (u *URL) Parse() (ParsedURL, error) {
 			WorkflowID: seg[1],
 			TaskID:     seg[2],
 			PortName:   seg[3],
-			StreamID:   seg[4],
 			RawQuery:   url.RawQuery,
 		}, nil
 
@@ -96,7 +95,6 @@ type TaskURL struct {
 	WorkflowID string
 	TaskID     string
 	PortName   string
-	StreamID   string
 	RawQuery   string
 }
 
@@ -110,10 +108,9 @@ func (u *TaskURL) String() string {
 			"/" + /* WorkflowID */
 			"/" + /* TaskID     */
 			"/" + /* PortName   */
-			"/" + /* StreamID   */
 			"?", /*  RawQuery   */
 	)
-	n += len(u.WorkflowID) + len(u.TaskID) + len(u.PortName) + len(u.StreamID) + len(u.RawQuery)
+	n += len(u.WorkflowID) + len(u.TaskID) + len(u.PortName) + len(u.RawQuery)
 	buf.Grow(n)
 
 	buf.WriteString(NagareEngineScheme)
@@ -125,8 +122,6 @@ func (u *TaskURL) String() string {
 	buf.WriteString(u.TaskID)
 	buf.WriteString("/")
 	buf.WriteString(u.PortName)
-	buf.WriteString("/")
-	buf.WriteString(u.StreamID)
 	buf.WriteString("?")
 	buf.WriteString(u.RawQuery)
 
@@ -140,7 +135,7 @@ func (u *TaskURL) URI() base.URI {
 func (u *TaskURL) URL() *url.URL {
 	return &url.URL{
 		Scheme:   NagareEngineScheme,
-		Path:     path.Join("/", TaskURLPathSegment, u.WorkflowID, u.TaskID, u.PortName, u.StreamID),
+		Path:     path.Join("/", TaskURLPathSegment, u.WorkflowID, u.TaskID, u.PortName),
 		RawQuery: u.RawQuery,
 	}
 }
