@@ -39,8 +39,15 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
       "GIT_TREE_STATE=${GIT_TREE_STATE}" \
       "BUILD_DATE=${BUILD_DATE}"
 
-FROM gcr.io/distroless/static:latest
-LABEL org.opencontainers.image.base.name="gcr.io/distroless/static:latest"
+FROM docker.io/library/ubuntu:24.04
+LABEL org.opencontainers.image.base.name="docker.io/library/ubuntu:24.04"
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      ffmpeg \
+      libavcodec-extra \
+ && rm -rf /var/lib/apt/lists/*
 
 ENV GOTRACEBACK=all
 
