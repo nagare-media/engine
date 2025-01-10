@@ -5,21 +5,28 @@
   "general": {
     "id": "d08b10de-ea8e-422f-be57-9d32e3082765",
     "name": "sleep",
-    "description": "A dummy workflow that creates a task that sleeps for some time.",
+    "description": "An example workflow that creates a task that sleeps for some time.",
     "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1"
+  },
+  "output": {
+    "media-parameters": [{
+      "stream-id": "dummy",
+      "name": "dummy",
+      "protocol": "dummy",
+      "mode": "push",
+      "caching-server-url": "dummy://dummy"
+    }]
   },
   "processing": {
     "connection-map": [{
-      "connection-id": "dummy-connection",
+      "connection-id": "0bf0de1d-7d8a-45e1-8770-b12e0eefdf49 --> dummy",
       "from": {
         "id": "0bf0de1d-7d8a-45e1-8770-b12e0eefdf49",
         "instance": "sleep-10s",
         "port-name": "dummy"
       },
       "to": {
-        "id": "c0825793-d106-4e5d-b263-cf416abde2a6",
-        "instance": "sleep-10s",
-        "port-name": "dummy"
+        "id": "dummy"
       }
     }],
     "function-restrictions": [{

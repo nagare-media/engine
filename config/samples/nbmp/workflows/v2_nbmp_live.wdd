@@ -4,44 +4,44 @@
   },
   "general": {
     "id": "d08b10de-ea8e-422f-be57-9d32e3082765",
-    "name": "test",
-    "description": "Test workflow.",
+    "name": "live",
+    "description": "An example workflow that generates a live stream.",
     "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1"
   },
   "processing": {
     "connection-map": [{
-      "connection-id": "dummy-connection",
+      "connection-id": "0bf0de1d-7d8a-45e1-8770-b12e0eefdf49 --> c0825793-d106-4e5d-b263-cf416abde2a6",
       "from": {
         "id": "0bf0de1d-7d8a-45e1-8770-b12e0eefdf49",
-        "instance": "generate",
-        "port-name": "out"
+        "instance": "generate-live-stream",
+        "port-name": "out.0"
       },
       "to": {
         "id": "c0825793-d106-4e5d-b263-cf416abde2a6",
-        "instance": "sleep",
-        "port-name": "dummy"
+        "instance": "discard-stream",
+        "port-name": "in"
       }
     }],
     "function-restrictions": [
       {
-        "instance": "generate",
+        "instance": "generate-live-stream",
         "general": {
           "id": "ClusterFunction/media-generate-testpattern"
-        }
-      },
-      {
-        "instance": "sleep",
-        "general": {
-          "id": "ClusterFunction/generic-sleep"
         },
         "configuration": {
           "parameters": [
             {
-              "name": "generic-sleep.engine.nagare.media/duration",
+              "name": "media-generate-testpattern.engine.nagare.media/duration",
               "datatype": "string",
-              "values": [{"restrictions": ["10s"]}]
+              "values": [{"restrictions": ["30s"]}]
             }
           ]
+        }
+      },
+      {
+        "instance": "discard-stream",
+        "general": {
+          "id": "ClusterFunction/data-discard"
         }
       }
     ]
