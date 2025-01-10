@@ -89,5 +89,8 @@ EOF
 # NBMP Task API
 EXPOSE 8888
 
+# HTTP ports
+EXPOSE 8080
+
 ENTRYPOINT [ "/task-shim" ]
 CMD [ "--config", "/config/task-shim.yaml" ]
