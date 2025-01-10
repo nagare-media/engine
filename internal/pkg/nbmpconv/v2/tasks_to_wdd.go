@@ -118,7 +118,7 @@ func (c *tasksToWDDConverter) convertInputs(wf *nbmpv2.Workflow) error {
 
 			// check if stream is workflow input
 
-			isWfInput := false
+			isWfInput := true
 			u, err := engineurl.Parse(string(*p.Input.URL))
 			if err == nil {
 				_, isTaskStream := u.(*engineurl.TaskURL)
@@ -169,7 +169,7 @@ func (c *tasksToWDDConverter) convertOutputs(wf *nbmpv2.Workflow) error {
 
 			// check if stream is workflow output
 
-			isWfOutput := false
+			isWfOutput := true
 			u, err := engineurl.Parse(string(*p.Output.URL))
 			if err == nil {
 				_, isTaskStream := u.(*engineurl.TaskURL)
