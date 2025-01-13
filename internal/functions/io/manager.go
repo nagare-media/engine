@@ -25,13 +25,15 @@ import (
 type Manager interface {
 	starter.Starter
 
+	ManageCriticalStarter(starter.Starter)
+	ManageStarter(starter.Starter)
 	ManageStreamProcessor(StreamProcessor) error
 	ManagePort(Port) error
 }
 
 type manager struct {
-	waitMgr   *starter.Manager
 	cancelMgr *starter.Manager
+	waitMgr   *starter.Manager
 	srv       map[uint16]Server
 }
 
@@ -40,13 +42,21 @@ var _ Manager = &manager{}
 func NewManager() Manager {
 	return &manager{
 		srv:       make(map[uint16]Server),
-		waitMgr:   starter.Manage().WaitForAllToTerminate(),
 		cancelMgr: starter.Manage(),
+		waitMgr:   starter.Manage().WaitForAllToTerminate(),
 	}
 }
 
+func (m *manager) ManageCriticalStarter(s starter.Starter) {
+	m.cancelMgr.ManageStarter(s)
+}
+
+func (m *manager) ManageStarter(s starter.Starter) {
+	m.waitMgr.ManageStarter(s)
+}
+
 func (m *manager) ManageStreamProcessor(sp StreamProcessor) error {
-	m.waitMgr.ManageStarter(sp)
+	m.ManageStarter(sp)
 	return nil
 }
 
@@ -59,7 +69,7 @@ func (m *manager) ManagePort(p Port) (err error) {
 				return
 			}
 			m.srv[p.PortNumber()] = srv
-			m.cancelMgr.ManageStarter(srv)
+				m.ManageCriticalStarter(srv)
 		}
 
 		if err = p.MountTo(srv); err != nil {
@@ -67,7 +77,7 @@ func (m *manager) ManagePort(p Port) (err error) {
 		}
 	}
 
-	m.waitMgr.ManageStarter(p)
+	m.ManageStarter(p)
 	return
 }
 
