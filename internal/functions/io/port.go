@@ -18,7 +18,6 @@ package io
 
 import (
 	"errors"
-	"strconv"
 	"strings"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
@@ -124,30 +123,15 @@ func PortCommonBaseName(n string) string {
 	if i < 0 {
 		return n
 	}
-	inst := parsePortInstance(n[i+1:])
-	if inst < 0 {
-		return n
-	}
 	return n[:i]
 }
 
-func PortInstance(n string) int64 {
+func PortInstance(n string) string {
 	i := strings.LastIndex(n, PortInstanceSeparationChar)
 	if i < 0 {
-		return -1
+		return ""
 	}
-	return parsePortInstance(n[i+1:])
-}
-
-func parsePortInstance(i string) int64 {
-	inst, err := strconv.ParseInt(i, 10, 0)
-	if err != nil {
-		return -1
-	}
-	if inst < 0 {
-		return -1
-	}
-	return inst
+	return n[i+1:]
 }
 
 func IsServerPort(p Port) bool {
