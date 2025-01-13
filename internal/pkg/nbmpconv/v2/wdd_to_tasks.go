@@ -610,9 +610,9 @@ func (c *wddToTasksConverter) mergeMediaRestrictions(stream, restrictions *engin
 	// HumanReadable.Name
 	if restrictions.HumanReadable != nil && restrictions.HumanReadable.Name != nil {
 		if stream.HumanReadable == nil || (stream.HumanReadable != nil && stream.HumanReadable.Name == nil) {
-			stream.HumanReadable.Name = restrictions.HumanReadable.Name
+			stream.HumanReadable = restrictions.HumanReadable
 		} else if stream.HumanReadable.Name != restrictions.HumanReadable.Name {
-			return errors.New("convert: unfulfilled restriction: description")
+			return errors.New("convert: unfulfilled restriction: name")
 		}
 	}
 
