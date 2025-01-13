@@ -10,6 +10,7 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-logr/logr v1.4.2
+	github.com/go-viper/mapstructure/v2 v2.2.1
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/google/uuid v1.6.0
 	github.com/inhies/go-bytesize v0.0.0-20220417184213-4913239db9cf
@@ -19,7 +20,9 @@ require (
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/smallnest/ringbuffer v0.0.0-20241129171057-356c688ba81d
+	github.com/stoewer/go-strcase v1.3.0
 	github.com/valyala/fasthttp v1.58.0
+	github.com/yuin/gopher-lua v1.1.1
 	go.uber.org/zap v1.27.0
 	k8s.io/api v0.32.0
 	k8s.io/apiextensions-apiserver v0.32.0
