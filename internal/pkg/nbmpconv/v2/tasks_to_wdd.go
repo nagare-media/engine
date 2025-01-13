@@ -421,7 +421,7 @@ func (c *tasksToWDDConverter) convertProcessingFunctionRestrictions(wf *nbmpv2.W
 		// $.processing.function-restrictions.general
 
 		// $.processing.function-restrictions.general.state
-		fr.General.State = ptr.To(engineTaskPhaseToNBMP(t.Status.Phase))
+		fr.General.State = ptr.To(EngineTaskPhaseToNBMP(t.Status.Phase))
 		if !t.DeletionTimestamp.IsZero() {
 			fr.General.State = ptr.To(nbmpv2.DestroyedState)
 		}

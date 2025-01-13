@@ -42,7 +42,7 @@ func encodeKeyword(k, v string) string {
 	return buf.String()
 }
 
-func engineWorkflowPhaseToNBMP(wp enginev1.WorkflowPhase) nbmpv2.State {
+func EngineWorkflowPhaseToNBMP(wp enginev1.WorkflowPhase) nbmpv2.State {
 	switch wp {
 	case enginev1.InitializingWorkflowPhase:
 		return nbmpv2.InstantiatedState
@@ -57,7 +57,7 @@ func engineWorkflowPhaseToNBMP(wp enginev1.WorkflowPhase) nbmpv2.State {
 	}
 }
 
-func engineTaskPhaseToNBMP(tp enginev1.TaskPhase) nbmpv2.State {
+func EngineTaskPhaseToNBMP(tp enginev1.TaskPhase) nbmpv2.State {
 	switch tp {
 	case enginev1.InitializingTaskPhase:
 		return nbmpv2.InstantiatedState

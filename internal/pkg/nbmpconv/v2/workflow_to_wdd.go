@@ -67,7 +67,7 @@ func (c *workflowToWDDConverter) Convert(wdd *nbmpv2.Workflow) error {
 	wdd.General.PublishedTime = ptr.To(c.wf.CreationTimestamp.Time)
 
 	// $.general.state
-	wdd.General.State = ptr.To(engineWorkflowPhaseToNBMP(c.wf.Status.Phase))
+	wdd.General.State = ptr.To(EngineWorkflowPhaseToNBMP(c.wf.Status.Phase))
 	if !c.wf.DeletionTimestamp.IsZero() {
 		wdd.General.State = ptr.To(nbmpv2.DestroyedState)
 	}
