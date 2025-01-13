@@ -73,7 +73,7 @@ func (f *function) Exec(ctx context.Context) error {
 		}
 
 		port.Connect(mainStream)
-		if err := mgr.ManagePort(port); err != nil {
+		if err := mgr.ManagePort(port, true); err != nil {
 			return err
 		}
 
@@ -93,7 +93,7 @@ func (f *function) Exec(ctx context.Context) error {
 		switch port.BaseName() {
 		case MainOutputPortName:
 			mainStream.Connect(port)
-			if err := mgr.ManagePort(port); err != nil {
+			if err := mgr.ManagePort(port, true); err != nil {
 				return err
 			}
 		default:

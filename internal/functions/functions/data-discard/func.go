@@ -63,7 +63,7 @@ func (f *function) Exec(ctx context.Context) error {
 		discard := io.NewConnection(goio.Discard)
 		port.Connect(discard)
 
-		if err := mgr.ManagePort(port); err != nil {
+		if err := mgr.ManagePort(port, true); err != nil {
 			return err
 		}
 	}

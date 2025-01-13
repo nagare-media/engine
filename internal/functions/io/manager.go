@@ -28,7 +28,7 @@ type Manager interface {
 	ManageCriticalStarter(starter.Starter)
 	ManageStarter(starter.Starter)
 	ManageStreamProcessor(StreamProcessor) error
-	ManagePort(Port) error
+	ManagePort(Port, bool) error
 }
 
 type manager struct {
@@ -60,7 +60,7 @@ func (m *manager) ManageStreamProcessor(sp StreamProcessor) error {
 	return nil
 }
 
-func (m *manager) ManagePort(p Port) (err error) {
+func (m *manager) ManagePort(p Port, critical bool) (err error) {
 	if IsServerPort(p) {
 		srv, ok := m.srv[p.PortNumber()]
 		if !ok {
@@ -69,7 +69,11 @@ func (m *manager) ManagePort(p Port) (err error) {
 				return
 			}
 			m.srv[p.PortNumber()] = srv
+			if critical {
 				m.ManageCriticalStarter(srv)
+			} else {
+				m.ManageStarter(srv)
+			}
 		}
 
 		if err = p.MountTo(srv); err != nil {
