@@ -219,14 +219,14 @@ func (m *workflowValidatorSpecLaxMiddleware) common(w *nbmpv2.Workflow) {
 				fmt.Sprintf("$.processing.connection-map[%d].connection-id", i))
 		}
 
-		// output-restrictions only allowed for "to" objects
-		if cmi.From.OutputRestrictions != nil {
+		// output-restrictions only allowed for "from" objects
+		if cmi.To.OutputRestrictions != nil {
 			w.Acknowledge.Failed = append(w.Acknowledge.Failed,
 				fmt.Sprintf("$.processing.connection-map[%d].from.output-restrictions", i))
 		}
 
-		// input-restrictions only allowed for "from" objects
-		if cmi.To.InputRestrictions != nil {
+		// input-restrictions only allowed for "to" objects
+		if cmi.From.InputRestrictions != nil {
 			w.Acknowledge.Failed = append(w.Acknowledge.Failed,
 				fmt.Sprintf("$.processing.connection-map[%d].from.input-restrictions", i))
 		}
