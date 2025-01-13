@@ -54,5 +54,8 @@ func (c *connection) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (c *connection) Close() error {
+	if wc, ok := c.w.(io.WriteCloser); ok {
+		return wc.Close()
+	}
 	return nil
 }
