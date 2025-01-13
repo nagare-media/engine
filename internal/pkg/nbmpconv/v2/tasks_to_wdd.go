@@ -528,11 +528,7 @@ func (c *tasksToWDDConverter) convertProcessingFunctionRestrictions(wf *nbmpv2.W
 		// $.processing.function-restrictions.configuration
 		if len(t.Spec.Config) > 0 {
 			fr.Configuration = &nbmpv2.Configuration{
-				Parameters: make([]nbmpv2.Parameter, 0, len(t.Spec.Config)),
-			}
-
-			for k, v := range t.Spec.Config {
-				fr.Configuration.Parameters = nbmputils.SetStringParameterValue(fr.Configuration.Parameters, k, v)
+				Parameters: MapToParameters(t.Spec.Config),
 			}
 		}
 

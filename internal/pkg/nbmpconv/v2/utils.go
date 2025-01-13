@@ -17,9 +17,11 @@ limitations under the License.
 package v2
 
 import (
+	"fmt"
 	"strings"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
+	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
@@ -72,4 +74,24 @@ func EngineTaskPhaseToNBMP(tp enginev1.TaskPhase) nbmpv2.State {
 	default:
 		return nbmpv2.InstantiatedState
 	}
+}
+
+func ParametersToMap(p []nbmpv2.Parameter) (map[string]string, error) {
+	m := make(map[string]string, len(p))
+	for _, e := range p {
+		v, ok := nbmputils.ExtractStringParameterValue(e)
+		if !ok {
+			return nil, fmt.Errorf("convert: unsupported parameter value for '%s'", e.Name)
+		}
+		m[e.Name] = v
+	}
+	return m, nil
+}
+
+func MapToParameters(m map[string]string) []nbmpv2.Parameter {
+	p := make([]nbmpv2.Parameter, 0, len(m))
+	for k, v := range m {
+		p = nbmputils.SetStringParameterValue(p, k, v)
+	}
+	return p
 }

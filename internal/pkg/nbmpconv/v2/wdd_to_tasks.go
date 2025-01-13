@@ -285,13 +285,10 @@ func (c *wddToTasksConverter) convertProcessingFunctionRestrictions() error {
 
 		// $.processing.function-restrictions.configuration
 		if fr.Configuration != nil {
-			tsk.Spec.Config = make(map[string]string, len(fr.Configuration.Parameters))
-			for _, p := range fr.Configuration.Parameters {
-				v, ok := nbmputils.ExtractStringParameterValue(p)
-				if !ok {
-					return fmt.Errorf("convert: unsupported parameter value for '%s'", p.Name)
-				}
-				tsk.Spec.Config[p.Name] = v
+			var err error
+			tsk.Spec.Config, err = ParametersToMap(fr.Configuration.Parameters)
+			if err != nil {
+				return err
 			}
 		}
 
