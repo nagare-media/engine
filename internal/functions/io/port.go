@@ -77,11 +77,11 @@ type InputPortBuilder func(nbmpv2.Port, nbmpv2.MediaOrMetadataParameter) (InputP
 var InputPortBuilders = registry.New[InputPortBuilder]()
 
 func NewInputPortForInputs(p nbmpv2.Port, i *nbmpv2.Input) (InputPort, error) {
-	mp := nbmputils.FindMediaOrMetadataParameter(p, i)
+	if p.Bind == nil {
+		return nil, PortUnbound
+	}
+	mp := nbmputils.FindMediaOrMetadataParameter(p.Bind.StreamID, i)
 	if mp == nil {
-		if p.Bind == nil {
-			return nil, PortUnbound
-		}
 		return nil, PortStreamNotFound
 	}
 	return NewInputPortFor(p, mp)
@@ -100,11 +100,11 @@ type OutputPortBuilder func(nbmpv2.Port, nbmpv2.MediaOrMetadataParameter) (Outpu
 var OutputPortBuilders = registry.New[OutputPortBuilder]()
 
 func NewOutputPortForOutputs(p nbmpv2.Port, o *nbmpv2.Output) (OutputPort, error) {
-	mp := nbmputils.FindMediaOrMetadataParameter(p, o)
+	if p.Bind == nil {
+		return nil, PortUnbound
+	}
+	mp := nbmputils.FindMediaOrMetadataParameter(p.Bind.StreamID, o)
 	if mp == nil {
-		if p.Bind == nil {
-			return nil, PortUnbound
-		}
 		return nil, PortStreamNotFound
 	}
 	return NewOutputPortFor(p, mp)

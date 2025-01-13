@@ -20,19 +20,15 @@ import (
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-func FindMediaOrMetadataParameter(p nbmpv2.Port, io nbmpv2.InputOrOutput) nbmpv2.MediaOrMetadataParameter {
-	if p.Bind == nil {
-		return nil
-	}
-
+func FindMediaOrMetadataParameter(streamID string, io nbmpv2.InputOrOutput) nbmpv2.MediaOrMetadataParameter {
 	for _, mp := range io.GetMediaParameters() {
-		if mp.StreamID == p.Bind.StreamID {
+		if mp.StreamID == streamID {
 			return &mp
 		}
 	}
 
 	for _, mp := range io.GetMetadataParameters() {
-		if mp.StreamID == p.Bind.StreamID {
+		if mp.StreamID == streamID {
 			return &mp
 		}
 	}
