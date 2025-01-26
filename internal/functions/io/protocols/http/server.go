@@ -32,8 +32,11 @@ import (
 	"k8s.io/utils/ptr"
 )
 
+// TODO: implement support for HTTPS
+
 const (
 	Protocol          = "http"
+	ProtocolTLS       = "https"
 	DefaultPortNumber = uint16(8080)
 	DefaultTimeout    = 30 * time.Minute
 )
@@ -95,4 +98,5 @@ func NewServer(portNumber uint16) (engineio.Server, error) {
 
 func init() {
 	engineio.ServerBuilders.Register(Protocol, NewServer)
+	engineio.ServerBuilders.Register(ProtocolTLS, NewServer)
 }

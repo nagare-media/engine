@@ -312,7 +312,7 @@ func NewOutputPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engine
 
 func newPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (*port, error) {
 	// protocol
-	if Protocol != mp.GetProtocol() {
+	if Protocol != mp.GetProtocol() && ProtocolTLS != mp.GetProtocol() {
 		return nil, engineio.ProtocolIncompatibleWithPort
 	}
 
@@ -363,4 +363,6 @@ func newPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (*port, error
 func init() {
 	engineio.InputPortBuilders.Register(Protocol, NewInputPortFor)
 	engineio.OutputPortBuilders.Register(Protocol, NewOutputPortFor)
+	engineio.InputPortBuilders.Register(ProtocolTLS, NewInputPortFor)
+	engineio.OutputPortBuilders.Register(ProtocolTLS, NewOutputPortFor)
 }
