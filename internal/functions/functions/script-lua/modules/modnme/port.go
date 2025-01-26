@@ -64,3 +64,30 @@ func (p *Port) ReadAll(L *luar.LState) int {
 	L.Push(lua.LString(buf))
 	return 1
 }
+
+func (p *Port) WriteLine(L *luar.LState) int {
+	s := L.ToStringMeta(L.Get(1)).String()
+	buf := make([]byte, len(s)+1)
+	copy(buf, s)
+	buf[len(s)] = '\n'
+
+	_, err := p.out.Write([]byte(buf))
+	if err != nil {
+		return modules.Error(L.LState, err)
+	}
+
+	return 0
+}
+
+func (p *Port) Close(L *luar.LState) int {
+	var err error
+	if p.in != nil {
+		err = p.in.Close()
+	} else {
+		err = p.out.Close()
+	}
+	if err != nil {
+		return modules.Error(L.LState, err)
+	}
+	return 0
+}
