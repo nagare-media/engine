@@ -33,7 +33,7 @@ const (
 	Name = "data-discard"
 )
 
-// function generates a test pattern input stream.
+// function discards input streams.
 type function struct {
 	tsk *nbmpv2.Task
 }

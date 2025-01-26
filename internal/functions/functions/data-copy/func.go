@@ -35,7 +35,7 @@ const (
 	MainOutputPortName = "out"
 )
 
-// function generates a test pattern input stream.
+// function copies an input stream.
 type function struct {
 	tsk *nbmpv2.Task
 }
