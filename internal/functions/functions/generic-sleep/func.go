@@ -33,7 +33,7 @@ import (
 const (
 	Name = "generic-sleep"
 
-	DurationParameterKey = "generic-sleep.engine.nagare.media/duration"
+	DurationParameterKey = Name + ".engine.nagare.media/duration"
 )
 
 // function sleeps for a certain amount of time. It can be used for debugging.

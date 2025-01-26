@@ -42,8 +42,8 @@ import (
 const (
 	Name = "script-lua"
 
-	ScriptParameterKey      = "script-lua.engine.nagare.media/script"
-	WorkflowAPIParameterKey = "script-lua.engine.nagare.media/workflow-api"
+	ScriptParameterKey      = Name + ".engine.nagare.media/script"
+	WorkflowAPIParameterKey = Name + ".engine.nagare.media/workflow-api"
 )
 
 // function executes Lua script.

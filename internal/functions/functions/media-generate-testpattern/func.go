@@ -40,7 +40,7 @@ const (
 
 	MainOutputPortName = "out"
 
-	DurationParameterKey = "media-generate-testpattern.engine.nagare.media/duration"
+	DurationParameterKey = Name + ".engine.nagare.media/duration"
 )
 
 var ffmpegScriptTmpl = template.Must(template.New(Name + "/ffmpeg-script").Parse(`
