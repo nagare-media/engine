@@ -286,7 +286,7 @@ func (p *port) handlePost(c *fiber.Ctx) error {
 	}
 
 	// TODO: how do we know, that no additional requests are coming?
-	p.Close()
+	// p.Close()
 
 	c.Status(fiber.StatusCreated)
 	return nil
