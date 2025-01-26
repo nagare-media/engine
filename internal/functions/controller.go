@@ -18,7 +18,9 @@ package functions
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -28,8 +30,8 @@ import (
 
 // TaskController for task execution.
 type TaskController struct {
-	FunctionName    string
-	TaskDescription *nbmpv2.Task
+	FunctionName string
+	TDDPath      string
 }
 
 var _ starter.Starter = &TaskController{}
@@ -47,9 +49,16 @@ func (c *TaskController) Start(ctx context.Context) error {
 		return err
 	}
 
+	// TODO: react to SIGHUP and reconfigure task
+	tdd, err := decodeTddFile(c.TDDPath)
+	if err != nil {
+		l.Error(err, "unable to parse the task description document")
+		return err
+	}
+
 	// build task
 	l.Info("building task")
-	tsk, err := builder(ctx, c.TaskDescription)
+	tsk, err := builder(ctx, tdd)
 	if err != nil {
 		l.Error(err, "building task failed")
 		return err
@@ -63,4 +72,23 @@ func (c *TaskController) Start(ctx context.Context) error {
 	}
 	l.Info("task finished")
 	return err
+}
+
+func decodeTddFile(path string) (*nbmpv2.Task, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	dec := json.NewDecoder(f)
+	dec.DisallowUnknownFields()
+
+	tdd := &nbmpv2.Task{}
+	err = dec.Decode(tdd)
+	if err != nil {
+		return nil, err
+	}
+
+	return tdd, nil
 }

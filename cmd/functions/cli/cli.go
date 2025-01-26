@@ -18,7 +18,6 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -33,7 +32,6 @@ import (
 
 	"github.com/nagare-media/engine/internal/functions"
 	"github.com/nagare-media/engine/internal/pkg/version"
-	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
 const BaseBinaryName = "functions"
@@ -130,19 +128,13 @@ func (c *cli) Execute(ctx context.Context, fn string, args []string) error {
 	if baseBinary {
 		fn = fs.Arg(fnArg)
 	}
-
 	tddPath := fs.Arg(tddArg)
-	tdd, err := decodeTddFile(tddPath)
-	if err != nil {
-		setupLog.Error(err, "unable to parse the task description document")
-		return err
-	}
 
 	// create and start task controller
 
 	tskCtrl := &functions.TaskController{
-		FunctionName:    fn,
-		TaskDescription: tdd,
+		FunctionName: fn,
+		TDDPath:      tddPath,
 	}
 
 	if err = tskCtrl.Start(ctx); err != nil {
@@ -151,23 +143,4 @@ func (c *cli) Execute(ctx context.Context, fn string, args []string) error {
 	}
 
 	return nil
-}
-
-func decodeTddFile(path string) (*nbmpv2.Task, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	dec := json.NewDecoder(f)
-	dec.DisallowUnknownFields()
-
-	tdd := &nbmpv2.Task{}
-	err = dec.Decode(tdd)
-	if err != nil {
-		return nil, err
-	}
-
-	return tdd, nil
 }
