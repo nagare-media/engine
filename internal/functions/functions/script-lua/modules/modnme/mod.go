@@ -18,6 +18,7 @@ package modnme
 
 import (
 	"errors"
+	"time"
 
 	"github.com/nagare-media/engine/internal/functions/functions/script-lua/modules"
 	luar "github.com/nagare-media/engine/third_party/github.com/layeh/gopher-luar"
@@ -37,6 +38,7 @@ func Open(L *lua.LState) int {
 var modFuncs = map[string]lua.LGFunction{
 	"log":             nmeLog,
 	"logerr":          nmeLogerr,
+	"sleep":           nmeSleep,
 	"get_input_port":  nmeGetInputPort,
 	"get_output_port": nmeGetOutputPort,
 }
@@ -67,6 +69,24 @@ func nmeLogerr(L *lua.LState) int {
 		return modules.Error(L, errors.New("odd number of key-value pairs"))
 	}
 	l.Error(errors.New(err), msg, kv...)
+	return 0
+}
+
+func nmeSleep(L *lua.LState) int {
+	ctx := L.Context()
+
+	durStr := L.CheckString(1)
+	dur, err := time.ParseDuration(durStr)
+	if err != nil {
+		return modules.Error(L, err)
+	}
+
+	select {
+	case <-ctx.Done():
+		return modules.Error(L, ctx.Err())
+	case <-time.After(dur):
+	}
+
 	return 0
 }
 
