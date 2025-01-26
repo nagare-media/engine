@@ -40,6 +40,8 @@ func addWorkflowType(L *lua.LState, mod *lua.LTable) {
 
 type Workflow struct {
 	Data *nbmpv2.Workflow `luar:"-" mapstructure:"-"`
+
+	changed bool
 }
 
 func workflowNew(L *lua.LState) int {
@@ -71,16 +73,18 @@ func workflowSelf(L *lua.LState) int {
 }
 
 func (w *Workflow) Update(L *luar.LState) int {
-	ctx := L.Context()
-	cfg := GetConfig(L.LState)
+	if w.changed {
+		ctx := L.Context()
+		cfg := GetConfig(L.LState)
 
-	c := nbmpclientv2.NewWorkflowClient(cfg.WorkflowAPI)
-	wf, err := c.Update(ctx, w.Data)
-	if err != nil {
-		return modules.Error(L.LState, err)
+		c := nbmpclientv2.NewWorkflowClient(cfg.WorkflowAPI)
+		wf, err := c.Update(ctx, w.Data)
+		if err != nil {
+			return modules.Error(L.LState, err)
+		}
+
+		w.Data = wf
 	}
-
-	w.Data = wf
 	return 0
 }
 
@@ -197,6 +201,7 @@ func (w *Workflow) AddConnection(L *luar.LState) int {
 		cm.To.PortName = con.To.Port
 	}
 	w.Data.Processing.ConnectionMap = append(w.Data.Processing.ConnectionMap, cm)
+	w.changed = true
 
 	// add function instances
 	if !isWfInput {
@@ -242,6 +247,7 @@ func (w *Workflow) RemoveConnection(L *luar.LState) int {
 
 	if i := w.connectionIndex(con); i >= 0 {
 		w.Data.Processing.ConnectionMap = append(w.Data.Processing.ConnectionMap[:i], w.Data.Processing.ConnectionMap[i+1:]...)
+		w.changed = true
 	}
 
 	return 0
