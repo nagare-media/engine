@@ -1232,17 +1232,17 @@ func (r *TaskReconciler) resolveMediaStream(ctx context.Context, task *enginev1.
 		// TODO: add support for cross-cluster connections (i.e. allow external connections through some gateway)
 		// TODO: add support for arbitrary streaming protocols
 
-		q, err := url.ParseQuery(u.RawQuery)
-		if err != nil {
-			return nil, err
-		}
-		q.Add(engineurl.BufferedProtocolQueryKey, "http")
+		// q, err := url.ParseQuery(u.RawQuery)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// q.Add(engineurl.BufferedProtocolQueryKey, "http")
 
 		res := url.URL{
-			Scheme:   "buffered",
-			Host:     fmt.Sprintf("%s%s.%s.svc.cluster.local", ResourcePrefix, u.TaskID, task.Namespace),
-			Path:     fmt.Sprintf("/streams/%s", u.PortName),
-			RawQuery: q.Encode(),
+			Scheme: "http",
+			Host:   fmt.Sprintf("%s%s.%s.svc.cluster.local", ResourcePrefix, u.TaskID, task.Namespace),
+			Path:   fmt.Sprintf("/streams/%s", u.PortName),
+			// RawQuery: q.Encode(),
 		}
 		newUrl = base.URI(res.String())
 
