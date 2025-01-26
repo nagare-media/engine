@@ -115,7 +115,7 @@ func (c *wddToTasksConverter) Convert(tsks *[]enginev1.Task) error {
 
 func (c *wddToTasksConverter) convertInputs() error {
 	for _, mp := range c.wdd.Input.MediaParameters {
-		m, err := c.convertMediaParametersToMedia(&mp)
+		m, err := c.convertMediaParametersToMedia(&mp, true)
 		if err != nil {
 			return err
 		}
@@ -123,7 +123,7 @@ func (c *wddToTasksConverter) convertInputs() error {
 	}
 
 	for _, mp := range c.wdd.Input.MetadataParameters {
-		m, err := c.convertMetadataParametersToMedia(&mp)
+		m, err := c.convertMetadataParametersToMedia(&mp, true)
 		if err != nil {
 			return err
 		}
@@ -135,7 +135,7 @@ func (c *wddToTasksConverter) convertInputs() error {
 
 func (c *wddToTasksConverter) convertOutputs() error {
 	for _, mp := range c.wdd.Output.MediaParameters {
-		m, err := c.convertMediaParametersToMedia(&mp)
+		m, err := c.convertMediaParametersToMedia(&mp, true)
 		if err != nil {
 			return err
 		}
@@ -143,7 +143,7 @@ func (c *wddToTasksConverter) convertOutputs() error {
 	}
 
 	for _, mp := range c.wdd.Output.MetadataParameters {
-		m, err := c.convertMetadataParametersToMedia(&mp)
+		m, err := c.convertMetadataParametersToMedia(&mp, true)
 		if err != nil {
 			return err
 		}
@@ -443,7 +443,7 @@ func (c *wddToTasksConverter) createMediaStream(cm nbmpv2.ConnectionMapping) (*e
 	// $.processing.connection-map[].from.output-restrictions
 	var fromRestrictions *enginev1.Media
 	if cm.From.OutputRestrictions != nil {
-		fromRestrictions, err = c.convertMediaOrMetadataRestrictionToMedia(cm.From.OutputRestrictions)
+		fromRestrictions, err = c.convertMediaOrMetadataRestrictionToMedia(cm.From.OutputRestrictions, false)
 		if err != nil {
 			return nil, err
 		}
@@ -454,7 +454,7 @@ func (c *wddToTasksConverter) createMediaStream(cm nbmpv2.ConnectionMapping) (*e
 	// $.processing.connection-map[].to.input-restrictions
 	var toRestrictions *enginev1.Media
 	if cm.To.InputRestrictions != nil {
-		toRestrictions, err = c.convertMediaOrMetadataRestrictionToMedia(cm.To.InputRestrictions)
+		toRestrictions, err = c.convertMediaOrMetadataRestrictionToMedia(cm.To.InputRestrictions, false)
 		if err != nil {
 			return nil, err
 		}
@@ -611,7 +611,7 @@ func (c *wddToTasksConverter) mergeMediaRestrictions(stream, restrictions *engin
 	if restrictions.HumanReadable != nil && restrictions.HumanReadable.Name != nil {
 		if stream.HumanReadable == nil || (stream.HumanReadable != nil && stream.HumanReadable.Name == nil) {
 			stream.HumanReadable = restrictions.HumanReadable
-		} else if stream.HumanReadable.Name != restrictions.HumanReadable.Name {
+		} else if *stream.HumanReadable.Name != *restrictions.HumanReadable.Name {
 			return errors.New("convert: unfulfilled restriction: name")
 		}
 	}
@@ -620,7 +620,7 @@ func (c *wddToTasksConverter) mergeMediaRestrictions(stream, restrictions *engin
 	if restrictions.Direction != nil {
 		if stream.Direction == nil {
 			stream.Direction = restrictions.Direction
-		} else if stream.Direction != restrictions.Direction {
+		} else if *stream.Direction != *restrictions.Direction {
 			return errors.New("convert: unfulfilled restriction: mode")
 		}
 	}
@@ -629,7 +629,7 @@ func (c *wddToTasksConverter) mergeMediaRestrictions(stream, restrictions *engin
 	if restrictions.URL != nil {
 		if stream.URL == nil {
 			stream.URL = restrictions.URL
-		} else if stream.URL != restrictions.URL {
+		} else if *stream.URL != *restrictions.URL {
 			return errors.New("convert: unfulfilled restriction: caching-server-url")
 		}
 	}
@@ -651,7 +651,7 @@ func (c *wddToTasksConverter) mergeMediaRestrictions(stream, restrictions *engin
 	if restrictions.Metadata.MimeType != nil {
 		if stream.Metadata.MimeType == nil {
 			stream.Metadata.MimeType = restrictions.Metadata.MimeType
-		} else if stream.Metadata.MimeType != restrictions.Metadata.MimeType {
+		} else if *stream.Metadata.MimeType != *restrictions.Metadata.MimeType {
 			return errors.New("convert: unfulfilled restriction: mime-type")
 		}
 	}
@@ -660,7 +660,7 @@ func (c *wddToTasksConverter) mergeMediaRestrictions(stream, restrictions *engin
 	if restrictions.Metadata.CodecType != nil {
 		if stream.Metadata.CodecType == nil {
 			stream.Metadata.CodecType = restrictions.Metadata.CodecType
-		} else if stream.Metadata.CodecType != restrictions.Metadata.CodecType {
+		} else if *stream.Metadata.CodecType != *restrictions.Metadata.CodecType {
 			return errors.New("convert: unfulfilled restriction: codec-type")
 		}
 	}
@@ -668,7 +668,7 @@ func (c *wddToTasksConverter) mergeMediaRestrictions(stream, restrictions *engin
 	return nil
 }
 
-func (c *wddToTasksConverter) convertMediaOrMetadataRestrictionToMedia(restrictions nbmpv2.InputOrOutput) (*enginev1.Media, error) {
+func (c *wddToTasksConverter) convertMediaOrMetadataRestrictionToMedia(restrictions nbmpv2.InputOrOutput, trackStreamID bool) (*enginev1.Media, error) {
 	n := len(restrictions.GetMediaParameters()) + len(restrictions.GetMetadataParameters())
 
 	if n == 0 {
@@ -681,17 +681,19 @@ func (c *wddToTasksConverter) convertMediaOrMetadataRestrictionToMedia(restricti
 
 	switch {
 	case len(restrictions.GetMediaParameters()) == 1:
-		return c.convertMediaParametersToMedia(&restrictions.GetMediaParameters()[0])
+		return c.convertMediaParametersToMedia(&restrictions.GetMediaParameters()[0], trackStreamID)
 	case len(restrictions.GetMetadataParameters()) == 1:
-		return c.convertMetadataParametersToMedia(&restrictions.GetMetadataParameters()[0])
+		return c.convertMetadataParametersToMedia(&restrictions.GetMetadataParameters()[0], trackStreamID)
 	}
 
 	return nil, fmt.Errorf("convert: illegal state reached: no restriction converted")
 }
 
-func (c *wddToTasksConverter) convertMediaParametersToMedia(mp *nbmpv2.MediaParameter) (*enginev1.Media, error) {
-	if err := c.observeStreamID(mp.StreamID); err != nil {
-		return nil, nil
+func (c *wddToTasksConverter) convertMediaParametersToMedia(mp *nbmpv2.MediaParameter, trackStreamID bool) (*enginev1.Media, error) {
+	if trackStreamID {
+		if err := c.observeStreamID(mp.StreamID); err != nil {
+			return nil, nil
+		}
 	}
 
 	c.mediaConverter.Reset(mp)
@@ -702,9 +704,11 @@ func (c *wddToTasksConverter) convertMediaParametersToMedia(mp *nbmpv2.MediaPara
 	return m, nil
 }
 
-func (c *wddToTasksConverter) convertMetadataParametersToMedia(mp *nbmpv2.MetadataParameter) (*enginev1.Media, error) {
-	if err := c.observeStreamID(mp.StreamID); err != nil {
-		return nil, nil
+func (c *wddToTasksConverter) convertMetadataParametersToMedia(mp *nbmpv2.MetadataParameter, trackStreamID bool) (*enginev1.Media, error) {
+	if trackStreamID {
+		if err := c.observeStreamID(mp.StreamID); err != nil {
+			return nil, nil
+		}
 	}
 
 	c.metadataConverter.Reset(mp)
