@@ -464,9 +464,10 @@ func DefaultRequirement(r *nbmpv2.Requirement) error {
 }
 
 func DefaultFlowcontrolRequirement(fcr *nbmpv2.FlowcontrolRequirement) error {
-	if fcr.AveragingWindow == nil {
-		fcr.AveragingWindow = ptr.To(uint64(1000)) // = 1s
-	}
+	// TODO: set
+	// if fcr.AveragingWindow == nil {
+	// 	fcr.AveragingWindow = ptr.To(uint64(1000)) // = 1s
+	// }
 	return nil
 }
 
