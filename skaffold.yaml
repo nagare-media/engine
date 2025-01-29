@@ -256,8 +256,9 @@ deploy:
               - "docker-image"
               - "--name"
               - "nagare-media-mgmt"
-              - "ghcr.io/nagare-media/engine/workflow-manager-helper:dev"
               - "ghcr.io/nagare-media/engine/function-data-buffer-fs:dev"
+              - "ghcr.io/nagare-media/engine/function-data-copy:dev"
+              - "ghcr.io/nagare-media/engine/function-data-discard:dev"
               - "ghcr.io/nagare-media/engine/function-generic-noop:dev"
               - "ghcr.io/nagare-media/engine/function-generic-sleep:dev"
               - "ghcr.io/nagare-media/engine/function-media-encode:dev"
@@ -266,6 +267,7 @@ deploy:
               - "ghcr.io/nagare-media/engine/function-media-metadata-technical:dev"
               - "ghcr.io/nagare-media/engine/function-media-package-hls:dev"
               - "ghcr.io/nagare-media/engine/function-script-lua:dev"
+              - "ghcr.io/nagare-media/engine/workflow-manager-helper:dev"
         - host:
             os: ["linux", "darwin"]
             command:
@@ -274,8 +276,9 @@ deploy:
               - "docker-image"
               - "--name"
               - "nagare-media-edge"
-              - "ghcr.io/nagare-media/engine/workflow-manager-helper:dev"
               - "ghcr.io/nagare-media/engine/function-data-buffer-fs:dev"
+              - "ghcr.io/nagare-media/engine/function-data-copy:dev"
+              - "ghcr.io/nagare-media/engine/function-data-discard:dev"
               - "ghcr.io/nagare-media/engine/function-generic-noop:dev"
               - "ghcr.io/nagare-media/engine/function-generic-sleep:dev"
               - "ghcr.io/nagare-media/engine/function-media-encode:dev"
@@ -284,6 +287,7 @@ deploy:
               - "ghcr.io/nagare-media/engine/function-media-metadata-technical:dev"
               - "ghcr.io/nagare-media/engine/function-media-package-hls:dev"
               - "ghcr.io/nagare-media/engine/function-script-lua:dev"
+              - "ghcr.io/nagare-media/engine/workflow-manager-helper:dev"
       after:
         # add test resources
         - host:
