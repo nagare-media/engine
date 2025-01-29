@@ -1,0 +1,212 @@
+{
+  "scheme": {
+    "uri": "urn:mpeg:mpegi:nbmp:2023"
+  },
+  "general": {
+    "id": "d08b10de-ea8e-422f-be57-9d32e3082765",
+    "name": "MMSys 2025",
+    "description": "MMSys 2025 evaluation workflow",
+    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1"
+  },
+  "input": {
+    "media-parameters": [{
+      "stream-id": "input",
+      "name": "input",
+      "protocol": "http",
+      "mode": "pull",
+      "caching-server-url": "https://shio-eu-c-public.s3.eu-central-003.backblazeb2.com/media/master/meridian.ts"
+    }]
+  },
+  "processing": {
+    "connection-map": [
+      {
+        "connection-id": "monitor --> script-lua",
+        "from": {
+          "id": "monitor",
+          "instance": "monitor",
+          "port-name": "stats",
+          "output-restrictions": {
+            "media-parameters": [{
+              "mode": "push"
+            }]
+          }
+        },
+        "to": {
+          "id": "script-lua",
+          "instance": "script-lua",
+          "port-name": "stats",
+          "input-restrictions": {
+            "media-parameters": [{
+              "mode": "push"
+            }]
+          }
+        }
+      },
+      {
+        "connection-id": "input --> input-buffer",
+        "from": {
+          "id": "input",
+          "output-restrictions": {
+            "media-parameters": [{
+              "mode": "pull"
+            }]
+          }
+        },
+        "to": {
+          "id": "input-buffer",
+          "instance": "input-buffer",
+          "port-name": "in",
+          "input-restrictions": {
+            "media-parameters": [{
+              "mode": "pull"
+            }]
+          }
+        }
+      },
+      {
+        "connection-id": "input-buffer --> media-source",
+        "from": {
+          "id": "input-buffer",
+          "instance": "input-buffer",
+          "port-name": "out",
+          "output-restrictions": {
+            "media-parameters": [{
+              "mode": "pull"
+            }]
+          }
+        },
+        "to": {
+          "id": "media-source",
+          "instance": "media-source",
+          "port-name": "in",
+          "input-restrictions": {
+            "media-parameters": [{
+              "mode": "pull"
+            }]
+          }
+        }
+      },
+      {
+        "connection-id": "media-source --> encode-240p-0-5",
+        "from": {
+          "id": "media-source",
+          "instance": "media-source",
+          "port-name": "out.240p-0-5"
+        },
+        "to": {
+          "id": "encode-240p-0-5",
+          "instance": "encode-240p-0-5",
+          "port-name": "in"
+        }
+      },
+      {
+        "connection-id": "encode-240p-0-5 --> packager",
+        "from": {
+          "id": "encode-240p-0-5",
+          "instance": "encode-240p-0-5",
+          "port-name": "out"
+        },
+        "to": {
+          "id": "packager",
+          "instance": "packager",
+          "port-name": "in-240p-0-5"
+        }
+      }
+    ],
+    "function-restrictions": [
+      {
+        "instance": "monitor",
+        "general": {
+          "id": "ClusterFunction/script-lua"
+        },
+        "configuration": {
+          "parameters": [
+            {
+              "name": "script-lua.engine.nagare.media/workflow-api",
+              "datatype": "string",
+              "values": [{"restrictions": ["http://gateway-nbmp.nagare-media-engine-system.svc.cluster.local:8080/v2/workflows"]}]
+            },
+            {
+              "name": "script-lua.engine.nagare.media/script",
+              "datatype": "string",
+              "values": [{"restrictions": ["data = {\n  \"{\\\"2160p-10\\\": 100, \\\"1440-7\\\": 100, \\\"1080-6\\\": 100, \\\"720p-3\\\": 100, \\\"480-1-5\\\": 100, \\\"360-1\\\": 100, \\\"240p-0-5\\\": 100}\",\n  \"{\\\"2160p-10\\\":   0, \\\"1440-7\\\":   0, \\\"1080-6\\\":   0, \\\"720p-3\\\":   0, \\\"480-1-5\\\":   0, \\\"360-1\\\":   0, \\\"240p-0-5\\\":   0}\",\n  \"{\\\"2160p-10\\\": 100, \\\"1440-7\\\": 100, \\\"1080-6\\\": 100, \\\"720p-3\\\": 100, \\\"480-1-5\\\": 100, \\\"360-1\\\": 100, \\\"240p-0-5\\\": 100}\",\n  \"{\\\"2160p-10\\\":   0, \\\"1440-7\\\":   0, \\\"1080-6\\\":   0, \\\"720p-3\\\":   0, \\\"480-1-5\\\":   0, \\\"360-1\\\":   0, \\\"240p-0-5\\\":   0}\",\n  \"{\\\"2160p-10\\\": 100, \\\"1440-7\\\": 100, \\\"1080-6\\\": 100, \\\"720p-3\\\": 100, \\\"480-1-5\\\": 100, \\\"360-1\\\": 100, \\\"240p-0-5\\\": 100}\",\n  \"{\\\"2160p-10\\\":   0, \\\"1440-7\\\":   0, \\\"1080-6\\\":   0, \\\"720p-3\\\":   0, \\\"480-1-5\\\":   0, \\\"360-1\\\":   0, \\\"240p-0-5\\\":   0}\",\n}\nstats_port = nme.get_output_port(\"stats\")\nfor _, stats in ipairs(data) do\n  stats_port:write_line(stats)\n  nme.sleep(\"2m\")\nend\nstats_port:close()\n"]}]
+            }
+          ]
+        }
+      },
+      {
+        "instance": "script-lua",
+        "general": {
+          "id": "ClusterFunction/script-lua"
+        },
+        "configuration": {
+          "parameters": [
+            {
+              "name": "script-lua.engine.nagare.media/workflow-api",
+              "datatype": "string",
+              "values": [{"restrictions": ["http://gateway-nbmp.nagare-media-engine-system.svc.cluster.local:8080/v2/workflows"]}]
+            },
+            {
+              "name": "script-lua.engine.nagare.media/script",
+              "datatype": "string",
+              "values": [{"restrictions": ["-- knowledge\nwf         = nbmp.Workflow:self()\nsrc_task   = wf:get_task(\"media-source\")\npkg_task   = wf:get_task(\"packager\")\nstats_port = nme.get_input_port(\"stats\")\nenc_ladder = {\n  [\"2160p-10\"] ={r=\"3840x2160\"; b=\"10000\"; min=20},\n  [ \"1440-7\"]  ={r=\"2560x1440\"; b= \"7000\"; min=10},\n  [ \"1080-6\"]  ={r=\"1920x1080\"; b= \"6000\"; min=10},\n  [ \"720p-3\"]  ={r=\"1280x720\";  b= \"3000\"; min= 5},\n  [  \"480-1-5\"]={r= \"854x480\";  b= \"1500\"; min= 5},\n  [  \"360-1\"]  ={r= \"640x360\";  b= \"1000\"; min= 1},\n  [ \"240p-0-5\"]={r= \"426x240\";  b=  \"500\"; min= 0}\n}\n\nwhile true do\n  -- analyze\n  stats_data = stats_port:read_line()\n  if not stats_data then break end\n\n  stats = json.parse(stats_data)\n  for enc, ladder in pairs(enc_ladder) do\n    enc_task = nbmp.Task:new({\n      id = \"encode-\"..enc,\n      function_restriction = {\n        id = \"ClusterFunction/media-encode\",\n        config = {\n          [\"media-encode.engine.nagare.media/resolution\"] = ladder.r,\n          [\"media-encode.engine.nagare.media/bitrate\"]    = ladder.b,\n        }\n      }\n    })\n\n    con_media = nbmp.Connection:new({\n      id   = src_task.id..\" --> \"..enc_task.id,\n      from = {task = src_task; port = \"out.\"..enc},\n      to   = {task = enc_task; port = \"in\"}\n    })\n\n    con_pkg = nbmp.Connection:new({\n      id   = enc_task.id..\" --> \"..pkg_task.id,\n      from = {task = enc_task; port = \"out\"},\n      to   = {task = pkg_task; port = \"in-\"..enc}\n    })\n\n    -- plan\n    if ladder.min <= stats[enc] then\n      nme.log(\"add encoding \"..enc)\n      wf:add_connection(con_media)\n      wf:add_connection(con_pkg)\n    else\n      nme.log(\"remove encoding \"..enc)\n      wf:remove_connection(con_media)\n      wf:remove_connection(con_pkg)\n    end\n  end\n\n  -- execute\n  nme.log(\"apply changes\")\n  wf:update()\nend\n"]}]
+            }
+          ]
+        }
+      },
+
+      {
+        "instance": "input-buffer",
+        "general": {
+          "id": "ClusterFunction/media-encode"
+        },
+        "configuration": {
+          "parameters": [
+            {
+              "name": "media-encode.engine.nagare.media/raw-input-args",
+              "datatype": "string",
+              "values": [{"restrictions": ["-re"]}]
+            },
+            {
+              "name": "media-encode.engine.nagare.media/raw-output-args",
+              "datatype": "string",
+              "values": [{"restrictions": ["-c:v copy"]}]
+            }
+          ]
+        }
+      },
+      {
+        "instance": "media-source",
+        "general": {
+          "id": "ClusterFunction/data-copy"
+        }
+      },
+      {
+        "instance": "encode-240p-0-5",
+        "general": {
+          "id": "ClusterFunction/media-encode"
+        },
+        "configuration": {
+          "parameters": [
+            {
+              "name": "media-encode.engine.nagare.media/bitrate",
+              "datatype": "string",
+              "values": [{"restrictions": ["500"]}]
+            },
+            {
+              "name": "media-encode.engine.nagare.media/resolution",
+              "datatype": "string",
+              "values": [{"restrictions": ["426x240"]}]
+            }
+          ]
+        }
+      },
+      {
+        "instance": "packager",
+        "general": {
+          "id": "ClusterFunction/data-discard"
+        }
+      }
+    ]
+  }
+}

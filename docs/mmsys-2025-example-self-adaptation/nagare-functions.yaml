@@ -1,0 +1,303 @@
+apiVersion: engine.nagare.media/v1alpha1
+kind: ClusterFunction
+metadata:
+  labels:
+    app.kubernetes.io/name: function
+    app.kubernetes.io/instance: data-copy
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+    beta.engine.nagare.media/function-type: data
+  name: data-copy
+spec:
+  version: 0.0.1
+  template: # JobTemplate
+    spec:
+      template: # PodTemplate
+        spec:
+          restartPolicy: Never # recreate pod by job controller
+          terminationGracePeriodSeconds: 35
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          containers:
+            - name: function
+              image: ghcr.io/nagare-media/engine/function-data-copy:mmsys-2025
+              imagePullPolicy: IfNotPresent
+              ports:
+                - name: stream-http
+                  containerPort: 8080
+                  protocol: TCP
+                - name: task-api
+                  containerPort: 8888
+                  protocol: TCP
+              startupProbe:
+                failureThreshold: 60
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: task-api
+              readinessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /readyz
+                  port: task-api
+              livenessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: task-api
+            - name: workflow-manager-helper
+              image: ghcr.io/nagare-media/engine/workflow-manager-helper:mmsys-2025
+              imagePullPolicy: IfNotPresent
+              ports:
+                - name: event-api
+                  containerPort: 8181
+                  protocol: TCP
+              startupProbe:
+                failureThreshold: 60
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: event-api
+              readinessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /readyz
+                  port: event-api
+              livenessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: event-api
+              resources:
+                requests:
+                  cpu: 100m
+---
+apiVersion: engine.nagare.media/v1alpha1
+kind: ClusterFunction
+metadata:
+  labels:
+    app.kubernetes.io/name: function
+    app.kubernetes.io/instance: data-discard
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+    beta.engine.nagare.media/function-type: data
+  name: data-discard
+spec:
+  version: 0.0.1
+  template: # JobTemplate
+    spec:
+      template: # PodTemplate
+        spec:
+          restartPolicy: Never # recreate pod by job controller
+          terminationGracePeriodSeconds: 35
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          containers:
+            - name: function
+              image: ghcr.io/nagare-media/engine/function-data-discard:mmsys-2025
+              imagePullPolicy: IfNotPresent
+              ports:
+                - name: stream-http
+                  containerPort: 8080
+                  protocol: TCP
+                - name: task-api
+                  containerPort: 8888
+                  protocol: TCP
+              startupProbe:
+                failureThreshold: 60
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: task-api
+              readinessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /readyz
+                  port: task-api
+              livenessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: task-api
+            - name: workflow-manager-helper
+              image: ghcr.io/nagare-media/engine/workflow-manager-helper:mmsys-2025
+              imagePullPolicy: IfNotPresent
+              ports:
+                - name: event-api
+                  containerPort: 8181
+                  protocol: TCP
+              startupProbe:
+                failureThreshold: 60
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: event-api
+              readinessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /readyz
+                  port: event-api
+              livenessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: event-api
+              resources:
+                requests:
+                  cpu: 100m
+---
+apiVersion: engine.nagare.media/v1alpha1
+kind: ClusterFunction
+metadata:
+  labels:
+    app.kubernetes.io/name: function
+    app.kubernetes.io/instance: media-encode
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+    beta.engine.nagare.media/function-type: media
+  name: media-encode
+spec:
+  version: 0.0.1
+  template: # JobTemplate
+    spec:
+      template: # PodTemplate
+        spec:
+          restartPolicy: Never # recreate pod by job controller
+          terminationGracePeriodSeconds: 35
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          containers:
+            - name: function
+              image: ghcr.io/nagare-media/engine/function-media-encode:mmsys-2025
+              imagePullPolicy: IfNotPresent
+              ports:
+                - name: stream-http
+                  containerPort: 8080
+                  protocol: TCP
+                - name: task-api
+                  containerPort: 8888
+                  protocol: TCP
+              startupProbe:
+                failureThreshold: 60
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: task-api
+              readinessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /readyz
+                  port: task-api
+              livenessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: task-api
+            - name: workflow-manager-helper
+              image: ghcr.io/nagare-media/engine/workflow-manager-helper:mmsys-2025
+              imagePullPolicy: IfNotPresent
+              ports:
+                - name: event-api
+                  containerPort: 8181
+                  protocol: TCP
+              startupProbe:
+                failureThreshold: 60
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: event-api
+              readinessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /readyz
+                  port: event-api
+              livenessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: event-api
+              resources:
+                requests:
+                  cpu: 4000m
+---
+apiVersion: engine.nagare.media/v1alpha1
+kind: ClusterFunction
+metadata:
+  labels:
+    app.kubernetes.io/name: function
+    app.kubernetes.io/instance: script-lua
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/part-of: nagare-media-engine
+    app.kubernetes.io/created-by: nagare-media-engine
+    beta.engine.nagare.media/function-type: script
+  name: script-lua
+spec:
+  version: 0.0.1
+  template: # JobTemplate
+    spec:
+      template: # PodTemplate
+        spec:
+          restartPolicy: Never # recreate pod by job controller
+          terminationGracePeriodSeconds: 35
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          containers:
+            - name: function
+              image: ghcr.io/nagare-media/engine/function-script-lua:mmsys-2025
+              imagePullPolicy: IfNotPresent
+              ports:
+                - name: stream-http
+                  containerPort: 8080
+                  protocol: TCP
+                - name: task-api
+                  containerPort: 8888
+                  protocol: TCP
+              startupProbe:
+                failureThreshold: 60
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: task-api
+              readinessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /readyz
+                  port: task-api
+              livenessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: task-api
+            - name: workflow-manager-helper
+              image: ghcr.io/nagare-media/engine/workflow-manager-helper:mmsys-2025
+              imagePullPolicy: IfNotPresent
+              ports:
+                - name: event-api
+                  containerPort: 8181
+                  protocol: TCP
+              startupProbe:
+                failureThreshold: 60
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: event-api
+              readinessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /readyz
+                  port: event-api
+              livenessProbe:
+                periodSeconds: 2
+                httpGet:
+                  path: /healthz
+                  port: event-api
+              resources:
+                requests:
+                  cpu: 500m
