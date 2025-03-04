@@ -84,6 +84,7 @@ func (w *Workflow) Update(L *luar.LState) int {
 		}
 
 		w.Data = wf
+		w.changed = false
 	}
 	return 0
 }
