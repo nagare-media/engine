@@ -34,9 +34,12 @@ import (
 	engineio "github.com/nagare-media/engine/internal/functions/io"
 	"github.com/nagare-media/engine/internal/pkg/backoff"
 	nbmpconvv2 "github.com/nagare-media/engine/internal/pkg/nbmpconv/v2"
+	"github.com/nagare-media/engine/pkg/http"
 	"github.com/nagare-media/engine/pkg/starter"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
+
+const CloseTimeout = 1 * time.Minute
 
 type port struct {
 	mtx sync.Mutex
@@ -51,6 +54,8 @@ type port struct {
 	con    engineio.Connection
 	pr     *io.PipeReader
 	pw     *io.PipeWriter
+
+	closeTimer *time.Timer
 }
 
 var _ engineio.Port = &port{}
@@ -166,7 +171,13 @@ func (p *port) MountTo(srv engineio.Server) error {
 
 func (p *port) getRequest(ctx context.Context) error {
 	// input (pull)
-	l := log.FromContext(ctx)
+
+	// only one request at a time
+	p.mtx.Lock()
+	defer p.mtx.Unlock()
+
+	l := log.FromContext(ctx, "port", p.Name())
+	ctx = log.IntoContext(ctx, l)
 
 	op := func() error {
 		req := fasthttp.AcquireRequest()
@@ -188,15 +199,19 @@ func (p *port) getRequest(ctx context.Context) error {
 			return fmt.Errorf("event: unexpected HTTP status code in response: %d", resp.StatusCode())
 		}
 
+		// At this point we will at least try to read from the response once. We will therefore defer closing this port with
+		// the closing timeout. In case of a retry, closing the port will be aborted.
+		if !p.abortCloseTimer(ctx) {
+			return errors.New("already closing")
+		}
+		defer p.initCloseTimer(ctx)
+
 		n, err := p.ReadFrom(resp.BodyStream())
 		// TODO: deal with "n > 0"
 		_ = n
 		if err != nil {
 			return err
 		}
-
-		// TODO: how do we know, that no additional requests are coming?
-		p.Close()
 
 		return nil
 	}
@@ -210,7 +225,13 @@ func (p *port) getRequest(ctx context.Context) error {
 
 func (p *port) postRequest(ctx context.Context) error {
 	// output (push)
-	l := log.FromContext(ctx)
+
+	// only one request at a time
+	p.mtx.Lock()
+	defer p.mtx.Unlock()
+
+	l := log.FromContext(ctx, "port", p.Name())
+	ctx = log.IntoContext(ctx, l)
 
 	op := func() error {
 		req := fasthttp.AcquireRequest()
@@ -271,6 +292,14 @@ func (p *port) handlePost(c *fiber.Ctx) error {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 
+	ctx := http.ContextFromFiberCtx(c)
+	ctx = log.IntoContext(ctx, log.FromContext(ctx, "port", p.Name()))
+
+	// check if we started a close timer
+	if !p.abortCloseTimer(ctx) {
+		return fiber.ErrGone
+	}
+
 	var err error
 	if c.Request().IsBodyStream() {
 		defer func() {
@@ -285,11 +314,35 @@ func (p *port) handlePost(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	// TODO: how do we know, that no additional requests are coming?
-	// p.Close()
+	// start timer to close port
+	p.initCloseTimer(ctx)
 
 	c.Status(fiber.StatusCreated)
 	return nil
+}
+
+func (p *port) abortCloseTimer(ctx context.Context) bool {
+	// assumes p.mtx is locked
+
+	l := log.FromContext(ctx)
+	if p.closeTimer == nil {
+		return true
+	}
+	l.Info("aborting timer to close port")
+	return p.closeTimer.Stop()
+}
+
+func (p *port) initCloseTimer(ctx context.Context) {
+	// assumes p.mtx is locked
+
+	l := log.FromContext(ctx)
+	l.Info("stopped receiving data")
+	l.Info("starting timer to close port")
+	// TODO: make timeout configurable
+	p.closeTimer = time.AfterFunc(CloseTimeout, func() {
+		p.Close()
+		l.Info("port closed")
+	})
 }
 
 func NewInputPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engineio.InputPort, error) {
