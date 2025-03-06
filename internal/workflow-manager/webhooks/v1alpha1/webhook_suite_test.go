@@ -39,6 +39,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
@@ -77,7 +79,7 @@ var _ = BeforeSuite(func() {
 	Expect(cfg).NotTo(BeNil())
 
 	scheme := runtime.NewScheme()
-	err = AddToScheme(scheme)
+	err = enginev1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = admissionv1beta1.AddToScheme(scheme)
@@ -103,34 +105,34 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&Function{}).SetupWebhookWithManager(mgr)
+	err = SetupFunctionWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&ClusterFunction{}).SetupWebhookWithManager(mgr)
+	err = SetupClusterFunctionWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&MediaLocation{}).SetupWebhookWithManager(mgr)
+	err = SetupMediaLocationWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&ClusterMediaLocation{}).SetupWebhookWithManager(mgr)
+	err = SetupClusterMediaLocationWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&MediaProcessingEntity{}).SetupWebhookWithManager(mgr)
+	err = SetupMediaProcessingEntityWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&ClusterMediaProcessingEntity{}).SetupWebhookWithManager(mgr)
+	err = SetupClusterMediaProcessingEntityWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&TaskTemplate{}).SetupWebhookWithManager(mgr)
+	err = SetupTaskTemplateWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&ClusterTaskTemplate{}).SetupWebhookWithManager(mgr)
+	err = SetupClusterTaskTemplateWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&Task{}).SetupWebhookWithManager(mgr)
+	err = SetupTaskWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&Workflow{}).SetupWebhookWithManager(mgr)
+	err = SetupWorkflowWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	// +kubebuilder:scaffold:webhook
