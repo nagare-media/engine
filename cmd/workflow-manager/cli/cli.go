@@ -46,6 +46,7 @@ import (
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/internal/pkg/version"
 	"github.com/nagare-media/engine/internal/workflow-manager/controllers"
+	webhooksv1 "github.com/nagare-media/engine/internal/workflow-manager/webhooks/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -162,43 +163,43 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	if err = (&enginev1.Function{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupFunctionWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Function")
 		return err
 	}
-	if err = (&enginev1.ClusterFunction{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupClusterFunctionWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ClusterFunction")
 		return err
 	}
-	if err = (&enginev1.MediaLocation{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupMediaLocationWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "MediaLocation")
 		return err
 	}
-	if err = (&enginev1.ClusterMediaLocation{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupClusterMediaLocationWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ClusterMediaLocation")
 		return err
 	}
-	if err = (&enginev1.MediaProcessingEntity{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupMediaProcessingEntityWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "MediaProcessingEntity")
 		return err
 	}
-	if err = (&enginev1.ClusterMediaProcessingEntity{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupClusterMediaProcessingEntityWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ClusterMediaProcessingEntity")
 		return err
 	}
-	if err = (&enginev1.TaskTemplate{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupTaskTemplateWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "TaskTemplate")
 		return err
 	}
-	if err = (&enginev1.ClusterTaskTemplate{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupClusterTaskTemplateWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ClusterTaskTemplate")
 		return err
 	}
-	if err = (&enginev1.Task{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupTaskWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Task")
 		return err
 	}
-	if err = (&enginev1.Workflow{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = webhooksv1.SetupWorkflowWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Workflow")
 		return err
 	}
