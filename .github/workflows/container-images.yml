@@ -39,7 +39,7 @@ jobs:
           - workflow-vacuum
 
     env:
-      IMAGE_PLATFORMS: linux/amd64,linux/arm,linux/arm64,linux/ppc64le,linux/s390x
+      IMAGE_PLATFORMS: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
 
     steps:
       - uses: actions/checkout@v4
