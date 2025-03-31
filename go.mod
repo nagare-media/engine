@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/cenkalti/backoff/v5 v5.0.2
-	github.com/cloudevents/sdk-go/v2 v2.15.2
+	github.com/cloudevents/sdk-go/v2 v2.16.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-logr/logr v1.4.2
 	github.com/go-viper/mapstructure/v2 v2.2.1
@@ -16,7 +16,7 @@ require (
 	github.com/inhies/go-bytesize v0.0.0-20220417184213-4913239db9cf
 	github.com/mattn/go-isatty v0.0.20
 	github.com/nagare-media/models.go v0.0.0-20250108160023-98fa97a2d480
-	github.com/nats-io/nats.go v1.39.1
+	github.com/nats-io/nats.go v1.40.1
 	github.com/onsi/ginkgo/v2 v2.23.3
 	github.com/onsi/gomega v1.36.3
 	github.com/smallnest/ringbuffer v0.0.0-20241129171057-356c688ba81d
@@ -31,7 +31,7 @@ require (
 	k8s.io/component-base v0.32.3
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/utils v0.0.0-20241210054802-24370beab758
-	sigs.k8s.io/controller-runtime v0.20.3
+	sigs.k8s.io/controller-runtime v0.20.4
 	sigs.k8s.io/kustomize/kyaml v0.19.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -64,7 +64,7 @@ require (
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
