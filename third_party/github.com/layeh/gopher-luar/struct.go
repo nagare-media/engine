@@ -3,7 +3,7 @@ package luar
 import (
 	"reflect"
 
-	"github.com/yuin/gopher-lua"
+	lua "github.com/yuin/gopher-lua"
 )
 
 func structIndex(L *lua.LState) int {
@@ -22,7 +22,7 @@ func structIndex(L *lua.LState) int {
 	}
 	field := ref.FieldByIndex(index)
 	if !field.CanInterface() {
-		L.RaiseError("cannot interface field " + key)
+		L.RaiseError("cannot interface field %s", key)
 	}
 
 	if (field.Kind() == reflect.Struct || field.Kind() == reflect.Array) && field.CanAddr() {
@@ -54,7 +54,7 @@ func structPtrIndex(L *lua.LState) int {
 	}
 	field := ref.FieldByIndex(index)
 	if !field.CanInterface() {
-		L.RaiseError("cannot interface field " + key)
+		L.RaiseError("cannot interface field %s", key)
 	}
 
 	if (field.Kind() == reflect.Struct || field.Kind() == reflect.Array) && field.CanAddr() {
@@ -74,11 +74,11 @@ func structPtrNewIndex(L *lua.LState) int {
 
 	index := mt.fieldIndex(key)
 	if index == nil {
-		L.RaiseError("unknown field " + key)
+		L.RaiseError("unknown field %s", key)
 	}
 	field := ref.FieldByIndex(index)
 	if !field.CanSet() {
-		L.RaiseError("cannot set field " + key)
+		L.RaiseError("cannot set field %s", key)
 	}
 	val, err := lValueToReflect(L, value, field.Type(), nil)
 	if err != nil {
