@@ -3,7 +3,7 @@ package luar
 import (
 	"reflect"
 
-	"github.com/yuin/gopher-lua"
+	lua "github.com/yuin/gopher-lua"
 )
 
 func checkPtr(L *lua.LState, idx int) (ref reflect.Value, mt *Metatable) {
@@ -57,7 +57,7 @@ func ptrUnm(L *lua.LState) int {
 	ref, _ := checkPtr(L, 1)
 	elem := ref.Elem()
 	if !elem.CanInterface() {
-		L.RaiseError("cannot interface pointer type " + elem.String())
+		L.RaiseError("cannot interface pointer type %s", elem.String())
 	}
 	L.Push(New(L, elem.Interface()))
 	return 1
