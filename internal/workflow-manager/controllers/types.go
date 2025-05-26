@@ -26,14 +26,12 @@ import (
 type EnsureFunc[T any] func(context.Context, T) (Result, error)
 
 type Result struct {
-	Requeue      bool
 	RequeueAfter time.Duration
 	Stop         bool
 }
 
 func (r *Result) ReconcileResult() reconcile.Result {
 	return reconcile.Result{
-		Requeue:      r.Requeue,
 		RequeueAfter: r.RequeueAfter,
 	}
 }
