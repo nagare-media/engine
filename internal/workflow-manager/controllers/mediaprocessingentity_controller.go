@@ -433,10 +433,9 @@ func (r *MediaProcessingEntityReconciler) newRemoteManager(ctx context.Context, 
 		return nil, err
 	}
 
-	// these options are set by controller-runtime as well (see config.GetConfigWithContext)
+	// disable client-side rate limiter (default for controller-runtime, see config.GetConfigWithContext)
 	if restConfig.QPS == 0.0 {
-		restConfig.QPS = 20.0
-		restConfig.Burst = 30.0
+		restConfig.QPS = -1
 	}
 
 	// set namespace
