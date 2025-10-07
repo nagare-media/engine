@@ -24,10 +24,6 @@ import (
 
 type ctxLocalKey struct{}
 
-type ContextLoader interface {
-	LoadContext() context.Context
-}
-
 func ContextMiddleware(ctxLoader func() context.Context) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		c.Locals(ctxLocalKey{}, ctxLoader())
