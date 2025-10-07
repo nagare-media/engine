@@ -116,7 +116,7 @@ func (p *port) MountTo(srv engineio.Server) error {
 }
 
 func NewInputPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engineio.InputPort, error) {
-	sp, err := newInputSubPortFor(p, mp)
+	sp, err := newInputWrappedPortFor(p, mp)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func NewInputPortForPortSize(p engineio.InputPort, size int) (engineio.InputPort
 	return port, nil
 }
 
-func newInputSubPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engineio.InputPort, error) {
+func newInputWrappedPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engineio.InputPort, error) {
 	mp, err := rewriteMediaOrMetadataParameter(mp)
 	if err != nil {
 		return nil, err
@@ -143,7 +143,7 @@ func newInputSubPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engi
 }
 
 func NewOutputPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engineio.OutputPort, error) {
-	sp, err := newOutputSubPortFor(p, mp)
+	sp, err := newOutputWrappedPortFor(p, mp)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func NewOutputPortForPortSize(p engineio.OutputPort, size int) (engineio.OutputP
 	return newPortForPortSize(p, size), nil
 }
 
-func newOutputSubPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engineio.OutputPort, error) {
+func newOutputWrappedPortFor(p nbmpv2.Port, mp nbmpv2.MediaOrMetadataParameter) (engineio.OutputPort, error) {
 	mp, err := rewriteMediaOrMetadataParameter(mp)
 	if err != nil {
 		return nil, err
