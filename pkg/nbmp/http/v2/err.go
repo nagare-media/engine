@@ -18,6 +18,7 @@ package v2
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -76,4 +77,35 @@ func handleErr(c *fiber.Ctx, obj any, svcErr error, contentType string) error {
 	}
 
 	return c.Send(respBody)
+}
+
+func handleStatusCode(status int) error {
+	switch status {
+	case http.StatusAccepted: // 202
+		return nbmp.ErrRetryLater
+
+	case http.StatusBadRequest: // 400
+		return nbmp.ErrInvalid
+
+	case http.StatusUnauthorized: // 401
+		return nbmp.ErrUnauthenticated
+
+	case http.StatusForbidden: // 403
+		return nbmp.ErrUnauthorized
+
+	case http.StatusNotFound: // 404
+		return nbmp.ErrNotFound
+
+	case http.StatusConflict: // 409
+		return nbmp.ErrAlreadyExists
+
+	case http.StatusUnprocessableEntity: // 422
+		return nbmp.ErrUnsupported
+	}
+
+	if 200 <= status && status <= 299 {
+		return nil
+	}
+
+	return nbmp.ErrUnexpected
 }
