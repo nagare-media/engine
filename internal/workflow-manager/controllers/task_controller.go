@@ -59,7 +59,7 @@ const (
 const (
 	internalInitTaskPhase   = enginev1.TaskPhase("InternalInit")
 	internalDeleteTaskPhase = enginev1.TaskPhase("InternalDelete")
-	internalNormalTaskPhase = enginev1.TaskPhase("InternalAlways")
+	internalNormalTaskPhase = enginev1.TaskPhase("InternalNormal")
 )
 
 const (
