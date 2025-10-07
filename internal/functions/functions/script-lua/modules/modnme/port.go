@@ -48,6 +48,9 @@ func (p *Port) ReadLine(L *luar.LState) int {
 	if p.scanner.Scan() {
 		L.Push(lua.LString(p.scanner.Text()))
 		return 1
+	} else if err := p.scanner.Err(); err != nil {
+		// scan returned false not because of EOF
+		return modules.Error(L.LState, err)
 	}
 
 	L.Push(lua.LNil)
