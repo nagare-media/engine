@@ -16,7 +16,7 @@ limitations under the License.
 
 package updatable
 
-type TransformFunc[T any, U any] func(v T) (U, error)
+type TransformFunc[T, U any] func(v T) (U, error)
 
 func IdentityTransform[T any](v T) (T, error) {
 	return v, nil

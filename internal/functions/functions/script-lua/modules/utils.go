@@ -41,7 +41,7 @@ func TypeConstructor(L *lua.LState, t any) error {
 	// arg 2 => table (LTable)
 
 	ltbl := L.OptTable(2, L.CreateTable(0, 0))
-	tbl, err := luar.ConvertTo(L, ltbl, map[interface{}]interface{}{})
+	tbl, err := luar.ConvertTo(L, ltbl, map[any]any{})
 	if err != nil {
 		return err
 	}

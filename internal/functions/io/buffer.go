@@ -21,7 +21,7 @@ import "sync"
 const BufferSize = 32 * 1024
 
 var bufferPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		b := make([]byte, BufferSize)
 		return &b
 	},

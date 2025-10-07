@@ -34,7 +34,7 @@ type updatableFile[T any] struct {
 	tFn TransformFunc[[]byte, T]
 }
 
-var _ Updatable[interface{}] = &updatableFile[interface{}]{}
+var _ Updatable[any] = &updatableFile[any]{}
 
 func NewFile(f string, bufSize ...int) (Updatable[[]byte], error) {
 	return NewFileWithTransform(f, IdentityTransform, bufSize...)

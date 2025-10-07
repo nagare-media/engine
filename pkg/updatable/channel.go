@@ -26,7 +26,7 @@ type updatableChannel[T any] struct {
 	subs []chan VersionedValue[T] // protected by mtx
 }
 
-var _ Updatable[interface{}] = &updatableChannel[interface{}]{}
+var _ Updatable[any] = &updatableChannel[any]{}
 
 func NewChannel[T any](bufSize ...int) Updatable[T] {
 	bs := 0
