@@ -25,14 +25,15 @@ import (
 var (
 	DefaultWorkflowManagerConfig = WorkflowManagerConfig{
 		WorkflowManagerConfigSpec: WorkflowManagerConfigSpec{
+			Controller:                         DefaultControllerConfig,
 			Cache:                              DefaultCacheConfig,
 			LeaderElection:                     DefaultLeaderElectionConfig,
 			Metrics:                            DefaultMetricsConfig,
 			Health:                             DefaultHealthConfig,
 			Webhook:                            DefaultWebhookConfig,
+			NATS:                               DefaultNATSConfig,
 			WorkflowTerminationWaitingDuration: &metav1.Duration{Duration: 20 * time.Second},
 			RemoteMediaProcessingEntityStabilizingDuration: &metav1.Duration{Duration: 5 * time.Second},
-			NATS: DefaultNATSConfig,
 		},
 	}
 )
