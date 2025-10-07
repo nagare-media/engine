@@ -1,11 +1,10 @@
 {
   "scheme": {
-    "uri": "urn:mpeg:mpegi:nbmp:2023"
+    "uri": "urn:mpeg:mpegi:nbmp:2020"
   },
   "general": {
     "id": "6ca5cc44-9e7b-4104-b3df-e11b84c26e42",
-    "name": "sleep",
-    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1"
+    "name": "sleep"
   },
   "configuration": {
     "parameters": [

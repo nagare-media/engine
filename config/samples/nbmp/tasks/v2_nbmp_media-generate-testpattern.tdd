@@ -1,11 +1,10 @@
 {
   "scheme": {
-    "uri": "urn:mpeg:mpegi:nbmp:2023"
+    "uri": "urn:mpeg:mpegi:nbmp:2020"
   },
   "general": {
     "id": "cabb66bf-082d-45c5-a58d-3adc48e1f9fc",
     "name": "media-generate-testpattern",
-    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1",
     "output-ports": [{
       "port-name": "out.0",
       "bind": {

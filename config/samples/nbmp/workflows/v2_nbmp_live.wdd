@@ -1,12 +1,11 @@
 {
   "scheme": {
-    "uri": "urn:mpeg:mpegi:nbmp:2023"
+    "uri": "urn:mpeg:mpegi:nbmp:2020"
   },
   "general": {
     "id": "d08b10de-ea8e-422f-be57-9d32e3082765",
     "name": "live",
-    "description": "An example workflow that generates a live stream.",
-    "nbmp-brand": "urn:nagare-media:engine:schema:nbmp:v1"
+    "description": "An example workflow that generates a live stream."
   },
   "processing": {
     "connection-map": [{
