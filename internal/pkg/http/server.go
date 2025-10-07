@@ -25,6 +25,7 @@ import (
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 	"github.com/nagare-media/engine/pkg/http"
+	"github.com/nagare-media/engine/pkg/starter"
 )
 
 type server struct {
@@ -33,6 +34,8 @@ type server struct {
 	cfg *enginev1.WebserverConfig
 	ctx context.Context
 }
+
+var _ starter.Starter = &server{}
 
 func NewServer(cfg *enginev1.WebserverConfig) *server {
 	s := &server{

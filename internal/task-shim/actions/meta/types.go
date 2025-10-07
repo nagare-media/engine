@@ -20,6 +20,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"k8s.io/utils/ptr"
+
 	"github.com/nagare-media/engine/internal/task-shim/actions"
 )
 
@@ -31,6 +33,8 @@ const (
 
 // ConfigType of the meta action.
 type ConfigType string
+
+var _ json.Unmarshaler = ptr.To(ConfigType(""))
 
 const (
 	StartTaskConfigType   = ConfigType("start-task")
