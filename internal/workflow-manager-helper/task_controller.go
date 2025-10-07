@@ -341,7 +341,7 @@ func (c *taskCtrl) observerLoop(ctx context.Context) error {
 				failedProbes = 0
 
 			default:
-				l.Error(fmt.Errorf("unknown .general.status '%s'", *tsk.General.State), "probe failed")
+				l.Error(fmt.Errorf("unknown .general.state '%s'", *tsk.General.State), "probe failed")
 				failedProbes++
 				continue
 			}
