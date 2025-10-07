@@ -70,7 +70,7 @@ func (p *port) Start(ctx context.Context) error {
 		// │ handlePost │──Server──▶│ p │──Start──▶│ con │
 		// └────────────┘           └───┘          └─────┘
 		defer p.con.Close()
-		_, err := io.Copy(p.con, p.pr)
+		_, err := p.con.ReadFrom(p.pr)
 		if err != nil {
 			return err
 		}
