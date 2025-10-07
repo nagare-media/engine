@@ -26,40 +26,41 @@ import (
 
 	"github.com/nagare-media/engine/internal/pkg/mime"
 	"github.com/nagare-media/engine/pkg/nbmp"
+	nbmpclientv2 "github.com/nagare-media/engine/pkg/nbmp/client/v2"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-type httpWorkflowClient struct {
+type workflowClient struct {
 	Endpoint string
 	HTTP     http.Client
 }
 
-var _ WorkflowClient = &httpWorkflowClient{}
+var _ nbmpclientv2.WorkflowClient = &workflowClient{}
 
-func NewWorkflowClient(url string) *httpWorkflowClient {
-	return &httpWorkflowClient{
+func WorkflowClient(url string) *workflowClient {
+	return &workflowClient{
 		Endpoint: url,
 		HTTP:     http.Client{},
 	}
 }
 
-func (c *httpWorkflowClient) Create(ctx context.Context, wf *nbmpv2.Workflow) (*nbmpv2.Workflow, error) {
+func (c *workflowClient) Create(ctx context.Context, wf *nbmpv2.Workflow) (*nbmpv2.Workflow, error) {
 	return c.request(ctx, http.MethodPost, c.Endpoint, wf)
 }
 
-func (c *httpWorkflowClient) Update(ctx context.Context, wf *nbmpv2.Workflow) (*nbmpv2.Workflow, error) {
+func (c *workflowClient) Update(ctx context.Context, wf *nbmpv2.Workflow) (*nbmpv2.Workflow, error) {
 	return c.request(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", c.Endpoint, wf.General.ID), wf)
 }
 
-func (c *httpWorkflowClient) Delete(ctx context.Context, id string) (*nbmpv2.Workflow, error) {
+func (c *workflowClient) Delete(ctx context.Context, id string) (*nbmpv2.Workflow, error) {
 	return c.request(ctx, http.MethodDelete, fmt.Sprintf("%s/%s", c.Endpoint, id), nil)
 }
 
-func (c *httpWorkflowClient) Retrieve(ctx context.Context, id string) (*nbmpv2.Workflow, error) {
+func (c *workflowClient) Retrieve(ctx context.Context, id string) (*nbmpv2.Workflow, error) {
 	return c.request(ctx, http.MethodGet, fmt.Sprintf("%s/%s", c.Endpoint, id), nil)
 }
 
-func (c *httpWorkflowClient) request(ctx context.Context, method, endpoint string, wf *nbmpv2.Workflow) (*nbmpv2.Workflow, error) {
+func (c *workflowClient) request(ctx context.Context, method, endpoint string, wf *nbmpv2.Workflow) (*nbmpv2.Workflow, error) {
 	buf := bytes.Buffer{}
 	if wf != nil {
 		enc := json.NewEncoder(&buf)
@@ -85,7 +86,7 @@ func (c *httpWorkflowClient) request(ctx context.Context, method, endpoint strin
 	return wf, err
 }
 
-func (c *httpWorkflowClient) doRequest(ctx context.Context, method, endpoint string, body io.Reader) (io.ReadCloser, error) {
+func (c *workflowClient) doRequest(ctx context.Context, method, endpoint string, body io.Reader) (io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, method, endpoint, body)
 	if err != nil {
 		return nil, err

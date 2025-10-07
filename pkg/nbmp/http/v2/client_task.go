@@ -26,40 +26,41 @@ import (
 
 	"github.com/nagare-media/engine/internal/pkg/mime"
 	"github.com/nagare-media/engine/pkg/nbmp"
+	nbmpclientv2 "github.com/nagare-media/engine/pkg/nbmp/client/v2"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
 
-type httpTaskClient struct {
+type taskClient struct {
 	Endpoint string
 	HTTP     http.Client
 }
 
-var _ TaskClient = &httpTaskClient{}
+var _ nbmpclientv2.TaskClient = &taskClient{}
 
-func NewTaskClient(url string) *httpTaskClient {
-	return &httpTaskClient{
+func TaskClient(url string) *taskClient {
+	return &taskClient{
 		Endpoint: url,
 		HTTP:     http.Client{},
 	}
 }
 
-func (c *httpTaskClient) Create(ctx context.Context, tsk *nbmpv2.Task) (*nbmpv2.Task, error) {
+func (c *taskClient) Create(ctx context.Context, tsk *nbmpv2.Task) (*nbmpv2.Task, error) {
 	return c.request(ctx, http.MethodPost, c.Endpoint, tsk)
 }
 
-func (c *httpTaskClient) Update(ctx context.Context, tsk *nbmpv2.Task) (*nbmpv2.Task, error) {
+func (c *taskClient) Update(ctx context.Context, tsk *nbmpv2.Task) (*nbmpv2.Task, error) {
 	return c.request(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", c.Endpoint, tsk.General.ID), tsk)
 }
 
-func (c *httpTaskClient) Delete(ctx context.Context, id string) (*nbmpv2.Task, error) {
+func (c *taskClient) Delete(ctx context.Context, id string) (*nbmpv2.Task, error) {
 	return c.request(ctx, http.MethodDelete, fmt.Sprintf("%s/%s", c.Endpoint, id), nil)
 }
 
-func (c *httpTaskClient) Retrieve(ctx context.Context, id string) (*nbmpv2.Task, error) {
+func (c *taskClient) Retrieve(ctx context.Context, id string) (*nbmpv2.Task, error) {
 	return c.request(ctx, http.MethodGet, fmt.Sprintf("%s/%s", c.Endpoint, id), nil)
 }
 
-func (c *httpTaskClient) request(ctx context.Context, method, endpoint string, tsk *nbmpv2.Task) (*nbmpv2.Task, error) {
+func (c *taskClient) request(ctx context.Context, method, endpoint string, tsk *nbmpv2.Task) (*nbmpv2.Task, error) {
 	buf := bytes.Buffer{}
 	if tsk != nil {
 		enc := json.NewEncoder(&buf)
@@ -85,7 +86,7 @@ func (c *httpTaskClient) request(ctx context.Context, method, endpoint string, t
 	return tsk, err
 }
 
-func (c *httpTaskClient) doRequest(ctx context.Context, method, endpoint string, body io.Reader) (io.ReadCloser, error) {
+func (c *taskClient) doRequest(ctx context.Context, method, endpoint string, body io.Reader) (io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, method, endpoint, body)
 	if err != nil {
 		return nil, err

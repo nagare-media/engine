@@ -41,6 +41,7 @@ import (
 	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmpclientv2 "github.com/nagare-media/engine/pkg/nbmp/client/v2"
+	nbmphttpv2 "github.com/nagare-media/engine/pkg/nbmp/http/v2"
 	"github.com/nagare-media/engine/pkg/starter"
 	"github.com/nagare-media/engine/pkg/updatable"
 	"github.com/nagare-media/models.go/base"
@@ -76,7 +77,7 @@ func NewTaskController(cfg *enginev1.WorkflowManagerHelperConfig, data updatable
 	return &taskCtrl{
 		cfg:    cfg,
 		data:   data,
-		client: nbmpclientv2.NewTaskClient(cfg.TaskController.TaskAPI),
+		client: nbmphttpv2.TaskClient(cfg.TaskController.TaskAPI),
 	}
 }
 

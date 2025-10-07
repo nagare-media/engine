@@ -25,7 +25,7 @@ import (
 
 	"github.com/nagare-media/engine/internal/functions/functions/script-lua/modules"
 	nbmpconvv2 "github.com/nagare-media/engine/internal/pkg/nbmpconv/v2"
-	nbmpclientv2 "github.com/nagare-media/engine/pkg/nbmp/client/v2"
+	nbmphttpv2 "github.com/nagare-media/engine/pkg/nbmp/http/v2"
 	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )
@@ -62,7 +62,7 @@ func workflowSelf(L *lua.LState) int {
 	ctx := L.Context()
 	cfg := GetConfig(L)
 
-	c := nbmpclientv2.NewWorkflowClient(cfg.WorkflowAPI)
+	c := nbmphttpv2.WorkflowClient(cfg.WorkflowAPI)
 	wf, err := c.Retrieve(ctx, cfg.WorkflowID)
 	if err != nil {
 		return modules.Error(L, err)
@@ -77,7 +77,7 @@ func (w *Workflow) Update(L *luar.LState) int {
 		ctx := L.Context()
 		cfg := GetConfig(L.LState)
 
-		c := nbmpclientv2.NewWorkflowClient(cfg.WorkflowAPI)
+		c := nbmphttpv2.WorkflowClient(cfg.WorkflowAPI)
 		wf, err := c.Update(ctx, w.Data)
 		if err != nil {
 			return modules.Error(L.LState, err)
