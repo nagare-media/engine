@@ -37,7 +37,6 @@ type Port struct {
 	scanner *bufio.Scanner
 
 	// output port
-	// TODO: implement
 	out io.WriteCloser
 }
 
