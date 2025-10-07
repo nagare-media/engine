@@ -21,7 +21,6 @@ import (
 	"errors"
 	"io"
 
-	"github.com/inhies/go-bytesize"
 	"github.com/smallnest/ringbuffer"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
@@ -35,7 +34,7 @@ import (
 const (
 	Protocol = "buffered"
 
-	DefaultBufferSize = int(10 * bytesize.MB)
+	DefaultBufferSize = 10 * 1024 * 1024 // 10MB
 )
 
 type port struct {
