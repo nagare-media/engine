@@ -59,9 +59,7 @@ func (m *Manager) Start(ctx context.Context) error {
 
 	wg := sync.WaitGroup{}
 	for _, s := range m.s {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			errStarter := s.Start(ctx)
 			if errStarter != nil {
 				setErr.Do(func() { err = errStarter })
@@ -69,7 +67,7 @@ func (m *Manager) Start(ctx context.Context) error {
 			if errStarter != nil || !m.waitForAllToTerminate {
 				cancel()
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
