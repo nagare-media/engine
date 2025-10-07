@@ -25,7 +25,8 @@ import (
 
 // Action description
 const (
-	Name = actions.BuildInActionPrefix + "meta"
+	BaseName = "meta"
+	Name     = actions.BuildInActionPrefix + BaseName
 )
 
 // ConfigType of the meta action.

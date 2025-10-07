@@ -27,7 +27,8 @@ import (
 
 // Action description
 const (
-	Name = actions.BuildInActionPrefix + "file"
+	BaseName = "file"
+	Name     = actions.BuildInActionPrefix + BaseName
 )
 
 var (
