@@ -50,7 +50,7 @@ The NBMP Gateway implements the NBMP Workflow API and translates to and from the
 
 ### Workflow Manager
 
-This is the central component and implements a NBMP workflow manager as a collection of [Kubernetes controllers](https://kubernetes.io/docs/concepts/architecture/controller/). NBMP concepts are reflected as custom resources in Kubernetes that are reconciled with the current cluster state.
+This is the central component and implements an NBMP workflow manager as a collection of [Kubernetes controllers](https://kubernetes.io/docs/concepts/architecture/controller/). NBMP concepts are reflected as custom resources in Kubernetes that are reconciled with the current cluster state.
 
 ### Workflow Manager Helper
 
