@@ -19,6 +19,7 @@ package utils
 import (
 	"context"
 	"errors"
+	"maps"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -192,9 +193,7 @@ func ResolveConfigMapOrSecretRefInline(ctx context.Context, c client.Client, ref
 		for k, v := range o.Data {
 			data[k] = []byte(v)
 		}
-		for k, v := range o.BinaryData {
-			data[k] = v
-		}
+		maps.Copy(data, o.BinaryData)
 	default:
 		return errors.New("ConfigMapOrSecretReference does not reference a ConfigMap or Secret")
 	}
