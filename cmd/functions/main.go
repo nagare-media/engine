@@ -26,7 +26,7 @@ import (
 
 	"github.com/nagare-media/engine/cmd/functions/cli"
 
-	// Import nagare media functions to be included in this multi-binary.
+	// Import nagare media functions to be included in this multi-call binary.
 	_ "github.com/nagare-media/engine/internal/functions/functions/data-buffer-fs"
 	_ "github.com/nagare-media/engine/internal/functions/functions/data-copy"
 	_ "github.com/nagare-media/engine/internal/functions/functions/data-discard"
@@ -39,7 +39,7 @@ import (
 	_ "github.com/nagare-media/engine/internal/functions/functions/media-package-hls"
 	_ "github.com/nagare-media/engine/internal/functions/functions/script-lua"
 
-	// Import io implementations to be included in this multi-binary.
+	// Import io implementations to be included in this multi-call binary.
 	_ "github.com/nagare-media/engine/internal/functions/io/protocols/buffered"
 	_ "github.com/nagare-media/engine/internal/functions/io/protocols/http"
 )
