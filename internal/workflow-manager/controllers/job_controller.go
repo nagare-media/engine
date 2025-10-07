@@ -73,16 +73,6 @@ func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 	taskName := job.Labels[enginev1.TaskNameLabel]
 	taskNamespace := job.Labels[enginev1.TaskNamespaceLabel]
 
-	// handle termination and deletion
-	if !utils.JobIsActive(job) || utils.IsInDeletion(job) {
-		// remove finalizer
-		if controllerutil.RemoveFinalizer(job, enginev1.JobProtectionFinalizer) {
-			if err := r.Client.Update(ctx, job); err != nil {
-				return ctrl.Result{}, err
-			}
-		}
-	}
-
 	// Reconciliation logic is handled by task controller. However, this is managed by another manager connected to the
 	// management cluster. We therefore use an event channel to trigger a reconciliation of the accompanying task.
 	r.EventChannel <- event.GenericEvent{
@@ -92,6 +82,16 @@ func (r *JobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 				Namespace: taskNamespace,
 			},
 		},
+	}
+
+	// handle termination and deletion
+	if !utils.JobIsActive(job) || utils.IsInDeletion(job) {
+		// remove finalizer
+		if controllerutil.RemoveFinalizer(job, enginev1.JobProtectionFinalizer) {
+			if err := r.Client.Update(ctx, job); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
 	}
 
 	return ctrl.Result{}, nil
