@@ -280,7 +280,7 @@ func (c *taskCtrl) observerLoop(ctx context.Context) error {
 	ctx = log.IntoContext(ctx, l)
 	l.Info("starting observer")
 
-	t := time.NewTimer(c.cfg.TaskController.ObservePeriode.Duration)
+	t := time.NewTimer(c.cfg.TaskController.ObservePeriod.Duration)
 	defer t.Stop()
 
 	failedProbes := 0
@@ -293,7 +293,7 @@ func (c *taskCtrl) observerLoop(ctx context.Context) error {
 
 		// reset timer
 		t.Stop()
-		t.Reset(c.cfg.TaskController.ObservePeriode.Duration)
+		t.Reset(c.cfg.TaskController.ObservePeriod.Duration)
 
 		select {
 		case <-ctx.Done():

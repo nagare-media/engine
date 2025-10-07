@@ -34,7 +34,7 @@ var (
 				RetrieveRequestTimeout: &metav1.Duration{Duration: 10 * time.Second},
 				UpdateRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
 				DeleteRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
-				ObservePeriode:         &metav1.Duration{Duration: 2 * time.Second},
+				ObservePeriod:          &metav1.Duration{Duration: 2 * time.Second},
 				MaxFailedProbes:        ptr.To(10),
 			},
 			ReportsController: WorkflowManagerHelperReportsControllerConfig{
@@ -75,9 +75,9 @@ type WorkflowManagerHelperTaskControllerConfig struct {
 	// +optional
 	DeleteRequestTimeout *metav1.Duration `json:"deleteRequestTimeout,omitempty"`
 
-	// ObservePeriode is the period the task is probed to retrieve the current state. Defaults to "2s".
+	// ObservePeriod is the period the task is probed to retrieve the current state. Defaults to "2s".
 	// +optional
-	ObservePeriode *metav1.Duration `json:"observePeriode,omitempty"`
+	ObservePeriod *metav1.Duration `json:"observePeriod,omitempty"`
 
 	// MaxFailedProbes indicates the maximum number of consecutive failed probes after which workflow-manager-helper will
 	// terminate with an error. Defaults to "10".
@@ -121,8 +121,8 @@ func (c *WorkflowManagerHelperConfig) doDefaultWithValuesFrom(d WorkflowManagerH
 	if c.TaskController.DeleteRequestTimeout == nil {
 		c.TaskController.DeleteRequestTimeout = d.TaskController.DeleteRequestTimeout
 	}
-	if c.TaskController.ObservePeriode == nil {
-		c.TaskController.ObservePeriode = d.TaskController.ObservePeriode
+	if c.TaskController.ObservePeriod == nil {
+		c.TaskController.ObservePeriod = d.TaskController.ObservePeriod
 	}
 	if c.TaskController.MaxFailedProbes == nil {
 		c.TaskController.MaxFailedProbes = d.TaskController.MaxFailedProbes
@@ -153,8 +153,8 @@ func (c *WorkflowManagerHelperConfig) Validate() error {
 	if c.TaskController.DeleteRequestTimeout == nil {
 		return errors.New("missing task.deleteRequestTimeout")
 	}
-	if c.TaskController.ObservePeriode == nil {
-		return errors.New("missing task.observePeriode")
+	if c.TaskController.ObservePeriod == nil {
+		return errors.New("missing task.observePeriod")
 	}
 	if c.TaskController.MaxFailedProbes == nil {
 		return errors.New("missing task.maxFailedProbes")

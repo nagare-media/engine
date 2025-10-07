@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "description": "This is a NBMP Workflow OpenAPI specification",
+    "description": "This is an NBMP Workflow OpenAPI specification",
     "version": "1.0.0",
     "title": "NBMP Workflow API",
     "license": {

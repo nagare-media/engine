@@ -36,7 +36,7 @@ type ContextData struct {
 	Task    *nbmpv2.Task
 }
 
-// Action represents a executable function in the context of a NBMP task lifecycle event handler.
+// Action represents a executable function in the context of an NBMP task lifecycle event handler.
 type Action interface {
 	Exec(Context) (*nbmpv2.Task, error)
 }

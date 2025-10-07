@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "description": "This is a NBMP Function Description Management API",
+    "description": "This is an NBMP Function Description Management API",
     "version": "1.0.0",
     "title": "NBMP Function Description Management API",
     "license": {

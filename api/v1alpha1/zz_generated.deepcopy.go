@@ -2668,8 +2668,8 @@ func (in *WorkflowManagerHelperTaskControllerConfig) DeepCopyInto(out *WorkflowM
 		*out = new(v1.Duration)
 		**out = **in
 	}
-	if in.ObservePeriode != nil {
-		in, out := &in.ObservePeriode, &out.ObservePeriode
+	if in.ObservePeriod != nil {
+		in, out := &in.ObservePeriod, &out.ObservePeriod
 		*out = new(v1.Duration)
 		**out = **in
 	}
