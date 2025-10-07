@@ -136,7 +136,8 @@ func (r *WorkflowReconciler) reconcileDelete(ctx context.Context, wf *enginev1.W
 		return res, err
 	}
 	if wf.Status.Active != nil && *wf.Status.Active > 0 {
-		return ctrl.Result{}, errors.New("not all Tasks have terminated")
+		log.Info("pause reconciling deleted Workflow: not all Tasks have terminated")
+		return ctrl.Result{RequeueAfter: 30 * time.Second}, nil
 	}
 
 	// remove finalizer
@@ -173,6 +174,10 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 		if res, err := r.reconcileTasks(ctx, wf); err != nil {
 			return res, err
 		}
+		// did we transition to the failed phase?
+		if wf.Status.Phase == enginev1.FailedWorkflowPhase {
+			return ctrl.Result{}, errors.New("workflow failed")
+		}
 
 		// as soon as we see Tasks belonging to this Workflow transition to running phase
 		if wf.Status.Total != nil && *wf.Status.Total > 0 {
@@ -183,6 +188,10 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 	case enginev1.RunningWorkflowPhase:
 		if res, err := r.reconcileTasks(ctx, wf); err != nil {
 			return res, err
+		}
+		// did we transition to the failed phase?
+		if wf.Status.Phase == enginev1.FailedWorkflowPhase {
+			return ctrl.Result{}, errors.New("workflow failed")
 		}
 
 		// TODO: ensure trace is started
@@ -203,6 +212,10 @@ func (r *WorkflowReconciler) reconcile(ctx context.Context, wf *enginev1.Workflo
 	case enginev1.AwaitingCompletionWorkflowPhase:
 		if res, err := r.reconcileTasks(ctx, wf); err != nil {
 			return res, err
+		}
+		// did we transition to the failed phase?
+		if wf.Status.Phase == enginev1.FailedWorkflowPhase {
+			return ctrl.Result{}, errors.New("workflow failed")
 		}
 
 		// check if indeed new Tasks have been created and are active
@@ -287,8 +300,10 @@ func (r *WorkflowReconciler) reconcileFailedTask(_ context.Context, wf *enginev1
 
 	switch policy {
 	case enginev1.IgnoreJobFailurePolicyAction:
+		// no action
 	case enginev1.FailWorkflowJobFailurePolicyAction:
 		wf.Status.Phase = enginev1.FailedWorkflowPhase
+		wf.Status.EndTime = &metav1.Time{Time: time.Now()}
 	}
 }
 
