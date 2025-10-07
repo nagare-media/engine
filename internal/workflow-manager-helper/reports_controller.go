@@ -41,7 +41,6 @@ const (
 )
 
 type reportsCtrl struct {
-	cfg  *enginev1.WorkflowManagerHelperConfig
 	data *enginev1.WorkflowManagerHelperData
 
 	http    starter.Starter
@@ -52,8 +51,8 @@ type reportsCtrl struct {
 
 var _ starter.Starter = &reportsCtrl{}
 
-func NewReportsController(cfg *enginev1.WorkflowManagerHelperConfig, data updatable.Updatable[*enginev1.WorkflowManagerHelperData]) starter.Starter {
-	s := enginehttp.NewServer(&cfg.ReportsController.Webserver)
+func NewReportsController(cfg *enginev1.WorkflowManagerHelperReportsControllerConfig, data updatable.Updatable[*enginev1.WorkflowManagerHelperData]) starter.Starter {
+	s := enginehttp.NewServer(&cfg.Webserver)
 
 	// Health API
 
@@ -65,7 +64,6 @@ func NewReportsController(cfg *enginev1.WorkflowManagerHelperConfig, data updata
 	events.API(eventCh).MountTo(s.App)
 
 	return &reportsCtrl{
-		cfg:     cfg,
 		data:    data.Get().Value, // assumption: System.NATS.URL, Workflow.ID and Task.ID will not change when data is updated
 		http:    s,
 		eventCh: eventCh,

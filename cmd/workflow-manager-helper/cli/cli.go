@@ -166,7 +166,7 @@ func (c *cli) Execute(ctx context.Context, args []string) error {
 	// create components
 
 	taskCtrl := workflowmanagerhelper.NewTaskController(cfg, data)
-	reportsCtrl := workflowmanagerhelper.NewReportsController(cfg, data)
+	reportsCtrl := workflowmanagerhelper.NewReportsController(&cfg.ReportsController, data)
 
 	// start components
 
