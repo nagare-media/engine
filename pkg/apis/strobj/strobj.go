@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +kubebuilder:object:generate=true
 package strobj
 
 import (
@@ -29,6 +28,11 @@ type StringOrObject struct {
 	StrVal    string
 	ObjectVal apiextensionsv1.JSON
 }
+
+var (
+	_ json.Marshaler   = &StringOrObject{}
+	_ json.Unmarshaler = &StringOrObject{}
+)
 
 type Type int
 

@@ -38,11 +38,11 @@ import (
 	"github.com/nagare-media/engine/internal/pkg/uuid"
 	"github.com/nagare-media/engine/internal/task-shim/actions"
 	metaaction "github.com/nagare-media/engine/internal/task-shim/actions/meta"
+	"github.com/nagare-media/engine/pkg/apis/strobj"
 	"github.com/nagare-media/engine/pkg/events"
 	"github.com/nagare-media/engine/pkg/nbmp"
 	nbmpsvcv2 "github.com/nagare-media/engine/pkg/nbmp/svc/v2"
 	nbmputils "github.com/nagare-media/engine/pkg/nbmp/utils"
-	"github.com/nagare-media/engine/pkg/strobj"
 	"github.com/nagare-media/engine/pkg/tplfuncs"
 	nbmpv2 "github.com/nagare-media/models.go/iso/nbmp/v2"
 )

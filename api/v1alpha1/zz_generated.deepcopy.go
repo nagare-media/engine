@@ -22,7 +22,7 @@ package v1alpha1
 
 import (
 	"github.com/nagare-media/engine/pkg/apis/meta"
-	"github.com/nagare-media/engine/pkg/strobj"
+	"github.com/nagare-media/engine/pkg/apis/strobj"
 	"github.com/nagare-media/models.go/base"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"

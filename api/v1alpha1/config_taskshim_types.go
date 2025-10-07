@@ -24,7 +24,7 @@ import (
 	"k8s.io/utils/ptr"
 
 	metaaction "github.com/nagare-media/engine/internal/task-shim/actions/meta"
-	"github.com/nagare-media/engine/pkg/strobj"
+	"github.com/nagare-media/engine/pkg/apis/strobj"
 )
 
 var (
