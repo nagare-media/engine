@@ -188,7 +188,6 @@ Parts of this software were presented at various conferences. Please cite this p
   year = {2025},
   month = mar,
   isbn = {979-8-4007-1467-2},
-
   publisher = {Association for Computing Machinery},
   address = {New York, NY, USA},
   url = {https://doi.org/10.1145/3712676.3718340},
@@ -216,7 +215,9 @@ Parts of this software were presented at various conferences. Please cite this p
   archiveprefix = {arXiv},
   url = {https://arxiv.org/abs/2509.24546},
   doi = {10.48550/arXiv.2509.24546},
-  abstract = {Before media playback is possible, live and video-on-demand content alike usually undergoes various operations described as tasks within a multimedia workflow. Where previously ingest, transcode, packaging and delivery tasks might have run on a single machine, today's workflows are significantly more complex distributed systems. Describing and implementing multimedia workflows is challenging and requires new approaches. A standards-based multimedia workflow system is described in ISO/IEC 23090-8 Network-Based Media Processing (NBMP) developed by MPEG. This technical report discusses details of nagare media engine, our open source research prototype implementation of NBMP. Built upon the Kubernetes platform, nagare media engine provides a cloud- and edge-native solution that meets today's requirements for multimedia workflow systems.}
+  abstract = {Before media playback is possible, live and video-on-demand content alike usually undergoes various operations described as tasks within a multimedia workflow. Where previously ingest, transcode, packaging and delivery tasks might have run on a single machine, today's workflows are significantly more complex distributed systems. Describing and implementing multimedia workflows is challenging and requires new approaches. A standards-based multimedia workflow system is described in ISO/IEC 23090-8 Network-Based Media Processing (NBMP) developed by MPEG. This technical report discusses details of nagare media engine, our open source research prototype implementation of NBMP. Built upon the Kubernetes platform, nagare media engine provides a cloud- and edge-native solution that meets today's requirements for multimedia workflow systems.},
+  numpages = {39},
+  keywords = {nbmp, network-based media processing, multimedia workflow, multimedia streaming, self-adapting}
 }
 ```
 
