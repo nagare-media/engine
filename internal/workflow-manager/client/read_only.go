@@ -44,6 +44,10 @@ func NewReadOnlyClient(reader client.Reader, scheme *runtime.Scheme, restMapper 
 	}
 }
 
+func (c *readOnlyClient) Apply(ctx context.Context, obj runtime.ApplyConfiguration, opts ...client.ApplyOption) error {
+	return errors.New("read only")
+}
+
 func (c *readOnlyClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	return errors.New("read only")
 }
