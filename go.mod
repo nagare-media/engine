@@ -13,12 +13,12 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/nagare-media/models.go v0.0.0-20250108160023-98fa97a2d480
-	github.com/nats-io/nats.go v1.46.0
-	github.com/onsi/ginkgo/v2 v2.25.3
+	github.com/nats-io/nats.go v1.46.1
+	github.com/onsi/ginkgo/v2 v2.26.0
 	github.com/onsi/gomega v1.38.2
 	github.com/smallnest/ringbuffer v0.0.0-20241129171057-356c688ba81d
 	github.com/stoewer/go-strcase v1.3.1
-	github.com/valyala/fasthttp v1.66.0
+	github.com/valyala/fasthttp v1.67.0
 	github.com/yuin/gopher-lua v1.1.1
 	go.uber.org/zap v1.27.0
 	k8s.io/api v0.34.1
@@ -28,7 +28,7 @@ require (
 	k8s.io/component-base v0.34.1
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
-	sigs.k8s.io/controller-runtime v0.22.1
+	sigs.k8s.io/controller-runtime v0.22.3
 	sigs.k8s.io/kustomize/kyaml v0.20.1
 	sigs.k8s.io/yaml v1.6.0
 )
@@ -88,7 +88,8 @@ require (
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.42.0 // indirect
-	golang.org/x/net v0.44.0 // indirect
+	golang.org/x/mod v0.27.0 // indirect
+	golang.org/x/net v0.45.0 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
