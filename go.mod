@@ -8,13 +8,13 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.16.2
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-logr/logr v1.4.3
-	github.com/go-viper/mapstructure/v2 v2.4.0
+	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/gofiber/fiber/v2 v2.52.10
 	github.com/google/uuid v1.6.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/nagare-media/models.go v0.0.0-20250108160023-98fa97a2d480
 	github.com/nats-io/nats.go v1.48.0
-	github.com/onsi/ginkgo/v2 v2.27.4
+	github.com/onsi/ginkgo/v2 v2.27.5
 	github.com/onsi/gomega v1.39.0
 	github.com/smallnest/ringbuffer v0.0.0-20241129171057-356c688ba81d
 	github.com/stoewer/go-strcase v1.3.1
