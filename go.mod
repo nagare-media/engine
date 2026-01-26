@@ -16,7 +16,7 @@ require (
 	github.com/nats-io/nats.go v1.48.0
 	github.com/onsi/ginkgo/v2 v2.27.5
 	github.com/onsi/gomega v1.39.0
-	github.com/smallnest/ringbuffer v0.0.0-20241129171057-356c688ba81d
+	github.com/smallnest/ringbuffer v0.1.0
 	github.com/stoewer/go-strcase v1.3.1
 	github.com/valyala/fasthttp v1.69.0
 	github.com/yuin/gopher-lua v1.1.1
@@ -28,7 +28,7 @@ require (
 	k8s.io/component-base v0.35.0
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
-	sigs.k8s.io/controller-runtime v0.22.4
+	sigs.k8s.io/controller-runtime v0.23.0
 	sigs.k8s.io/kustomize/kyaml v0.21.0
 	sigs.k8s.io/yaml v1.6.0
 )
