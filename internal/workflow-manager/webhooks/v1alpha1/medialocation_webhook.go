@@ -18,22 +18,18 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupMediaLocationWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.MediaLocation{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.MediaLocation{}).
 		WithDefaulter(&MediaLocationCustomDefaulter{}).
 		WithValidator(&MediaLocationCustomValidator{}).
 		Complete()
@@ -41,56 +37,34 @@ func SetupMediaLocationWebhookWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-medialocation,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=mmedialocation.engine.nagare.media,admissionReviewVersions=v1
 
-type MediaLocationCustomDefaulter struct {
-}
+type MediaLocationCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &MediaLocationCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.MediaLocation] = &MediaLocationCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *MediaLocationCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	_, ok := obj.(*enginev1.MediaLocation)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a MediaLocation but got a %T", obj))
-	}
+func (d *MediaLocationCustomDefaulter) Default(ctx context.Context, obj *enginev1.MediaLocation) error {
 	// TODO: implement
 	return nil
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-medialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=medialocations,verbs=create;update,versions=v1alpha1,name=vmedialocation.engine.nagare.media,admissionReviewVersions=v1
 
-type MediaLocationCustomValidator struct {
-}
+type MediaLocationCustomValidator struct{}
 
-var _ webhook.CustomValidator = &MediaLocationCustomValidator{}
+var _ admission.Validator[*enginev1.MediaLocation] = &MediaLocationCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *MediaLocationCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.MediaLocation)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaLocation but got a %T", obj))
-	}
-	return v.validate(ctx, o, nil)
+func (v *MediaLocationCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.MediaLocation) (admission.Warnings, error) {
+	return v.validate(ctx, obj, nil)
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *MediaLocationCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	oo, ok := oldObj.(*enginev1.MediaLocation)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaLocation but got a %T", oldObj))
-	}
-	no, ok := newObj.(*enginev1.MediaLocation)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaLocation but got a %T", newObj))
-	}
-	return v.validate(ctx, no, oo)
+func (v *MediaLocationCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.MediaLocation) (admission.Warnings, error) {
+	return v.validate(ctx, newObj, oldObj)
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *MediaLocationCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	_, ok := obj.(*enginev1.MediaLocation)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaLocation but got a %T", obj))
-	}
+func (v *MediaLocationCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.MediaLocation) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }

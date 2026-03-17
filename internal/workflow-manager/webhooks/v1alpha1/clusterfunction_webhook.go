@@ -18,20 +18,15 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupClusterFunctionWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.ClusterFunction{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.ClusterFunction{}).
 		WithDefaulter(&ClusterFunctionCustomDefaulter{}).
 		WithValidator(&ClusterFunctionCustomValidator{}).
 		Complete()
@@ -39,54 +34,32 @@ func SetupClusterFunctionWebhookWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clusterfunction,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=mclusterfunction.engine.nagare.media,admissionReviewVersions=v1
 
-type ClusterFunctionCustomDefaulter struct {
-}
+type ClusterFunctionCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &ClusterFunctionCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.ClusterFunction] = &ClusterFunctionCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *ClusterFunctionCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	o, ok := obj.(*enginev1.ClusterFunction)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterFunction but got a %T", obj))
-	}
-	return (*FunctionCustomDefaulter)(d).Default(ctx, (*enginev1.Function)(o))
+func (d *ClusterFunctionCustomDefaulter) Default(ctx context.Context, obj *enginev1.ClusterFunction) error {
+	return (*FunctionCustomDefaulter)(d).Default(ctx, (*enginev1.Function)(obj))
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clusterfunction,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clusterfunctions,verbs=create;update,versions=v1alpha1,name=vclusterfunction.engine.nagare.media,admissionReviewVersions=v1
 
-type ClusterFunctionCustomValidator struct {
-}
+type ClusterFunctionCustomValidator struct{}
 
-var _ webhook.CustomValidator = &ClusterFunctionCustomValidator{}
+var _ admission.Validator[*enginev1.ClusterFunction] = &ClusterFunctionCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterFunctionCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.ClusterFunction)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterFunction but got a %T", obj))
-	}
-	return (*FunctionCustomValidator)(v).ValidateCreate(ctx, (*enginev1.Function)(o))
+func (v *ClusterFunctionCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.ClusterFunction) (admission.Warnings, error) {
+	return (*FunctionCustomValidator)(v).ValidateCreate(ctx, (*enginev1.Function)(obj))
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterFunctionCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	oo, ok := oldObj.(*enginev1.ClusterFunction)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterFunction but got a %T", oldObj))
-	}
-	no, ok := newObj.(*enginev1.ClusterFunction)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterFunction but got a %T", newObj))
-	}
-	return (*FunctionCustomValidator)(v).ValidateUpdate(ctx, (*enginev1.Function)(oo), (*enginev1.Function)(no))
+func (v *ClusterFunctionCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.ClusterFunction) (admission.Warnings, error) {
+	return (*FunctionCustomValidator)(v).ValidateUpdate(ctx, (*enginev1.Function)(oldObj), (*enginev1.Function)(newObj))
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterFunctionCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.ClusterFunction)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterFunction but got a %T", obj))
-	}
-	return (*FunctionCustomValidator)(v).ValidateDelete(ctx, (*enginev1.Function)(o))
+func (v *ClusterFunctionCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.ClusterFunction) (admission.Warnings, error) {
+	return (*FunctionCustomValidator)(v).ValidateDelete(ctx, (*enginev1.Function)(obj))
 }

@@ -18,20 +18,15 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupClusterMediaProcessingEntityWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.ClusterMediaProcessingEntity{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.ClusterMediaProcessingEntity{}).
 		WithDefaulter(&ClusterMediaProcessingEntityCustomDefaulter{}).
 		WithValidator(&ClusterMediaProcessingEntityCustomValidator{}).
 		Complete()
@@ -39,54 +34,32 @@ func SetupClusterMediaProcessingEntityWebhookWithManager(mgr ctrl.Manager) error
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustermediaprocessingentity,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=create;update,versions=v1alpha1,name=mclustermediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
-type ClusterMediaProcessingEntityCustomDefaulter struct {
-}
+type ClusterMediaProcessingEntityCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &ClusterMediaProcessingEntityCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.ClusterMediaProcessingEntity] = &ClusterMediaProcessingEntityCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *ClusterMediaProcessingEntityCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	o, ok := obj.(*enginev1.ClusterMediaProcessingEntity)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaProcessingEntity but got a %T", obj))
-	}
-	return (*MediaProcessingEntityCustomDefaulter)(d).Default(ctx, (*enginev1.MediaProcessingEntity)(o))
+func (d *ClusterMediaProcessingEntityCustomDefaulter) Default(ctx context.Context, obj *enginev1.ClusterMediaProcessingEntity) error {
+	return (*MediaProcessingEntityCustomDefaulter)(d).Default(ctx, (*enginev1.MediaProcessingEntity)(obj))
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vclustermediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
-type ClusterMediaProcessingEntityCustomValidator struct {
-}
+type ClusterMediaProcessingEntityCustomValidator struct{}
 
-var _ webhook.CustomValidator = &ClusterMediaProcessingEntityCustomValidator{}
+var _ admission.Validator[*enginev1.ClusterMediaProcessingEntity] = &ClusterMediaProcessingEntityCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterMediaProcessingEntityCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.ClusterMediaProcessingEntity)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaProcessingEntity but got a %T", obj))
-	}
-	return (*MediaProcessingEntityCustomValidator)(v).ValidateCreate(ctx, (*enginev1.MediaProcessingEntity)(o))
+func (v *ClusterMediaProcessingEntityCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.ClusterMediaProcessingEntity) (admission.Warnings, error) {
+	return (*MediaProcessingEntityCustomValidator)(v).ValidateCreate(ctx, (*enginev1.MediaProcessingEntity)(obj))
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterMediaProcessingEntityCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	oo, ok := oldObj.(*enginev1.ClusterMediaProcessingEntity)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaProcessingEntity but got a %T", oldObj))
-	}
-	no, ok := newObj.(*enginev1.ClusterMediaProcessingEntity)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaProcessingEntity but got a %T", newObj))
-	}
-	return (*MediaProcessingEntityCustomValidator)(v).ValidateUpdate(ctx, (*enginev1.MediaProcessingEntity)(oo), (*enginev1.MediaProcessingEntity)(no))
+func (v *ClusterMediaProcessingEntityCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.ClusterMediaProcessingEntity) (admission.Warnings, error) {
+	return (*MediaProcessingEntityCustomValidator)(v).ValidateUpdate(ctx, (*enginev1.MediaProcessingEntity)(oldObj), (*enginev1.MediaProcessingEntity)(newObj))
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterMediaProcessingEntityCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.ClusterMediaProcessingEntity)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaProcessingEntity but got a %T", obj))
-	}
-	return (*MediaProcessingEntityCustomValidator)(v).ValidateDelete(ctx, (*enginev1.MediaProcessingEntity)(o))
+func (v *ClusterMediaProcessingEntityCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.ClusterMediaProcessingEntity) (admission.Warnings, error) {
+	return (*MediaProcessingEntityCustomValidator)(v).ValidateDelete(ctx, (*enginev1.MediaProcessingEntity)(obj))
 }

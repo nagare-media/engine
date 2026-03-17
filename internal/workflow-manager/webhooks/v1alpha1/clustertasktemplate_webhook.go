@@ -18,20 +18,15 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupClusterTaskTemplateWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.ClusterTaskTemplate{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.ClusterTaskTemplate{}).
 		WithDefaulter(&ClusterTaskTemplateCustomDefaulter{}).
 		WithValidator(&ClusterTaskTemplateCustomValidator{}).
 		Complete()
@@ -39,54 +34,32 @@ func SetupClusterTaskTemplateWebhookWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=mclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
 
-type ClusterTaskTemplateCustomDefaulter struct {
-}
+type ClusterTaskTemplateCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &ClusterTaskTemplateCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.ClusterTaskTemplate] = &ClusterTaskTemplateCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *ClusterTaskTemplateCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	o, ok := obj.(*enginev1.ClusterTaskTemplate)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterTaskTemplate but got a %T", obj))
-	}
-	return (*TaskTemplateCustomDefaulter)(d).Default(ctx, (*enginev1.TaskTemplate)(o))
+func (d *ClusterTaskTemplateCustomDefaulter) Default(ctx context.Context, obj *enginev1.ClusterTaskTemplate) error {
+	return (*TaskTemplateCustomDefaulter)(d).Default(ctx, (*enginev1.TaskTemplate)(obj))
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustertasktemplate,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustertasktemplates,verbs=create;update,versions=v1alpha1,name=vclustertasktemplate.engine.nagare.media,admissionReviewVersions=v1
 
-type ClusterTaskTemplateCustomValidator struct {
-}
+type ClusterTaskTemplateCustomValidator struct{}
 
-var _ webhook.CustomValidator = &ClusterTaskTemplateCustomValidator{}
+var _ admission.Validator[*enginev1.ClusterTaskTemplate] = &ClusterTaskTemplateCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterTaskTemplateCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.ClusterTaskTemplate)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterTaskTemplate but got a %T", obj))
-	}
-	return (*TaskTemplateCustomValidator)(v).ValidateCreate(ctx, (*enginev1.TaskTemplate)(o))
+func (v *ClusterTaskTemplateCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.ClusterTaskTemplate) (admission.Warnings, error) {
+	return (*TaskTemplateCustomValidator)(v).ValidateCreate(ctx, (*enginev1.TaskTemplate)(obj))
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterTaskTemplateCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	oo, ok := oldObj.(*enginev1.ClusterTaskTemplate)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterTaskTemplate but got a %T", oldObj))
-	}
-	no, ok := newObj.(*enginev1.ClusterTaskTemplate)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterTaskTemplate but got a %T", newObj))
-	}
-	return (*TaskTemplateCustomValidator)(v).ValidateUpdate(ctx, (*enginev1.TaskTemplate)(oo), (*enginev1.TaskTemplate)(no))
+func (v *ClusterTaskTemplateCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.ClusterTaskTemplate) (admission.Warnings, error) {
+	return (*TaskTemplateCustomValidator)(v).ValidateUpdate(ctx, (*enginev1.TaskTemplate)(oldObj), (*enginev1.TaskTemplate)(newObj))
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterTaskTemplateCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.ClusterTaskTemplate)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterTaskTemplate but got a %T", obj))
-	}
-	return (*TaskTemplateCustomValidator)(v).ValidateDelete(ctx, (*enginev1.TaskTemplate)(o))
+func (v *ClusterTaskTemplateCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.ClusterTaskTemplate) (admission.Warnings, error) {
+	return (*TaskTemplateCustomValidator)(v).ValidateDelete(ctx, (*enginev1.TaskTemplate)(obj))
 }
