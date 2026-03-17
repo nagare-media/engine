@@ -18,20 +18,15 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupWorkflowWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.Workflow{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.Workflow{}).
 		WithDefaulter(&WorkflowCustomDefaulter{}).
 		WithValidator(&WorkflowCustomValidator{}).
 		Complete()
@@ -39,58 +34,36 @@ func SetupWorkflowWebhookWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-workflow,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=workflows,verbs=create;update,versions=v1alpha1,name=mworkflow.engine.nagare.media,admissionReviewVersions=v1
 
-type WorkflowCustomDefaulter struct {
-}
+type WorkflowCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &WorkflowCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.Workflow] = &WorkflowCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *WorkflowCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	_, ok := obj.(*enginev1.Workflow)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a Workflow but got a %T", obj))
-	}
+func (d *WorkflowCustomDefaulter) Default(ctx context.Context, obj *enginev1.Workflow) error {
 	// TODO: implement
 	return nil
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-workflow,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=workflows,verbs=create;update,versions=v1alpha1,name=vworkflow.engine.nagare.media,admissionReviewVersions=v1
 
-type WorkflowCustomValidator struct {
-}
+type WorkflowCustomValidator struct{}
 
-var _ webhook.CustomValidator = &WorkflowCustomValidator{}
+var _ admission.Validator[*enginev1.Workflow] = &WorkflowCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *WorkflowCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	_, ok := obj.(*enginev1.Workflow)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Workflow but got a %T", obj))
-	}
+func (v *WorkflowCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.Workflow) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *WorkflowCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	_, ok := oldObj.(*enginev1.Workflow)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Workflow but got a %T", oldObj))
-	}
-	_, ok = newObj.(*enginev1.Workflow)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Workflow but got a %T", newObj))
-	}
+func (v *WorkflowCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.Workflow) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *WorkflowCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	_, ok := obj.(*enginev1.Workflow)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Workflow but got a %T", obj))
-	}
+func (v *WorkflowCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.Workflow) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }

@@ -18,20 +18,15 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupTaskWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.Task{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.Task{}).
 		WithDefaulter(&TaskCustomDefaulter{}).
 		WithValidator(&TaskCustomValidator{}).
 		Complete()
@@ -39,58 +34,36 @@ func SetupTaskWebhookWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-task,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=tasks,verbs=create;update,versions=v1alpha1,name=mtask.engine.nagare.media,admissionReviewVersions=v1
 
-type TaskCustomDefaulter struct {
-}
+type TaskCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &TaskCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.Task] = &TaskCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *TaskCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	_, ok := obj.(*enginev1.Task)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a Task but got a %T", obj))
-	}
+func (d *TaskCustomDefaulter) Default(ctx context.Context, obj *enginev1.Task) error {
 	// TODO: implement
 	return nil
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-task,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=tasks,verbs=create;update,versions=v1alpha1,name=vtask.engine.nagare.media,admissionReviewVersions=v1
 
-type TaskCustomValidator struct {
-}
+type TaskCustomValidator struct{}
 
-var _ webhook.CustomValidator = &TaskCustomValidator{}
+var _ admission.Validator[*enginev1.Task] = &TaskCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *TaskCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	_, ok := obj.(*enginev1.Task)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Task but got a %T", obj))
-	}
+func (v *TaskCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.Task) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *TaskCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	_, ok := oldObj.(*enginev1.Task)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Task but got a %T", oldObj))
-	}
-	_, ok = newObj.(*enginev1.Task)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Task but got a %T", newObj))
-	}
+func (v *TaskCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.Task) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *TaskCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	_, ok := obj.(*enginev1.Task)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Task but got a %T", obj))
-	}
+func (v *TaskCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.Task) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }

@@ -18,20 +18,15 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupMediaProcessingEntityWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.MediaProcessingEntity{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.MediaProcessingEntity{}).
 		WithDefaulter(&MediaProcessingEntityCustomDefaulter{}).
 		WithValidator(&MediaProcessingEntityCustomValidator{}).
 		Complete()
@@ -39,58 +34,36 @@ func SetupMediaProcessingEntityWebhookWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=mmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
-type MediaProcessingEntityCustomDefaulter struct {
-}
+type MediaProcessingEntityCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &MediaProcessingEntityCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.MediaProcessingEntity] = &MediaProcessingEntityCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *MediaProcessingEntityCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	_, ok := obj.(*enginev1.MediaProcessingEntity)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a MediaProcessingEntity but got a %T", obj))
-	}
+func (d *MediaProcessingEntityCustomDefaulter) Default(ctx context.Context, obj *enginev1.MediaProcessingEntity) error {
 	// TODO: implement
 	return nil
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-mediaprocessingentity,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=mediaprocessingentities,verbs=create;update,versions=v1alpha1,name=vmediaprocessingentity.engine.nagare.media,admissionReviewVersions=v1
 
-type MediaProcessingEntityCustomValidator struct {
-}
+type MediaProcessingEntityCustomValidator struct{}
 
-var _ webhook.CustomValidator = &MediaProcessingEntityCustomValidator{}
+var _ admission.Validator[*enginev1.MediaProcessingEntity] = &MediaProcessingEntityCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *MediaProcessingEntityCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	_, ok := obj.(*enginev1.MediaProcessingEntity)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaProcessingEntity but got a %T", obj))
-	}
+func (v *MediaProcessingEntityCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.MediaProcessingEntity) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *MediaProcessingEntityCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	_, ok := oldObj.(*enginev1.MediaProcessingEntity)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaProcessingEntity but got a %T", oldObj))
-	}
-	_, ok = newObj.(*enginev1.MediaProcessingEntity)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaProcessingEntity but got a %T", newObj))
-	}
+func (v *MediaProcessingEntityCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.MediaProcessingEntity) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *MediaProcessingEntityCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	_, ok := obj.(*enginev1.MediaProcessingEntity)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a MediaProcessingEntity but got a %T", obj))
-	}
+func (v *MediaProcessingEntityCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.MediaProcessingEntity) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }

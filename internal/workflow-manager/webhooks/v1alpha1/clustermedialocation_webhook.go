@@ -18,20 +18,15 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupClusterMediaLocationWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.ClusterMediaLocation{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.ClusterMediaLocation{}).
 		WithDefaulter(&ClusterMediaLocationCustomDefaulter{}).
 		WithValidator(&ClusterMediaLocationCustomValidator{}).
 		Complete()
@@ -39,54 +34,32 @@ func SetupClusterMediaLocationWebhookWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-clustermedialocation,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermedialocations,verbs=create;update,versions=v1alpha1,name=mclustermedialocation.engine.nagare.media,admissionReviewVersions=v1
 
-type ClusterMediaLocationCustomDefaulter struct {
-}
+type ClusterMediaLocationCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &ClusterMediaLocationCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.ClusterMediaLocation] = &ClusterMediaLocationCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *ClusterMediaLocationCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	o, ok := obj.(*enginev1.ClusterMediaLocation)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaLocation but got a %T", obj))
-	}
-	return (*MediaLocationCustomDefaulter)(d).Default(ctx, (*enginev1.MediaLocation)(o))
+func (d *ClusterMediaLocationCustomDefaulter) Default(ctx context.Context, obj *enginev1.ClusterMediaLocation) error {
+	return (*MediaLocationCustomDefaulter)(d).Default(ctx, (*enginev1.MediaLocation)(obj))
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-clustermedialocation,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=clustermedialocations,verbs=create;update,versions=v1alpha1,name=vclustermedialocation.engine.nagare.media,admissionReviewVersions=v1
 
-type ClusterMediaLocationCustomValidator struct {
-}
+type ClusterMediaLocationCustomValidator struct{}
 
-var _ webhook.CustomValidator = &ClusterMediaLocationCustomValidator{}
+var _ admission.Validator[*enginev1.ClusterMediaLocation] = &ClusterMediaLocationCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterMediaLocationCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.ClusterMediaLocation)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaLocation but got a %T", obj))
-	}
-	return (*MediaLocationCustomValidator)(v).ValidateCreate(ctx, (*enginev1.MediaLocation)(o))
+func (v *ClusterMediaLocationCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.ClusterMediaLocation) (admission.Warnings, error) {
+	return (*MediaLocationCustomValidator)(v).ValidateCreate(ctx, (*enginev1.MediaLocation)(obj))
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterMediaLocationCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	oo, ok := oldObj.(*enginev1.ClusterMediaLocation)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaLocation but got a %T", oldObj))
-	}
-	no, ok := newObj.(*enginev1.ClusterMediaLocation)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaLocation but got a %T", newObj))
-	}
-	return (*MediaLocationCustomValidator)(v).ValidateUpdate(ctx, (*enginev1.MediaLocation)(oo), (*enginev1.MediaLocation)(no))
+func (v *ClusterMediaLocationCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.ClusterMediaLocation) (admission.Warnings, error) {
+	return (*MediaLocationCustomValidator)(v).ValidateUpdate(ctx, (*enginev1.MediaLocation)(oldObj), (*enginev1.MediaLocation)(newObj))
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *ClusterMediaLocationCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.ClusterMediaLocation)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a ClusterMediaLocation but got a %T", obj))
-	}
-	return (*MediaLocationCustomValidator)(v).ValidateDelete(ctx, (*enginev1.MediaLocation)(o))
+func (v *ClusterMediaLocationCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.ClusterMediaLocation) (admission.Warnings, error) {
+	return (*MediaLocationCustomValidator)(v).ValidateDelete(ctx, (*enginev1.MediaLocation)(obj))
 }

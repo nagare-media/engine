@@ -18,21 +18,17 @@ package v1alpha1
 
 import (
 	"context"
-	"fmt"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	enginev1 "github.com/nagare-media/engine/api/v1alpha1"
 )
 
 func SetupFunctionWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&enginev1.Function{}).
+	return ctrl.NewWebhookManagedBy(mgr, &enginev1.Function{}).
 		WithDefaulter(&FunctionCustomDefaulter{}).
 		WithValidator(&FunctionCustomValidator{}).
 		Complete()
@@ -40,56 +36,34 @@ func SetupFunctionWebhookWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:webhook:path=/mutate-engine-nagare-media-v1alpha1-function,mutating=true,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=functions,verbs=create;update,versions=v1alpha1,name=mfunction.engine.nagare.media,admissionReviewVersions=v1
 
-type FunctionCustomDefaulter struct {
-}
+type FunctionCustomDefaulter struct{}
 
-var _ webhook.CustomDefaulter = &FunctionCustomDefaulter{}
+var _ admission.Defaulter[*enginev1.Function] = &FunctionCustomDefaulter{}
 
 // Default implements webhook.CustomDefaulter so a webhook will be registered for the type
-func (d *FunctionCustomDefaulter) Default(ctx context.Context, obj runtime.Object) error {
-	_, ok := obj.(*enginev1.Function)
-	if !ok {
-		return apierrors.NewBadRequest(fmt.Sprintf("expected a Function but got a %T", obj))
-	}
+func (d *FunctionCustomDefaulter) Default(ctx context.Context, obj *enginev1.Function) error {
 	// TODO: implement
 	return nil
 }
 
 // +kubebuilder:webhook:path=/validate-engine-nagare-media-v1alpha1-function,mutating=false,failurePolicy=fail,sideEffects=None,groups=engine.nagare.media,resources=functions,verbs=create;update,versions=v1alpha1,name=vfunction.engine.nagare.media,admissionReviewVersions=v1
 
-type FunctionCustomValidator struct {
-}
+type FunctionCustomValidator struct{}
 
-var _ webhook.CustomValidator = &FunctionCustomValidator{}
+var _ admission.Validator[*enginev1.Function] = &FunctionCustomValidator{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *FunctionCustomValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	o, ok := obj.(*enginev1.Function)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Function but got a %T", obj))
-	}
-	return v.validate(ctx, o, nil)
+func (v *FunctionCustomValidator) ValidateCreate(ctx context.Context, obj *enginev1.Function) (admission.Warnings, error) {
+	return v.validate(ctx, obj, nil)
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *FunctionCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	oo, ok := oldObj.(*enginev1.Function)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Function but got a %T", oldObj))
-	}
-	no, ok := newObj.(*enginev1.Function)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Function but got a %T", newObj))
-	}
-	return v.validate(ctx, no, oo)
+func (v *FunctionCustomValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *enginev1.Function) (admission.Warnings, error) {
+	return v.validate(ctx, newObj, oldObj)
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (v *FunctionCustomValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	_, ok := obj.(*enginev1.Function)
-	if !ok {
-		return nil, apierrors.NewBadRequest(fmt.Sprintf("expected a Function but got a %T", obj))
-	}
+func (v *FunctionCustomValidator) ValidateDelete(ctx context.Context, obj *enginev1.Function) (admission.Warnings, error) {
 	// TODO: implement
 	return nil, nil
 }
