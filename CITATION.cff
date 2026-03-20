@@ -1,0 +1,208 @@
+cff-version: 1.2.0
+title: nagare media engine
+abstract: nagare media engine is a prototypical implementation of ISO/IEC 23090-8:2020 Network Based Media Processing (NBMP) coming from research. MPEG published NBMP in order to meet today's multimedia workflows. It defines a data model, APIs and a reference architecture for network-distributed multimedia workflows. nagare media engine builds upon the Kubernetes platform to implement NBMP as a modern open source cloud- and edge-native solution. Our goal is to extend nagare media engine to a production ready implementation and simultaneously innovate on new ideas.
+message: If you use nagare media ingest, please cite the publications from the preferred-citation and references sections.
+type: software
+authors:
+  - given-names: Matthias
+    family-names: Neugebauer
+    alias: mtneug
+    email: matthias.neugebauer@uni-muenster.de
+    orcid: https://orcid.org/0000-0002-1363-0373
+    affiliation: University of Münster
+contact:
+  - given-names: Matthias
+    family-names: Neugebauer
+    alias: mtneug
+    email: matthias.neugebauer@uni-muenster.de
+    orcid: https://orcid.org/0000-0002-1363-0373
+    affiliation: University of Münster
+repository-code: https://github.com/nagare-media/engine
+repository-artifact: https://github.com/orgs/nagare-media/packages?repo_name=engine
+license: Apache-2.0
+keywords:
+  - go
+  - kubernetes
+  - livestreaming
+  - media
+  - nbmp
+  - streaming
+  - video
+  - workflow
+preferred-citation:
+  type: conference-paper
+  title: "Nagare Media Engine: Towards an Open-Source Cloud- and Edge-Native NBMP Implementation"
+  authors:
+    - given-names: Matthias
+      family-names: Neugebauer
+      alias: mtneug
+      email: matthias.neugebauer@uni-muenster.de
+      orcid: https://orcid.org/0000-0002-1363-0373
+      affiliation: University of Münster
+  abstract: "Making efficient use of cloud and edge computing resources in multimedia workflows that span multiple providers poses a significant challenge. Recently, MPEG published ISO/IEC 23090-8 Network-Based Media Processing (NBMP), which defines APIs and data models for network-distributed multimedia workflows. This standardized way of describing workflows over various cloud providers, computing models and environments will benefit researchers and practitioners alike. A wide adoption of this standard would enable users to easily optimize the placement of tasks that are part of the multimedia workflow, potentially leading to an increase in the quality of experience (QoE). As a first step towards a modern open-source cloud- and edge-native NBMP implementation, we have developed the NBMP workflow manager Nagare Media Engine based on the Kubernetes platform. We describe its components in detail and discuss the advantages and challenges involved with our approach. We evaluate Nagare Media Engine in a test scenario and show its scalability."
+  url: https://doi.org/10.5220/0012087200003538
+  doi: 10.5220/0012087200003538
+  isbn: 978-989-758-665-1
+  issn: 2184-2833
+  collection-title: Proceedings of the 18th International Conference on Software Technologies
+  collection-type: proceedings
+  conference:
+    name: ICSOFT '23
+  location:
+    city: Rome
+    country: IT
+  month: 7
+  year: 2023
+  publisher:
+    name: SciTePress - Science and Technology Publications
+    city: Setúbal
+    country: PT
+  pages: 8
+  copyright: "© 2023 Copyright held by Science and Technology Publications, Lda (SciTePress)."
+  license: CC-BY-NC-ND-4.0
+  keywords:
+    - nbmp
+    - network-distributed multimedia processing
+  languages:
+    - en
+references:
+  - type: conference-paper
+    title: "Nagare Media Engine: Towards an Open-Source Cloud- and Edge-Native NBMP Implementation"
+    authors:
+      - given-names: Matthias
+        family-names: Neugebauer
+        alias: mtneug
+        email: matthias.neugebauer@uni-muenster.de
+        orcid: https://orcid.org/0000-0002-1363-0373
+        affiliation: University of Münster
+    abstract: "Making efficient use of cloud and edge computing resources in multimedia workflows that span multiple providers poses a significant challenge. Recently, MPEG published ISO/IEC 23090-8 Network-Based Media Processing (NBMP), which defines APIs and data models for network-distributed multimedia workflows. This standardized way of describing workflows over various cloud providers, computing models and environments will benefit researchers and practitioners alike. A wide adoption of this standard would enable users to easily optimize the placement of tasks that are part of the multimedia workflow, potentially leading to an increase in the quality of experience (QoE). As a first step towards a modern open-source cloud- and edge-native NBMP implementation, we have developed the NBMP workflow manager Nagare Media Engine based on the Kubernetes platform. We describe its components in detail and discuss the advantages and challenges involved with our approach. We evaluate Nagare Media Engine in a test scenario and show its scalability."
+    url: https://doi.org/10.5220/0012087200003538
+    doi: 10.5220/0012087200003538
+    isbn: 978-989-758-665-1
+    issn: 2184-2833
+    collection-title: Proceedings of the 18th International Conference on Software Technologies
+    collection-type: proceedings
+    conference:
+      name: ICSOFT '23
+    location:
+      city: Rome
+      country: IT
+    month: 7
+    year: 2023
+    publisher:
+      name: SciTePress - Science and Technology Publications
+      city: Setúbal
+      country: PT
+    pages: 8
+    copyright: "© 2023 Copyright held by Science and Technology Publications, Lda (SciTePress)."
+    license: CC-BY-NC-ND-4.0
+    keywords:
+      - nbmp
+      - network-distributed multimedia processing
+    languages:
+      - en
+  - type: conference-paper
+    title: "Nagare Media Engine: Task Error Recovery in MPEG NBMP Workflows Through Event Sourcing"
+    authors:
+      - given-names: Matthias
+        family-names: Neugebauer
+        alias: mtneug
+        email: matthias.neugebauer@uni-muenster.de
+        orcid: https://orcid.org/0000-0002-1363-0373
+        affiliation: University of Münster
+    abstract: "Multimedia workflows have become complex distributed systems that are deployed in a multi-cloud and multi-edge fashion. Such systems are prone to errors either in hardware or software. Modern multimedia workflows therefore need to design an appropriate error-handling strategy. Because tasks are often computationally expensive and run for a long time, simply restarting and redoing prior work is an inadequate solution. Instead, tasks should create regular checkpoints and continue from the last good state after a restart. We propose to use an event sourcing approach for recording and potentially replaying state changes in the form of published events. In this paper, we adopt this approach for Network-Based Media Processing (NBMP), an MPEG standard published as ISO/IEC 23090-8 that defines APIs and data models for network-distributed multimedia workflows. Additionally, we developed our approach as an extension to Nagare Media Engine, our existing open source NBMP implementation based on the Kubernetes platform. We evaluated our approach in scene detection and video encoding scenarios with simulated disruptions and observed significant speedups."
+    url: https://doi.org/10.1145/3625468.3652167
+    doi: 10.1145/3625468.3652167
+    isbn: 979-8-4007-0412-3
+    collection-title: Proceedings of the 15th ACM Multimedia Systems Conference
+    collection-type: proceedings
+    conference:
+      name: MMSys '24
+    location:
+      city: Bari
+      country: IT
+    month: 4
+    year: 2024
+    publisher:
+      name: Association for Computing Machinery
+      city: New York
+      region: NY
+      country: US
+    pages: 7
+    copyright: "© 2024 Copyright held by the author."
+    license: CC-BY-4.0
+    keywords:
+      - encoding
+      - error recovery
+      - event sourcing
+      - nbmp
+      - network-distributed multimedia processing
+    languages:
+      - en
+  - type: conference-paper
+    title: "Nagare Media Engine: Towards Self-Adapting MPEG NBMP Multimedia Workflows"
+    authors:
+      - given-names: Matthias
+        family-names: Neugebauer
+        alias: mtneug
+        email: matthias.neugebauer@uni-muenster.de
+        orcid: https://orcid.org/0000-0002-1363-0373
+        affiliation: University of Münster
+    abstract: "With ISO/IEC 23090-8 Network-Based Media Processing (NBMP), MPEG published a standard for today's multimedia workflows: complex distributed systems deployed in multi-cloud and multi-edge environments. It defines data models, APIs and a reference architecture for implementing and operating multimedia workflows as well as the corresponding workflow system. Next to the increased architectural complexity, multimedia workflows are subject to changing surroundings or objectives. As such, they are forced to adapt in order to still meet the workflow goals. In this paper, we explore self-adaptability in the context of NBMP to automate this process. We give an overview of adaptation types encountered in multimedia workflows. Moreover, we propose a general design for self-adapting NBMP workflows. Finally, we implement our approach as part of Nagare Media Engine, our existing open source NBMP implementation. The evaluation of our prototype demonstrates self-adaptability in an HTTP Adaptive Streaming (HAS) scenario resulting in decreased computing resource usage."
+    url: https://doi.org/10.1145/3712676.3718340
+    doi: 10.1145/3712676.3718340
+    isbn: 979-8-4007-1467-2
+    collection-title: Proceedings of the 16th ACM Multimedia Systems Conference
+    collection-type: proceedings
+    conference:
+      name: MMSys '25
+    location:
+      city: Stellenbosch
+      country: ZA
+    month: 3
+    year: 2025
+    publisher:
+      name: Association for Computing Machinery
+      city: New York
+      region: NY
+      country: US
+    pages: 7
+    copyright: "© 2025 Copyright held by the author."
+    license: CC-BY-4.0
+    keywords:
+      - nbmp
+      - network-based media processing
+      - multimedia
+      - workflow
+      - self-adapting
+      - streaming
+    languages:
+      - en
+  - type: report
+    title: "Nagare Media Engine: A System for Cloud- and Edge-Native Network-based Multimedia Workflows"
+    authors:
+      - given-names: Matthias
+        family-names: Neugebauer
+        alias: mtneug
+        email: matthias.neugebauer@uni-muenster.de
+        orcid: https://orcid.org/0000-0002-1363-0373
+        affiliation: University of Münster
+    abstract: "Before media playback is possible, live and video-on-demand content alike usually undergoes various operations described as tasks within a multimedia workflow. Where previously ingest, transcode, packaging and delivery tasks might have run on a single machine, today's workflows are significantly more complex distributed systems. Describing and implementing multimedia workflows is challenging and requires new approaches. A standards-based multimedia workflow system is described in ISO/IEC 23090-8 Network-Based Media Processing (NBMP) developed by MPEG. This technical report discusses details of nagare media engine, our open source research prototype implementation of NBMP. Built upon the Kubernetes platform, nagare media engine provides a cloud- and edge-native solution that meets today's requirements for multimedia workflow systems."
+    url: https://arxiv.org/abs/2509.24546
+    doi: 10.48550/arXiv.2509.24546
+    month: 3
+    year: 2026
+    year-original: 2025
+    publisher:
+      name: arXiv
+    pages: 39
+    copyright: "© 2026 Copyright held by the author."
+    license: CC-BY-4.0
+    keywords:
+      - nbmp
+      - network-based media processing
+      - multimedia workflow
+      - multimedia streaming
+      - self-adapting
+    languages:
+      - en
