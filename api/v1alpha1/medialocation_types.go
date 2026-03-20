@@ -558,7 +558,3 @@ type MediaLocationList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []MediaLocation `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&MediaLocation{}, &MediaLocationList{})
-}

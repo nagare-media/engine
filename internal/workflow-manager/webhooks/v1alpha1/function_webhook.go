@@ -84,5 +84,5 @@ func (v *FunctionCustomValidator) validate(_ context.Context, obj, oldObj *engin
 	if len(allErrs) == 0 {
 		return nil, nil
 	}
-	return nil, apierrors.NewInvalid(enginev1.GroupVersion.WithKind("Function").GroupKind(), obj.Name, allErrs)
+	return nil, apierrors.NewInvalid(enginev1.Kind("Function"), obj.Name, allErrs)
 }

@@ -37,7 +37,3 @@ type ClusterMediaLocationList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []ClusterMediaLocation `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&ClusterMediaLocation{}, &ClusterMediaLocationList{})
-}

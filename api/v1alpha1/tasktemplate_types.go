@@ -85,7 +85,3 @@ type TaskTemplateList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []TaskTemplate `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&TaskTemplate{}, &TaskTemplateList{})
-}

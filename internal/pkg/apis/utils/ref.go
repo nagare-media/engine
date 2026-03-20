@@ -213,7 +213,7 @@ func PartiallyResolveLocalRef(c client.Client, namespace string, ref *meta.Local
 	}
 	if gv.Empty() {
 		// assume we talk about nagare media engine types
-		gv = enginev1.GroupVersion
+		gv = enginev1.SchemeGroupVersion
 	}
 	gvk := gv.WithKind(ref.Kind)
 

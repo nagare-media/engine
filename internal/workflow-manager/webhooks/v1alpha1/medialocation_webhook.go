@@ -101,5 +101,5 @@ func (v *MediaLocationCustomValidator) validate(_ context.Context, obj, _ *engin
 	if len(allErrs) == 0 {
 		return nil, nil
 	}
-	return nil, apierrors.NewInvalid(enginev1.GroupVersion.WithKind("MediaLocation").GroupKind(), obj.Name, allErrs)
+	return nil, apierrors.NewInvalid(enginev1.Kind("MediaLocation"), obj.Name, allErrs)
 }

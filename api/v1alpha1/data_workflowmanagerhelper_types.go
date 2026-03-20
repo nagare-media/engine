@@ -72,7 +72,3 @@ type WorkflowManagerHelperData struct {
 
 	WorkflowManagerHelperDataSpec `json:",inline"`
 }
-
-func init() {
-	SchemeBuilder.Register(&WorkflowManagerHelperData{})
-}

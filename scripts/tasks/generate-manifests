@@ -27,6 +27,11 @@
   crd \
   output:crd:artifacts:config=config/crd/bases
 
+# apply configuration
+"${CONTROLLER_GEN}" \
+  paths="./..." \
+  applyconfiguration:headerFile="hack/boilerplate.go.txt"
+
 # webhooks
 "${CONTROLLER_GEN}" \
   paths="./..." \

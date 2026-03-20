@@ -40,7 +40,3 @@ type ClusterMediaProcessingEntityList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []ClusterMediaProcessingEntity `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&ClusterMediaProcessingEntity{}, &ClusterMediaProcessingEntityList{})
-}

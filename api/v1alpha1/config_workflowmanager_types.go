@@ -121,7 +121,3 @@ func (c *WorkflowManagerConfig) doDefaultWithValuesFrom(d WorkflowManagerConfig)
 func (c *WorkflowManagerConfig) Validate() error {
 	return nil
 }
-
-func init() {
-	SchemeBuilder.Register(&WorkflowManagerConfig{})
-}

@@ -195,6 +195,7 @@ var (
 
 // ControllerConfig defines the global configuration for controllers registered with the manager.
 // +kubebuilder:object:generate=false
+// TODO: add custom struct for controller configuration to remove dependency on ctrlcfg
 type ControllerConfig ctrlcfg.Controller
 
 // TODO: Fix DeepCopyInto for ctrlcfg.Controller (Logger has no DeepCopyInto)

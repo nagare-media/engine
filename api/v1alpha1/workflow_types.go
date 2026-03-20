@@ -154,7 +154,3 @@ type WorkflowList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Workflow `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&Workflow{}, &WorkflowList{})
-}

@@ -173,7 +173,3 @@ func (c *TaskShimConfig) Validate() error {
 	}
 	return nil
 }
-
-func init() {
-	SchemeBuilder.Register(&TaskShimConfig{})
-}

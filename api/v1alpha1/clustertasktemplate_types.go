@@ -37,7 +37,3 @@ type ClusterTaskTemplateList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []ClusterTaskTemplate `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&ClusterTaskTemplate{}, &ClusterTaskTemplateList{})
-}

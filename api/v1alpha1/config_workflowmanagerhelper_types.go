@@ -164,7 +164,3 @@ func (c *WorkflowManagerHelperConfig) Validate() error {
 	}
 	return nil
 }
-
-func init() {
-	SchemeBuilder.Register(&WorkflowManagerHelperConfig{})
-}

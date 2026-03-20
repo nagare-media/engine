@@ -107,7 +107,3 @@ func (c *GatewayNBMPConfig) Validate() error {
 	}
 	return nil
 }
-
-func init() {
-	SchemeBuilder.Register(&GatewayNBMPConfig{})
-}
