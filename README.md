@@ -4,7 +4,7 @@
 ![Go Version](https://img.shields.io/badge/go%20version-%3E=1.25-61CFDD.svg?style=flat-square)
 [![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/nagare-media/engine)](https://pkg.go.dev/github.com/nagare-media/engine)
 
-`nagare media engine` is a prototypical implementation of [ISO/IEC 23090-8:2020 Network Based Media Processing (NBMP)](https://www.iso.org/standard/77839.html) coming from research. MPEG published NBMP in order to meet today's multimedia workflows. It defines data models, APIs and a reference architecture for network-distributed multimedia workflows. `nagare media engine` builds upon the Kubernetes platform to implement NBMP as a modern open source cloud native solution. Our goal is to extend `nagare media engine` to a production ready implementation and simultaneously innovate on new ideas.
+`nagare media engine` is a prototypical implementation of [ISO/IEC 23090-8:2020 Network Based Media Processing (NBMP)](https://www.iso.org/standard/77839.html) coming from research. MPEG published NBMP in order to meet today's multimedia workflows. It defines a data model, APIs and a reference architecture for network-distributed multimedia workflows. `nagare media engine` builds upon the Kubernetes platform to implement NBMP as a modern open source cloud- and edge-native solution. Our goal is to extend `nagare media engine` to a production ready implementation and simultaneously innovate on new ideas.
 
 Original repo: <https://github.com/nagare-media/engine>
 
@@ -144,6 +144,7 @@ Parts of this software were presented at various conferences. Please cite this p
   author = {Neugebauer, Matthias},
   title = {Nagare {{Media Engine}}: {{Towards}} an {{Open-Source Cloud-}} and {{Edge-Native NBMP Implementation}}},
   year = {2023},
+  month = jul,
   isbn = {978-989-758-665-1},
   issn = {2184-2833},
   organization = {INSTICC},
@@ -156,7 +157,8 @@ Parts of this software were presented at various conferences. Please cite this p
   pages = {404--411},
   numpages = {8},
   keywords = {nbmp, network-distributed multimedia processing},
-  location = {Rome, Italy}
+  location = {Rome, Italy},
+  series = {ICSOFT '23}
 }
 ```
 
@@ -206,8 +208,8 @@ Parts of this software were presented at various conferences. Please cite this p
 @misc{10.48550/arXiv.2509.24546,
   author = {Neugebauer, Matthias},
   title = {Nagare {{Media Engine}}: {{A System}} for {{Cloud-}} and {{Edge-Native Network-based Multimedia Workflows}}},
-  year = {2025},
-  month = sep,
+  year = {2026},
+  month = mar,
   publisher = {arXiv},
   number = {arXiv:2509.24546 [cs.MM]},
   eprint = {2509.24546},
