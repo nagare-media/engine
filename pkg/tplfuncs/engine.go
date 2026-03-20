@@ -23,11 +23,9 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-var (
-	engineFuncMap = template.FuncMap{
-		"toYAML": toYAML,
-	}
-)
+var engineFuncMap = template.FuncMap{
+	"toYAML": toYAML,
+}
 
 func toYAML(v any) (string, error) {
 	y, err := yaml.Marshal(v)

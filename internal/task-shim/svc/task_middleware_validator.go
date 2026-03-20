@@ -36,7 +36,9 @@ func TaskValidatorMiddleware(next nbmpsvcv2.TaskService) nbmpsvcv2.TaskService {
 	}
 }
 
-var _ nbmpsvcv2.TaskServiceMiddleware = TaskValidatorMiddleware
-var _ nbmpsvcv2.TaskService = &taskValidatorMiddleware{}
+var (
+	_ nbmpsvcv2.TaskServiceMiddleware = TaskValidatorMiddleware
+	_ nbmpsvcv2.TaskService           = &taskValidatorMiddleware{}
+)
 
 // TODO: implement task validation

@@ -22,21 +22,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var (
-	DefaultWorkflowManagerConfig = WorkflowManagerConfig{
-		WorkflowManagerConfigSpec: WorkflowManagerConfigSpec{
-			Controller:                         DefaultControllerConfig,
-			Cache:                              DefaultCacheConfig,
-			LeaderElection:                     DefaultLeaderElectionConfig,
-			Metrics:                            DefaultMetricsConfig,
-			Health:                             DefaultHealthConfig,
-			Webhook:                            DefaultWebhookConfig,
-			NATS:                               DefaultNATSConfig,
-			WorkflowTerminationWaitingDuration: &metav1.Duration{Duration: 20 * time.Second},
-			RemoteMediaProcessingEntityStabilizingDuration: &metav1.Duration{Duration: 5 * time.Second},
-		},
-	}
-)
+var DefaultWorkflowManagerConfig = WorkflowManagerConfig{
+	WorkflowManagerConfigSpec: WorkflowManagerConfigSpec{
+		Controller:                         DefaultControllerConfig,
+		Cache:                              DefaultCacheConfig,
+		LeaderElection:                     DefaultLeaderElectionConfig,
+		Metrics:                            DefaultMetricsConfig,
+		Health:                             DefaultHealthConfig,
+		Webhook:                            DefaultWebhookConfig,
+		NATS:                               DefaultNATSConfig,
+		WorkflowTerminationWaitingDuration: &metav1.Duration{Duration: 20 * time.Second},
+		RemoteMediaProcessingEntityStabilizingDuration: &metav1.Duration{Duration: 5 * time.Second},
+	},
+}
 
 type WorkflowManagerConfigSpec struct {
 	// Kubernetes cache configuration.

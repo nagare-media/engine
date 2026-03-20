@@ -23,9 +23,7 @@ import (
 	"github.com/nagare-media/engine/pkg/starter"
 )
 
-var (
-	ApplicationProtocolUnknown = errors.New("io: application protocol unknown")
-)
+var ApplicationProtocolUnknown = errors.New("io: application protocol unknown")
 
 type Server interface {
 	starter.Starter

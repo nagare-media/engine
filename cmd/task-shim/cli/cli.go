@@ -41,9 +41,7 @@ import (
 	_ "github.com/nagare-media/engine/internal/task-shim/actions/file"
 )
 
-var (
-	scheme = runtime.NewScheme()
-)
+var scheme = runtime.NewScheme()
 
 func init() {
 	utilruntime.Must(enginev1.AddToScheme(scheme))

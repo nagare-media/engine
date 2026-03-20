@@ -30,12 +30,10 @@ import (
 	"github.com/nagare-media/models.go/base"
 )
 
-var (
-	DefaultNATSConfig = NATSConfig{
-		// TODO: set useful default
-		URL: "nats://nats.nats.svc.cluster.local:4222",
-	}
-)
+var DefaultNATSConfig = NATSConfig{
+	// TODO: set useful default
+	URL: "nats://nats.nats.svc.cluster.local:4222",
+}
 
 type NATSConfig struct {
 	// TODO: add auth methods
@@ -57,16 +55,14 @@ func (c *NATSConfig) doDefaultWithValuesFrom(d NATSConfig) {
 	}
 }
 
-var (
-	DefaultWebserverConfig = WebserverConfig{
-		BindAddress:   ptr.To(":8080"),
-		ReadTimeout:   &metav1.Duration{Duration: time.Minute},
-		WriteTimeout:  &metav1.Duration{Duration: time.Minute},
-		IdleTimeout:   &metav1.Duration{Duration: time.Minute},
-		Network:       ptr.To("tcp"),
-		PublicBaseURL: ptr.To("http://127.0.0.1:8080"),
-	}
-)
+var DefaultWebserverConfig = WebserverConfig{
+	BindAddress:   ptr.To(":8080"),
+	ReadTimeout:   &metav1.Duration{Duration: time.Minute},
+	WriteTimeout:  &metav1.Duration{Duration: time.Minute},
+	IdleTimeout:   &metav1.Duration{Duration: time.Minute},
+	Network:       ptr.To("tcp"),
+	PublicBaseURL: ptr.To("http://127.0.0.1:8080"),
+}
 
 type WebserverConfig struct {
 	// +optional
@@ -141,11 +137,9 @@ func (c *WebserverConfig) Validate(cfgPrefix string) error {
 	return nil
 }
 
-var (
-	DefaultCacheConfig = CacheConfig{
-		SyncPeriod: &metav1.Duration{Duration: 10 * time.Hour},
-	}
-)
+var DefaultCacheConfig = CacheConfig{
+	SyncPeriod: &metav1.Duration{Duration: 10 * time.Hour},
+}
 
 type CacheConfig struct {
 	// SyncPeriod determines the minimum frequency at which watched resources are
@@ -182,16 +176,14 @@ func (c *CacheConfig) doDefaultWithValuesFrom(d CacheConfig) {
 	}
 }
 
-var (
-	DefaultControllerConfig = ControllerConfig{
-		SkipNameValidation:      ptr.To(false),
-		GroupKindConcurrency:    nil,
-		MaxConcurrentReconciles: 1,
-		CacheSyncTimeout:        2 * time.Minute,
-		RecoverPanic:            nil,
-		NeedLeaderElection:      nil,
-	}
-)
+var DefaultControllerConfig = ControllerConfig{
+	SkipNameValidation:      ptr.To(false),
+	GroupKindConcurrency:    nil,
+	MaxConcurrentReconciles: 1,
+	CacheSyncTimeout:        2 * time.Minute,
+	RecoverPanic:            nil,
+	NeedLeaderElection:      nil,
+}
 
 // ControllerConfig defines the global configuration for controllers registered with the manager.
 // +kubebuilder:object:generate=false
@@ -271,11 +263,9 @@ func (c *ControllerConfig) doDefaultWithValuesFrom(d ControllerConfig) {
 	}
 }
 
-var (
-	DefaultMetricsConfig = MetricsConfig{
-		BindAddress: ":8080",
-	}
-)
+var DefaultMetricsConfig = MetricsConfig{
+	BindAddress: ":8080",
+}
 
 // MetricsConfig defines the metrics configs.
 type MetricsConfig struct {
@@ -301,13 +291,11 @@ func (c *MetricsConfig) doDefaultWithValuesFrom(d MetricsConfig) {
 	}
 }
 
-var (
-	DefaultHealthConfig = HealthConfig{
-		BindAddress:           ":8081",
-		ReadinessEndpointName: "/readyz",
-		LivenessEndpointName:  "/healthz",
-	}
-)
+var DefaultHealthConfig = HealthConfig{
+	BindAddress:           ":8081",
+	ReadinessEndpointName: "/readyz",
+	LivenessEndpointName:  "/healthz",
+}
 
 // HealthConfig defines the health configs.
 type HealthConfig struct {
@@ -347,13 +335,11 @@ func (c *HealthConfig) doDefaultWithValuesFrom(d HealthConfig) {
 	}
 }
 
-var (
-	DefaultWebhookConfig = WebhookConfig{
-		Port:    ptr.To(9443),
-		Host:    "",
-		CertDir: "",
-	}
-)
+var DefaultWebhookConfig = WebhookConfig{
+	Port:    ptr.To(9443),
+	Host:    "",
+	CertDir: "",
+}
 
 // WebhookConfig defines the webhook server for the controller.
 type WebhookConfig struct {
@@ -396,16 +382,14 @@ func (c *WebhookConfig) doDefaultWithValuesFrom(d WebhookConfig) {
 	}
 }
 
-var (
-	DefaultLeaderElectionConfig = LeaderElectionConfig{
-		LeaderElect:   ptr.To(false),
-		LeaseDuration: metav1.Duration{Duration: 15 * time.Second},
-		RenewDeadline: metav1.Duration{Duration: 10 * time.Second},
-		RetryPeriod:   metav1.Duration{Duration: 2 * time.Second},
-		ResourceLock:  resourcelock.LeasesResourceLock,
-		ResourceName:  "a3df9e9e.engine.nagare.media",
-	}
-)
+var DefaultLeaderElectionConfig = LeaderElectionConfig{
+	LeaderElect:   ptr.To(false),
+	LeaseDuration: metav1.Duration{Duration: 15 * time.Second},
+	RenewDeadline: metav1.Duration{Duration: 10 * time.Second},
+	RetryPeriod:   metav1.Duration{Duration: 2 * time.Second},
+	ResourceLock:  resourcelock.LeasesResourceLock,
+	ResourceName:  "a3df9e9e.engine.nagare.media",
+}
 
 type LeaderElectionConfig configv1alpha1.LeaderElectionConfiguration
 

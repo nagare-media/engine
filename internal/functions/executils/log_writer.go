@@ -29,9 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
-var (
-	MaxLogLineLength = 2048
-)
+var MaxLogLineLength = 2048
 
 type LogFunc func(string)
 
@@ -56,7 +54,6 @@ type logWriter struct {
 var _ io.WriteCloser = &logWriter{}
 
 func (lw *logWriter) Write(p []byte) (n int, err error) {
-
 	// log line by line
 	for {
 		i := bytes.IndexByte(p, '\n')

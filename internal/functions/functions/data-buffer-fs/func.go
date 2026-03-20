@@ -32,8 +32,7 @@ const (
 )
 
 // function buffers input stream.
-type function struct {
-}
+type function struct{}
 
 var _ nbmp.Function = &function{}
 

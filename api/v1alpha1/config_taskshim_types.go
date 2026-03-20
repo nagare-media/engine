@@ -27,43 +27,41 @@ import (
 	"github.com/nagare-media/engine/pkg/apis/strobj"
 )
 
-var (
-	DefaultTaskShimConfig = TaskShimConfig{
-		TaskShimConfigSpec: TaskShimConfigSpec{
-			TaskService: TaskShimTaskServiceConfig{
-				OnCreateActions: []TaskServiceAction{{
-					Action: metaaction.Name,
-					Config: &strobj.StringOrObject{
-						Type:   strobj.String,
-						StrVal: string(metaaction.StartTaskConfigType),
-					},
-				}},
-				OnUpdateActions: []TaskServiceAction{{
-					Action: metaaction.Name,
-					Config: &strobj.StringOrObject{
-						Type:   strobj.String,
-						StrVal: string(metaaction.RestartTaskConfigType),
-					},
-				}},
-				OnDeleteActions: []TaskServiceAction{{
-					Action: metaaction.Name,
-					Config: &strobj.StringOrObject{
-						Type:   strobj.String,
-						StrVal: string(metaaction.StopTaskConfigType),
-					},
-				}},
-				CreateTimeout: &metav1.Duration{Duration: 1 * time.Minute},
-				DeleteTimeout: &metav1.Duration{Duration: 1 * time.Minute},
-			},
-			Webserver: WebserverConfig{
-				BindAddress:   ptr.To(":8888"),
-				WriteTimeout:  &metav1.Duration{}, // = unlimited
-				IdleTimeout:   &metav1.Duration{}, // = unlimited
-				PublicBaseURL: ptr.To("http://127.0.0.1:8888"),
-			},
+var DefaultTaskShimConfig = TaskShimConfig{
+	TaskShimConfigSpec: TaskShimConfigSpec{
+		TaskService: TaskShimTaskServiceConfig{
+			OnCreateActions: []TaskServiceAction{{
+				Action: metaaction.Name,
+				Config: &strobj.StringOrObject{
+					Type:   strobj.String,
+					StrVal: string(metaaction.StartTaskConfigType),
+				},
+			}},
+			OnUpdateActions: []TaskServiceAction{{
+				Action: metaaction.Name,
+				Config: &strobj.StringOrObject{
+					Type:   strobj.String,
+					StrVal: string(metaaction.RestartTaskConfigType),
+				},
+			}},
+			OnDeleteActions: []TaskServiceAction{{
+				Action: metaaction.Name,
+				Config: &strobj.StringOrObject{
+					Type:   strobj.String,
+					StrVal: string(metaaction.StopTaskConfigType),
+				},
+			}},
+			CreateTimeout: &metav1.Duration{Duration: 1 * time.Minute},
+			DeleteTimeout: &metav1.Duration{Duration: 1 * time.Minute},
 		},
-	}
-)
+		Webserver: WebserverConfig{
+			BindAddress:   ptr.To(":8888"),
+			WriteTimeout:  &metav1.Duration{}, // = unlimited
+			IdleTimeout:   &metav1.Duration{}, // = unlimited
+			PublicBaseURL: ptr.To("http://127.0.0.1:8888"),
+		},
+	},
+}
 
 type TaskShimConfigSpec struct {
 	// TaskService configuration.

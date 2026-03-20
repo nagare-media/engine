@@ -37,14 +37,13 @@ func New(ctx context.Context, terminateFunc func(error), cfg *enginev1.TaskShimC
 
 	// NBMP 2nd edition APIs
 
-	svc :=
-		nbmpsvcv2.TaskDefaulterSpecMiddleware(
-			nbmpsvcv2.TaskValidatorSpecLaxMiddleware(
-				svc.TaskValidatorMiddleware(
-					svc.NewTaskService(ctx, terminateFunc, &cfg.TaskService),
-				),
+	svc := nbmpsvcv2.TaskDefaulterSpecMiddleware(
+		nbmpsvcv2.TaskValidatorSpecLaxMiddleware(
+			svc.TaskValidatorMiddleware(
+				svc.NewTaskService(ctx, terminateFunc, &cfg.TaskService),
 			),
-		)
+		),
+	)
 
 	r := s.App.Group("/v2")
 	// middlewares

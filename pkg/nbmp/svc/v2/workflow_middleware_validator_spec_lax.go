@@ -35,8 +35,10 @@ func WorkflowValidatorSpecLaxMiddleware(next WorkflowService) WorkflowService {
 	}
 }
 
-var _ WorkflowServiceMiddleware = WorkflowValidatorSpecLaxMiddleware
-var _ WorkflowService = &workflowValidatorSpecLaxMiddleware{}
+var (
+	_ WorkflowServiceMiddleware = WorkflowValidatorSpecLaxMiddleware
+	_ WorkflowService           = &workflowValidatorSpecLaxMiddleware{}
+)
 
 func (m *workflowValidatorSpecLaxMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
 	m.common(w)

@@ -37,18 +37,16 @@ const (
 	NVIDIA_GPUShared = corev1.ResourceName("nvidia.com/gpu.shared")
 )
 
-var (
-	DefaultGatewayNBMPConfig = GatewayNBMPConfig{
-		GatewayNBMPConfigSpec: GatewayNBMPConfigSpec{
-			WorkflowService: GatewayNBMPWorkflowServiceConfig{
-				Kubernetes: GatewayNBMPWorkflowServiceKubernetesConfig{
-					GPUResourceName: NVIDIA_GPU,
-				},
+var DefaultGatewayNBMPConfig = GatewayNBMPConfig{
+	GatewayNBMPConfigSpec: GatewayNBMPConfigSpec{
+		WorkflowService: GatewayNBMPWorkflowServiceConfig{
+			Kubernetes: GatewayNBMPWorkflowServiceKubernetesConfig{
+				GPUResourceName: NVIDIA_GPU,
 			},
-			Webserver: DefaultWebserverConfig,
 		},
-	}
-)
+		Webserver: DefaultWebserverConfig,
+	},
+}
 
 type GatewayNBMPConfigSpec struct {
 	WorkflowService GatewayNBMPWorkflowServiceConfig `json:"workflow"`

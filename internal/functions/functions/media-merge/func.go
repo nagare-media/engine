@@ -32,8 +32,7 @@ const (
 )
 
 // function merges multiple input streams.
-type function struct {
-}
+type function struct{}
 
 var _ nbmp.Function = &function{}
 

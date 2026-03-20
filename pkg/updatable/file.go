@@ -17,13 +17,12 @@ limitations under the License.
 package updatable
 
 import (
-	"fmt"
-
-	"github.com/fsnotify/fsnotify"
-
 	"crypto/sha256"
+	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 type updatableFile[T any] struct {
@@ -106,5 +105,5 @@ func (u *updatableFile[T]) start() {
 }
 
 func (u *updatableFile[T]) Close() {
-	u.w.Close()
+	_ = u.w.Close()
 }

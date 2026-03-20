@@ -58,9 +58,11 @@ type port struct {
 	closeTimer *time.Timer
 }
 
-var _ engineio.Port = &port{}
-var _ engineio.InputPort = &port{}
-var _ engineio.OutputPort = &port{}
+var (
+	_ engineio.Port       = &port{}
+	_ engineio.InputPort  = &port{}
+	_ engineio.OutputPort = &port{}
+)
 
 func (p *port) Start(ctx context.Context) error {
 	switch {

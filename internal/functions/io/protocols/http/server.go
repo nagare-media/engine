@@ -41,17 +41,15 @@ const (
 	DefaultTimeout    = 30 * time.Minute
 )
 
-var (
-	// TODO: make configurable
-	DefaultWebserverConfig = enginev1.WebserverConfig{
-		BindAddress:   ptr.To(fmt.Sprintf(":%d", DefaultPortNumber)),
-		ReadTimeout:   &metav1.Duration{Duration: DefaultTimeout},
-		WriteTimeout:  &metav1.Duration{Duration: DefaultTimeout},
-		IdleTimeout:   &metav1.Duration{Duration: DefaultTimeout},
-		Network:       ptr.To("tcp"),
-		PublicBaseURL: ptr.To(fmt.Sprintf("http://127.0.0.1:%d", DefaultPortNumber)),
-	}
-)
+// TODO: make configurable
+var DefaultWebserverConfig = enginev1.WebserverConfig{
+	BindAddress:   ptr.To(fmt.Sprintf(":%d", DefaultPortNumber)),
+	ReadTimeout:   &metav1.Duration{Duration: DefaultTimeout},
+	WriteTimeout:  &metav1.Duration{Duration: DefaultTimeout},
+	IdleTimeout:   &metav1.Duration{Duration: DefaultTimeout},
+	Network:       ptr.To("tcp"),
+	PublicBaseURL: ptr.To(fmt.Sprintf("http://127.0.0.1:%d", DefaultPortNumber)),
+}
 
 type Server interface {
 	engineio.Server

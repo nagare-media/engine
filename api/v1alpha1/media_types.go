@@ -279,5 +279,4 @@ type SubtitleMediaStream struct {
 
 type Language string
 
-type DataMediaStream struct {
-}
+type DataMediaStream struct{}

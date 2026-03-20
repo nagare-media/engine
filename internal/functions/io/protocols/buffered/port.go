@@ -43,8 +43,10 @@ type port struct {
 	buf *ringbuffer.RingBuffer
 }
 
-var _ engineio.InputPort = &port{}
-var _ engineio.OutputPort = &port{}
+var (
+	_ engineio.InputPort  = &port{}
+	_ engineio.OutputPort = &port{}
+)
 
 func (p *port) Start(ctx context.Context) error {
 	mgr := starter.Manage(p.p, starter.Func(p.startBuffer)).WaitForAllToTerminate()

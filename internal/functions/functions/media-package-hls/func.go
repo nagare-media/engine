@@ -32,8 +32,7 @@ const (
 )
 
 // function packages input streams into HLS.
-type function struct {
-}
+type function struct{}
 
 var _ nbmp.Function = &function{}
 

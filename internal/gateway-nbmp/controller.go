@@ -37,14 +37,13 @@ func New(cfg *enginev1.GatewayNBMPConfig, k8sClient client.Client) starter.Start
 
 	// NBMP 2nd edition APIs
 
-	svc :=
-		nbmpsvcv2.WorkflowDefaulterSpecMiddleware(
-			nbmpsvcv2.WorkflowValidatorSpecLaxMiddleware(
-				svc.WorkflowValidatorMiddleware(
-					svc.NewWorkflowService(&cfg.WorkflowService, k8sClient),
-				),
+	svc := nbmpsvcv2.WorkflowDefaulterSpecMiddleware(
+		nbmpsvcv2.WorkflowValidatorSpecLaxMiddleware(
+			svc.WorkflowValidatorMiddleware(
+				svc.NewWorkflowService(&cfg.WorkflowService, k8sClient),
 			),
-		)
+		),
+	)
 
 	r := s.App.Group("/v2")
 	// middlewares

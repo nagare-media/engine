@@ -38,9 +38,7 @@ import (
 	"github.com/nagare-media/engine/pkg/updatable"
 )
 
-var (
-	scheme = runtime.NewScheme()
-)
+var scheme = runtime.NewScheme()
 
 func init() {
 	utilruntime.Must(enginev1.AddToScheme(scheme))

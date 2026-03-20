@@ -91,7 +91,7 @@ func (c *taskCtrl) Start(ctx context.Context) error {
 			return
 		}
 
-		f, err := os.OpenFile("/dev/termination-log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+		f, err := os.OpenFile("/dev/termination-log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o777)
 		if err != nil {
 			l.Error(err, "failed to open /dev/termination-log")
 			return
@@ -206,7 +206,8 @@ func (c *taskCtrl) convertToNBMPTask(data *enginev1.WorkflowManagerHelperData) (
 }
 
 func (c *taskCtrl) observeTaskPhase(ctx context.Context, data *enginev1.WorkflowManagerHelperData,
-	dataSub <-chan updatable.VersionedValue[*enginev1.WorkflowManagerHelperData]) error {
+	dataSub <-chan updatable.VersionedValue[*enginev1.WorkflowManagerHelperData],
+) error {
 	l := log.FromContext(ctx, "phase", "observe-task")
 	ctx = log.IntoContext(ctx, l)
 	l.Info("starting new phase")

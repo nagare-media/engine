@@ -33,9 +33,7 @@ import (
 	"github.com/nagare-media/engine/pkg/apis/meta"
 )
 
-var (
-	ErrSelectedMultiple = errors.New("selection returned multiple items")
-)
+var ErrSelectedMultiple = errors.New("selection returned multiple items")
 
 func SelectMediaProcessingEntityRef(ctx context.Context, c client.Client, namespace string, sel labels.Selector) (*meta.ObjectReference, error) {
 	// local MediaProcessingEntity

@@ -36,8 +36,10 @@ func TaskDefaulterSpecMiddleware(next TaskService) TaskService {
 	}
 }
 
-var _ TaskServiceMiddleware = TaskDefaulterSpecMiddleware
-var _ TaskService = &taskDefaulterSpecMiddleware{}
+var (
+	_ TaskServiceMiddleware = TaskDefaulterSpecMiddleware
+	_ TaskService           = &taskDefaulterSpecMiddleware{}
+)
 
 func (m *taskDefaulterSpecMiddleware) Create(ctx context.Context, t *nbmpv2.Task) error {
 	if err := DefaultTask(t); err != nil {

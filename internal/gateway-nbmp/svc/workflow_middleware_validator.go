@@ -42,8 +42,10 @@ func WorkflowValidatorMiddleware(next nbmpsvcv2.WorkflowService) nbmpsvcv2.Workf
 	}
 }
 
-var _ nbmpsvcv2.WorkflowServiceMiddleware = WorkflowValidatorMiddleware
-var _ nbmpsvcv2.WorkflowService = &workflowValidatorMiddleware{}
+var (
+	_ nbmpsvcv2.WorkflowServiceMiddleware = WorkflowValidatorMiddleware
+	_ nbmpsvcv2.WorkflowService           = &workflowValidatorMiddleware{}
+)
 
 func (m *workflowValidatorMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
 	m.common(w)

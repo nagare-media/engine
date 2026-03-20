@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
@@ -502,16 +501,16 @@ func (c *tasksToWDDConverter) convertProcessingFunctionRestrictions(wf *nbmpv2.W
 
 			for res, quantity := range rl {
 				switch res {
-				case v1.ResourceCPU:
+				case corev1.ResourceCPU:
 					// $.processing.function-restrictions.requirements.hardware.vcpu
 					fr.Requirements.Hardware.VCPU = ptr.To(uint64(quantity.Value()))
 				case c.gpuResourceName: // TODO: make gpuResourceName configurable per Task
 					// $.processing.function-restrictions.requirements.hardware.vgpu
 					fr.Requirements.Hardware.VGPU = ptr.To(uint64(quantity.Value()))
-				case v1.ResourceMemory:
+				case corev1.ResourceMemory:
 					// $.processing.function-restrictions.requirements.hardware.ram
 					fr.Requirements.Hardware.RAM = ptr.To(uint64(quantity.ScaledValue(resource.Mega)))
-				case v1.ResourceEphemeralStorage:
+				case corev1.ResourceEphemeralStorage:
 					// $.processing.function-restrictions.requirements.hardware.disk
 					fr.Requirements.Hardware.Disk = ptr.To(uint64(quantity.ScaledValue(resource.Giga)))
 				default:

@@ -48,9 +48,7 @@ import (
 	"github.com/nagare-media/engine/internal/pkg/version"
 )
 
-var (
-	scheme = runtime.NewScheme()
-)
+var scheme = runtime.NewScheme()
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))

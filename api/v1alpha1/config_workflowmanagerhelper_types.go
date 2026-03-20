@@ -25,27 +25,25 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-var (
-	DefaultWorkflowManagerHelperConfig = WorkflowManagerHelperConfig{
-		WorkflowManagerHelperConfigSpec: WorkflowManagerHelperConfigSpec{
-			TaskController: WorkflowManagerHelperTaskControllerConfig{
-				TaskAPI:                "http://127.0.0.1:8888/v2/tasks",
-				CreateRequestTimeout:   &metav1.Duration{Duration: 3 * time.Minute},
-				RetrieveRequestTimeout: &metav1.Duration{Duration: 10 * time.Second},
-				UpdateRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
-				DeleteRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
-				ObservePeriod:          &metav1.Duration{Duration: 2 * time.Second},
-				MaxFailedProbes:        ptr.To(10),
-			},
-			ReportsController: WorkflowManagerHelperReportsControllerConfig{
-				Webserver: WebserverConfig{
-					BindAddress:   ptr.To(":8181"),
-					PublicBaseURL: ptr.To("http://127.0.0.1:8181"),
-				},
+var DefaultWorkflowManagerHelperConfig = WorkflowManagerHelperConfig{
+	WorkflowManagerHelperConfigSpec: WorkflowManagerHelperConfigSpec{
+		TaskController: WorkflowManagerHelperTaskControllerConfig{
+			TaskAPI:                "http://127.0.0.1:8888/v2/tasks",
+			CreateRequestTimeout:   &metav1.Duration{Duration: 3 * time.Minute},
+			RetrieveRequestTimeout: &metav1.Duration{Duration: 10 * time.Second},
+			UpdateRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
+			DeleteRequestTimeout:   &metav1.Duration{Duration: 10 * time.Minute},
+			ObservePeriod:          &metav1.Duration{Duration: 2 * time.Second},
+			MaxFailedProbes:        ptr.To(10),
+		},
+		ReportsController: WorkflowManagerHelperReportsControllerConfig{
+			Webserver: WebserverConfig{
+				BindAddress:   ptr.To(":8181"),
+				PublicBaseURL: ptr.To("http://127.0.0.1:8181"),
 			},
 		},
-	}
-)
+	},
+}
 
 type WorkflowManagerHelperConfigSpec struct {
 	// Task controller configuration.

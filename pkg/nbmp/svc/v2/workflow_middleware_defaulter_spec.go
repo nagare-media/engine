@@ -36,8 +36,10 @@ func WorkflowDefaulterSpecMiddleware(next WorkflowService) WorkflowService {
 	}
 }
 
-var _ WorkflowServiceMiddleware = WorkflowDefaulterSpecMiddleware
-var _ WorkflowService = &workflowDefaulterSpecMiddleware{}
+var (
+	_ WorkflowServiceMiddleware = WorkflowDefaulterSpecMiddleware
+	_ WorkflowService           = &workflowDefaulterSpecMiddleware{}
+)
 
 func (m *workflowDefaulterSpecMiddleware) Create(ctx context.Context, w *nbmpv2.Workflow) error {
 	if err := DefaultWorkflow(w); err != nil {

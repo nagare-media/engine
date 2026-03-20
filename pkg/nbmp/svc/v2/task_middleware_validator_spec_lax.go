@@ -34,8 +34,10 @@ func TaskValidatorSpecLaxMiddleware(next TaskService) TaskService {
 	}
 }
 
-var _ TaskServiceMiddleware = TaskValidatorSpecLaxMiddleware
-var _ TaskService = &taskValidatorSpecLaxMiddleware{}
+var (
+	_ TaskServiceMiddleware = TaskValidatorSpecLaxMiddleware
+	_ TaskService           = &taskValidatorSpecLaxMiddleware{}
+)
 
 func (m *taskValidatorSpecLaxMiddleware) Create(ctx context.Context, t *nbmpv2.Task) error {
 	m.common(t)

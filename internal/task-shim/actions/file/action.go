@@ -31,10 +31,8 @@ const (
 	Name     = actions.BuildInActionPrefix + BaseName
 )
 
-var (
-	// TODO: make this configurable
-	DefaultMode = os.FileMode(0640)
-)
+// TODO: make this configurable
+var DefaultMode = os.FileMode(0o640)
 
 // action file manipulates a file on the filesystem.
 type action struct {
