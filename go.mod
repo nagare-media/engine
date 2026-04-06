@@ -19,7 +19,7 @@ require (
 	github.com/smallnest/ringbuffer v0.1.1
 	github.com/stoewer/go-strcase v1.3.1
 	github.com/valyala/fasthttp v1.69.0
-	github.com/yuin/gopher-lua v1.1.1
+	github.com/yuin/gopher-lua v1.1.2
 	go.uber.org/zap v1.27.1
 	k8s.io/api v0.35.3
 	k8s.io/apiextensions-apiserver v0.35.3
