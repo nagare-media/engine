@@ -13,7 +13,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/mattn/go-isatty v0.0.21
 	github.com/nagare-media/models.go v0.0.0-20250108160023-98fa97a2d480
-	github.com/nats-io/nats.go v1.50.0
+	github.com/nats-io/nats.go v1.51.0
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
 	github.com/smallnest/ringbuffer v0.1.1
@@ -21,16 +21,16 @@ require (
 	github.com/valyala/fasthttp v1.70.0
 	github.com/yuin/gopher-lua v1.1.2
 	go.uber.org/zap v1.27.1
-	k8s.io/api v0.35.3
-	k8s.io/apiextensions-apiserver v0.35.3
-	k8s.io/apimachinery v0.35.3
-	k8s.io/client-go v0.35.3
-	k8s.io/component-base v0.35.3
+	k8s.io/api v0.35.4
+	k8s.io/apiextensions-apiserver v0.35.4
+	k8s.io/apimachinery v0.35.4
+	k8s.io/client-go v0.35.4
+	k8s.io/component-base v0.35.4
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 	sigs.k8s.io/controller-runtime v0.23.3
 	sigs.k8s.io/kustomize/kyaml v0.21.1
-	sigs.k8s.io/structured-merge-diff/v6 v6.3.2
+	sigs.k8s.io/structured-merge-diff/v6 v6.4.0
 	sigs.k8s.io/yaml v1.6.0
 )
 
