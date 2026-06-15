@@ -14,18 +14,18 @@ require (
 	github.com/mattn/go-isatty v0.0.22
 	github.com/nagare-media/models.go v0.0.0-20250108160023-98fa97a2d480
 	github.com/nats-io/nats.go v1.52.0
-	github.com/onsi/ginkgo/v2 v2.29.0
-	github.com/onsi/gomega v1.41.0
+	github.com/onsi/ginkgo/v2 v2.31.0
+	github.com/onsi/gomega v1.42.0
 	github.com/smallnest/ringbuffer v0.1.1
 	github.com/stoewer/go-strcase v1.3.1
 	github.com/valyala/fasthttp v1.71.0
 	github.com/yuin/gopher-lua v1.1.2
 	go.uber.org/zap v1.28.0
-	k8s.io/api v0.36.1
-	k8s.io/apiextensions-apiserver v0.36.1
-	k8s.io/apimachinery v0.36.1
-	k8s.io/client-go v0.36.1
-	k8s.io/component-base v0.36.1
+	k8s.io/api v0.36.2
+	k8s.io/apiextensions-apiserver v0.36.2
+	k8s.io/apimachinery v0.36.2
+	k8s.io/client-go v0.36.2
+	k8s.io/component-base v0.36.2
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/utils v0.0.0-20260210185600-b8788abfbbc2
 	sigs.k8s.io/controller-runtime v0.24.1
