@@ -18,7 +18,7 @@ require (
 	github.com/onsi/gomega v1.42.1
 	github.com/smallnest/ringbuffer v0.1.1
 	github.com/stoewer/go-strcase v1.3.1
-	github.com/valyala/fasthttp v1.71.0
+	github.com/valyala/fasthttp v1.72.0
 	github.com/yuin/gopher-lua v1.1.2
 	go.uber.org/zap v1.28.0
 	k8s.io/api v0.36.2
