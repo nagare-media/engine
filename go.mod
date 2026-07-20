@@ -11,7 +11,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/gofiber/fiber/v2 v2.52.14
 	github.com/google/uuid v1.6.0
-	github.com/mattn/go-isatty v0.0.22
+	github.com/mattn/go-isatty v0.0.23
 	github.com/nagare-media/models.go v0.0.0-20250108160023-98fa97a2d480
 	github.com/nats-io/nats.go v1.52.0
 	github.com/onsi/ginkgo/v2 v2.32.0
